@@ -1,0 +1,128 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
+using Stripe;
+using LeaderAnalytics.Vyntix.Web.Models;
+
+namespace LeaderAnalytics.Vyntix.Web
+{
+    public class Startup
+    {
+        public IConfiguration Configuration { get; }
+        private List<SubscriptionPlan> subscriptionPlans;
+
+        public Startup(IWebHostEnvironment env, IConfiguration configuration)
+        {
+            string configFilePath = string.Empty;
+
+            if (env.EnvironmentName == "Development")
+                configFilePath = "C:\\Users\\sam\\OneDrive\\LeaderAnalytics\\Config\\Vyntix.Web";
+
+            Configuration = new ConfigurationBuilder()
+                .AddConfiguration(configuration)
+                .AddJsonFile(Path.Combine(configFilePath, $"appsettings.{env.EnvironmentName}.json"), false)
+                .Build();
+
+            // Read subscription plan data
+            string subscriptionFile = Path.Combine(configFilePath, $"subscriptions.{env.EnvironmentName}.json");
+            
+            if (! System.IO.File.Exists(subscriptionFile))
+                throw new Exception($"Subscription File {subscriptionFile} was not found.");
+            
+            subscriptionPlans = JsonSerializer.Deserialize<List<SubscriptionPlan>>(System.IO.File.ReadAllBytes(subscriptionFile));
+            
+            if(subscriptionPlans == null || ! subscriptionPlans.Any())
+                throw new Exception($"Subscription File {subscriptionFile} was not parsed correctly.  No subscription plans were found.");
+        }
+
+        
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
+            
+            services.AddMicrosoftWebAppAuthentication(Configuration, "AzureADB2C");
+
+            services.AddControllersWithViews()
+                .AddMicrosoftIdentityUI();
+
+            services.AddRazorPages();
+
+            //Configuring appsettings section AzureAdB2C, into IOptions
+            services.AddOptions();
+            services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureADB2C"));
+            services.AddCors();
+            
+            // Stripe
+            StripeConfiguration.ApiKey = Configuration["StripeApiKey"];
+            services.AddSingleton(new StripeClient(StripeConfiguration.ApiKey));
+
+            // Subscription Plans
+            services.AddSingleton(subscriptionPlans);
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+
+            // With endpoint routing, the CORS middleware must be configured to execute between the calls to UseRouting and UseEndpoints.
+            app.UseCors(policy =>
+            {
+                policy.WithOrigins(new string[]
+                {
+                    "http://www.vyntix.com",
+                    "https://www.vyntix.com",
+                    "http://vyntix.com",
+                    "https://vyntix.com",
+                    "http://localhost",
+                    "http://dev.vyntix.com",
+                    "http://vyntix.azurewebsites.net",
+                    "https://vyntix.azurewebsites.net",
+                    "http://localhost:45282",
+                    "https://localhost:44345",
+                    "http://localhost:5116",
+                    "https://localhost:5117",
+                    "https://vyntix-staging.azurewebsites.net"
+                }).AllowAnyMethod().AllowAnyHeader();
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+            });
+        }
+    }
+}

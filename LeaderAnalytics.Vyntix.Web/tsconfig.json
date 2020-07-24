@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "ES6",
+    "outDir": "./wwwroot/js",
+    "lib": [ "ES2018", "DOM", "ES5", "ES2015", "ES2016", "ESNext" ],
+    "module": "ES2015",
+    "moduleResolution": "Node",
+    "typeRoots": [ "./node_modules/@types/", "./node_modules/@stripe/" ]
+  },
+  "exclude": [
+    "wwwroot"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "name": "asp.net",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@types/jquery": "3.5.0"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^1.8.0"
+  }
+}
