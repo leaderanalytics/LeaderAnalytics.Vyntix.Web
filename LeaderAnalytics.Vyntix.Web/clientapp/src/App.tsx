@@ -1,25 +1,32 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Nav from './Components/Nav';
+import Home from './Components/Home';
+import About from './Components/About';
+import Contact from './Components/Contact';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { GlobalSettings, GlobalContext } from './GlobalSettings';
+
+var s = new GlobalSettings();
+s.UserName = "";
+s.CustomerID = "";
+s.SubscriptionID = "";
+
 
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React asdfsdafsfdsdfddddd
-        </a>
-      </header>
-    </div>
+          <GlobalContext.Provider value={s}>
+          <Router>
+            <Nav />
+            <Switch>
+                <Route exact path="/" component={Home} />
+                <Route exact path="/about/:name/:otherName" component={About} />
+                <Route exact path="/contact" component={Contact} />
+            </Switch>
+          </Router>
+          </GlobalContext.Provider>
   );
 }
 

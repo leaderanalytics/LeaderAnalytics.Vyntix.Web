@@ -15,6 +15,7 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Stripe;
 using LeaderAnalytics.Vyntix.Web.Models;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 
 namespace LeaderAnalytics.Vyntix.Web
 {
@@ -59,7 +60,11 @@ namespace LeaderAnalytics.Vyntix.Web
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
 
-            services.AddRazorPages();
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
 
             //Configuring appsettings section AzureAdB2C, into IOptions
             services.AddOptions();
@@ -77,10 +82,11 @@ namespace LeaderAnalytics.Vyntix.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {
@@ -90,6 +96,7 @@ namespace LeaderAnalytics.Vyntix.Web
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSpaStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -108,10 +115,8 @@ namespace LeaderAnalytics.Vyntix.Web
                     "http://dev.vyntix.com",
                     "http://vyntix.azurewebsites.net",
                     "https://vyntix.azurewebsites.net",
-                    "http://localhost:45282",
-                    "https://localhost:44345",
-                    "http://localhost:5116",
-                    "https://localhost:5117",
+                    "http://localhost:5032",
+                    "https://localhost:5031",
                     "https://vyntix-staging.azurewebsites.net"
                 }).AllowAnyMethod().AllowAnyHeader();
             });
@@ -120,8 +125,18 @@ namespace LeaderAnalytics.Vyntix.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
+                    pattern: "{controller}/{action=Index}/{id?}");
+                
+            });
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (env.IsDevelopment())
+                {
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                }
             });
         }
     }

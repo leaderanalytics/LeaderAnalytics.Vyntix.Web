@@ -1,0 +1,13 @@
+﻿Added to appsettings.json.  Must run on port 5031 so Azure login callback will work:
+
+"Kestrel": {
+    "EndPoints": {
+      "Https": {
+        "Url": "https://localhost:5031"
+      }
+    }
+  },
+=======================================================================================================
+See .csproj file:
+<Project Sdk="Microsoft.NET.Sdk.Web" InitialTargets="CopyMSAL"> Note "InitialTargets"
+At build time,  ClientApp/src/Config/msalconfig.???.tsx is copied to ClientApp/src overwriting the existing file.
