@@ -58,10 +58,11 @@
     <None Remove="ClientApp\src\Components\Subscriptions.tsx" />
     <None Remove="ClientApp\src\GlobalSettings.tsx" />
     <None Remove="ClientApp\src\Model\SubscriptionPlan.tsx" />
+    <None Remove="ClientApp\src\Services\Services.tsx" />
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="LeaderAnalytics.Core" Version="1.0.55" />
+    <PackageReference Include="LeaderAnalytics.Core" Version="1.0.56" />
     <PackageReference Include="Microsoft.Identity.Web" Version="0.2.0-preview" />
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="0.2.0-preview" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
@@ -86,6 +87,11 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\Nav.tsx" />
     <TypeScriptCompile Include="ClientApp\src\Model\SubscriptionPlan.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\Services\Services.tsx" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="ClientApp\src\Assets\" />
   </ItemGroup>
  
 </Project>

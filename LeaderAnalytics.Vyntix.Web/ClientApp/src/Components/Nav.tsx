@@ -51,6 +51,11 @@ const Nav = () => {
                 </li>
 
                 <li>
+                    <Link to="/Subscriptions">Subscribe</Link>
+                </li>
+
+
+                <li>
                     <button onClick={() =>  signIn()}>Sign in</button>
                     <button onClick={() => signOut()}>Sign out</button>
                 </li>

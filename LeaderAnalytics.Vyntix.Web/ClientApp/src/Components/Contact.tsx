@@ -1,36 +1,26 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import { useAsyncEffect } from 'use-async-effect';
+import { GetPerson } from '../Services/Services';
 
 function Contact() {
     const location: any = useLocation();
     var currentPath = location.pathname;
     var searchParams = new URLSearchParams(location.search);
     const [count, setCount] = useState(0);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
+    useAsyncEffect(async (isMounted) => {
 
-    const useFetch = (url: string) => {
-        const [data, setData] = useState(null);
-        const [loading, setLoading] = useState(true);
+        if (!isMounted())
+            return;
 
-        useAsyncEffect(async (isMounted) => {
-            const response = await fetch(url);
-            const data = await response.json();
-            const item = data.results[0];
-            const [item2] = data.results;
-
-            if (!isMounted())
-                return;
-
-            setData(item);
-            setLoading(false);
-
-        }, [count]);
-
-        return { data, loading };
-    };
-
-    const { data, loading } = (useFetch('https://api.randomuser.me/') as any);
+        const tmp = await GetPerson();
+        setData(tmp);
+        setLoading(false);
+        
+    }, [count]);
 
     useEffect(() => {
         currentPath = location.pathname;

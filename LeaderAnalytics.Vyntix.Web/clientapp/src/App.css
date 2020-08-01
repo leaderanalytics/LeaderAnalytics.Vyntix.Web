@@ -1,38 +1,312 @@
-.App {
-  text-align: center;
+﻿@charset "UTF-8";
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+html, body {
+    height: 100%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.floatleft {
+    float: left;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.floatright {
+    float: right;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.alignleft {
+    float: left;
+    margin-right: 15px;
+    margin-bottom: 15px;
 }
 
-.App-link {
-  color: #61dafb;
+.alignright {
+    float: right;
+    margin-left: 15px;
+    margin-bottom: 15px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.aligncenter {
+    display: block;
+    margin: 0 auto 15px;
 }
+
+a:focus {
+    outline: 0px solid;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.fix {
+    overflow: hidden;
+}
+
+p {
+    margin: 0 0 15px;
+    color: #444;
+    text-align: justify;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 15px;
+    color: #444;
+    font-weight: 500;
+}
+
+h1 {
+    font-size: 48px;
+    line-height: 50px;
+}
+
+h2 {
+    font-size: 38px;
+    line-height: 40px;
+}
+
+h3 {
+    font-size: 30px;
+    line-height: 32px;
+}
+
+h4 {
+    font-size: 24px;
+    line-height: 26px;
+}
+
+h5 {
+    font-size: 20px;
+    line-height: 22px;
+}
+
+h6 {
+    font-size: 16px;
+    line-height: 20px;
+}
+
+a {
+    transition: all 0.3s ease 0s;
+    text-decoration: none;
+}
+
+    a:hover {
+        color: #3EC1D5 !important;
+        text-decoration: none !important;
+    }
+
+    a:active, a:hover {
+        outline: 0 none;
+    }
+
+body {
+    background: #fff none repeat scroll 0 0;
+    color: #444;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    text-align: left;
+    overflow-x: hidden;
+    line-height: 22px;
+    position: relative;
+}
+
+/* Back to top button */
+.back-to-top {
+    position: fixed;
+    display: none;
+    background: transparent;
+    color: #fff;
+    padding: 2px 1px 0px 2px;
+    font-size: 32px;
+    border-radius: 20px;
+    right: 15px;
+    bottom: 15px;
+    transition: background 0.5s;
+}
+
+@media (max-width: 768px) {
+    .back-to-top {
+        bottom: 15px;
+    }
+}
+
+.back-to-top:focus {
+    background: #3EC1D5;
+    color: #fff;
+    outline: none;
+}
+
+
+
+.clear {
+    clear: both;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+ul {
+    list-style: outside none none;
+    margin: 0;
+    padding: 0;
+}
+
+input, select, textarea, input[type="text"], input[type="date"], input[type="url"], input[type="email"], input[type="password"], input[type="tel"], button, button[type="submit"] {
+    -moz-appearance: none;
+    box-shadow: none !important;
+}
+
+div#preloader {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 99999;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    background: #fff url("/assets/preloader.gif") no-repeat center center;
+}
+
+::-moz-selection {
+    background: #3EC1D5;
+    text-shadow: none;
+}
+
+::selection {
+    background: #3EC1D5;
+    text-shadow: none;
+}
+
+.area-padding {
+    padding: 2vw 1vw 1vw 1vw;
+}
+
+.area-padding-2 {
+    padding: 70px 0px 50px;
+}
+
+.padding-2 {
+    padding-bottom: 90px;
+}
+
+.section-headline h2 {
+    display: inline-block;
+    font-size: 40px;
+    font-weight: 600;
+    margin-bottom: 70px;
+    position: relative;
+}
+
+    .section-headline h2::after {
+        border: 1px solid #333;
+        bottom: -20px;
+        content: "";
+        left: 0;
+        margin: 0 auto;
+        position: absolute;
+        right: 0;
+        width: 60%;
+    }
+
+.sec-head {
+    display: inline-block;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 0;
+    padding: 0 0 10px;
+    text-transform: uppercase;
+    transition: all 0.4s ease 0s;
+}
+
+.flexx-table {
+    flex-direction: column;
+}
+
+.flexx-row {
+    flex-direction: row;
+}
+
+.flexx-cell2 {
+    flex-basis: 50%;
+}
+
+.flexx-cell3 {
+    flex-basis: 33.333%;
+}
+
+.flexx-cell4 {
+    flex-basis: 25%;
+}
+
+.flexx-cell5 {
+    flex-basis: 20%;
+}
+
+.flexx-table,
+.flexx-row,
+.flexx-cell2,
+.flexx-cell3,
+.flexx-cell4,
+.flexx-cell5 {
+    display: flex;
+    flex-grow: 1;
+}
+
+.justify-content-space-even {
+    justify-content: space-evenly;
+    flex-grow: 1;
+}
+
+.shadow {
+    box-shadow: 0 10px 29px 0 rgba(68, 88, 144, 0.3);
+}
+
+.img-cover {
+    object-fit: cover;
+}
+
+.small-font {
+    font-size: 14pt;
+}
+
+.under-construction {
+    display: flex;
+    flex-flow: column;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
+    justify-content: center;
+    padding: 3vw;
+    margin: 3vw;
+    background-color: teal;
+}
+
+    .under-construction i {
+        font-size: 80px;
+        color: yellow;
+        margin-bottom: 2vw;
+    }
+
+    .under-construction a {
+        color: rgb(185, 185, 185);
+    }
+
+        .under-construction a:hover {
+            color: white;
+        }
+
+/*--------------------------------------------------------------
+# Subscriptions
+--------------------------------------------------------------*/
+.sub-plan-grid {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto;
+    align-content: flex-start;
+}
+
+
