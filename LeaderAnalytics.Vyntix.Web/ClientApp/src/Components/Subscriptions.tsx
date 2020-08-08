@@ -4,12 +4,21 @@ import { useAsyncEffect } from 'use-async-effect';
 import $ from 'jquery';
 import { GetSubscriptionPlans } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
+import AppConfig from '../appconfig';
+import * as MSAL from 'msal';
+import MSALConfig from '../msalconfig';
+
+import { GlobalContext, GlobalSettings } from '../GlobalSettings';
 
 function Subscriptions() {
+    const globalSettings: GlobalSettings = useContext(GlobalContext);
+    const [promoCodes, setPromoCodes] = useState("");    
 
     const useFetch = () => {
+        
         var [plans, setPlans] = useState(new Array<SubscriptionPlan>());
         const [loading, setLoading] = useState(true);
+        
 
         useAsyncEffect(async (isMounted) => {
 
@@ -17,8 +26,7 @@ function Subscriptions() {
                 return;
 
             plans = await GetSubscriptionPlans();
-
-            setPlans(plans)
+            setPlans(plans);
             setLoading(false);
 
         }, []);
@@ -35,7 +43,7 @@ function Subscriptions() {
     }
 
     // make sure only one plan is checked.
-    const toggleChecked = (event: SyntheticEvent) => {
+    const handleSelectionChange = (event: SyntheticEvent) => {
         
         const isChecked: boolean = $(event.target).is(":checked");
 
@@ -46,7 +54,41 @@ function Subscriptions() {
         $(event.target).prop("checked", true);
     }
 
-    const handleSubmit = (event: SyntheticEvent) => {
+    const handlePromoCodeChange = (event: any) => {
+        setPromoCodes(event.target.value);
+    }
+
+
+    const SignIn = () => {
+
+        // All changes made to this method must also be made in Nav.tsx.  
+
+        var result: boolean = false;
+
+        if (globalSettings.UserID != null && globalSettings.UserID.length > 1) {
+            alert('You are already signed in.  Sign out before signing in again.')
+            return true;
+        }
+
+        const auth: MSAL.Configuration = new MSALConfig();
+        const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
+
+        userAgentApplication.loginPopup(AppConfig.loginScopes).then(response => {
+            globalSettings.UserName = response.account.name;
+            globalSettings.UserID = response.account.accountIdentifier;
+            globalSettings.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
+            globalSettings.Token = response.idToken;
+            localStorage.setItem('globalSettings', JSON.stringify(globalSettings));
+            result = true;
+
+        }).catch(err => {
+            alert('The login attempt was not successful.')
+        });
+
+        return result;
+    }
+
+    const handleSubmit = async (event: SyntheticEvent) => {
         event.preventDefault();
         const c: number = getSelectionCount();
 
@@ -63,8 +105,32 @@ function Subscriptions() {
         const product: string = getSelectedSubscription();
 
         // if the user is not logged in, prompt them to log in.
-        //$.post('/subscription/accountsetup')
+        if (globalSettings.UserID === null || globalSettings.UserID.length < 2) {
+            alert('You must create an account or sign in with your existing account ID before you can proceed.');
+            const isLoggedIn: boolean = SignIn();
 
+            if (!isLoggedIn)
+                return;
+        }
+
+        // At this point the user is logged in and has made a subscription selection. 
+        // Post user identity and subscription selection back to the server for validation.
+
+        const order = {
+            UserID: globalSettings.UserID,
+            CustomerID: globalSettings.CustomerID,
+            SubscriptionID: globalSettings.SubscriptionID,
+            PlanPaymentProviderID: product,
+            PromoCodes: promoCodes
+        }
+
+        let response = await fetch('/subscription/ApproveSubscriptionOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(order)
+        });
     }
 
     const renderPlans = (plans: SubscriptionPlan[]) => {
@@ -72,7 +138,7 @@ function Subscriptions() {
             plans.map((val, i) => (
                 <>
                     <div>
-                        <input onClick={toggleChecked} type="checkbox" data-providerid={(val).PaymentProviderID}></input>
+                        <input key={i} onClick={handleSelectionChange} type="checkbox" data-providerid={(val).PlanPaymentProviderID}></input>
                     </div>
 
                     <div>
@@ -104,6 +170,11 @@ function Subscriptions() {
 
     return (
         <form  onSubmit={handleSubmit}>
+
+            <div id="promoCodes" >
+                <label>Enter promo codes, if any, here.  Seperate multiple codes with a comma:</label>
+                <input type="text" value={promoCodes} onChange={handlePromoCodeChange}></input>
+            </div>
 
             <div id="subPlans" className="sub-plan-grid">
                 <div>

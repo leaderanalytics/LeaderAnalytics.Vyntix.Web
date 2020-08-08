@@ -9,7 +9,8 @@ export default class MSALConfig {
     public auth = {
         clientId: "7f892e9e-97d5-42fb-a553-f9d585d6742b",
         authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/B2C_1_susi",
-        validateAuthority: false
+        validateAuthority: false,
+        redirectUri: "https://localhost:5031"
     };
     public cache = {
         CacheLocation: "localStorage", // LocalStorage allows single signon accross tabs.

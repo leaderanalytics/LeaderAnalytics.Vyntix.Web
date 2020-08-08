@@ -2,37 +2,50 @@
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import * as MSAL from 'msal';
 import MSALConfig from '../msalconfig';
+import AppConfig from '../appconfig';
 import { GlobalContext, GlobalSettings } from '../GlobalSettings';
 
 const Nav = () => {
-
     const globalSettings: GlobalSettings = useContext(GlobalContext);
-    var userAgentApplication: MSAL.UserAgentApplication;
-    
 
-    const signIn = () => {
-        if (userAgentApplication === null || userAgentApplication === undefined) {
-            var auth: MSAL.Configuration = new MSALConfig();
-            userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration)
+    const SignIn = () => {
+
+        // All changes made to this method must also be made in Subscriptions.tsx.
+
+        var result: boolean = false;
+
+        if (globalSettings.UserID != null && globalSettings.UserID.length > 1) {
+            alert('You are already signed in.  Sign out before signing in again.')
+            return true;
         }
+        
+        const auth: MSAL.Configuration = new MSALConfig();
+        const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
 
-        var loginRequest = {
-            scopes: ["https://LeaderAnalytics.onmicrosoft.com/9ea79dd6-d8c9-48da-8f54-6394a953f003/read"] // optional Array<string>
-        };
-
-        userAgentApplication.loginPopup(loginRequest).then(response => {
-            
+        userAgentApplication.loginPopup(AppConfig.loginScopes).then(response => {
             globalSettings.UserName = response.account.name;
             globalSettings.UserID = response.account.accountIdentifier;
+            globalSettings.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
             globalSettings.Token = response.idToken;
+            localStorage.setItem('globalSettings', JSON.stringify(globalSettings));
+            result = true;
 
         }).catch(err => {
             alert('The login attempt was not successful.')
         });
+
+        return result;
     }
 
-    const signOut = () => {
-        alert('sign out');
+    const SignOut = () => {
+        
+        const auth: MSAL.Configuration = new MSALConfig();
+        const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
+        userAgentApplication.logout();
+        globalSettings.UserName = "";
+        globalSettings.UserID = "";
+        globalSettings.Token = null;
+        localStorage.setItem('globalSettings', JSON.stringify(globalSettings));
     }
 
     return (
@@ -56,13 +69,11 @@ const Nav = () => {
 
 
                 <li>
-                    <button onClick={() =>  signIn()}>Sign in</button>
-                    <button onClick={() => signOut()}>Sign out</button>
+                    <button onClick={() =>  SignIn()}>Sign in</button>
+                    <button onClick={() => SignOut()}>Sign out</button>
                 </li>
             </ul>
         </header>
-
-
     );
 
 

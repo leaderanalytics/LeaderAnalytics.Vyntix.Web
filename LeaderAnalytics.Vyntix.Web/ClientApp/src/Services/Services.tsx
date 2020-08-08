@@ -1,5 +1,6 @@
 ﻿import { string, number } from "prop-types";
 import SubscriptionPlan from "../Model/SubscriptionPlan";
+import { GlobalContext, GlobalSettings } from '../GlobalSettings';
 
 
 // Dummmy / test
@@ -20,7 +21,6 @@ export const GetIdentity = async () : Promise<string> => {
 }
 
 // Get active subscription plans
-
 export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
     const url = window.location.origin + '/Subscription/GetActiveSubscriptionPlans';
     const response = await fetch(url);
@@ -33,7 +33,7 @@ export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
         s.Cost = json[i].cost;
         s.DisplaySequence = json[i].displaySequence;
         s.EndDate = json[i].endDate;
-        s.PaymentProviderID = json[i].paymentProviderID;
+        s.PlanPaymentProviderID = json[i].planPaymentProviderID;
         s.PlanDescription = json[i].planDescription;
         s.StartDate = json[i].startDate;
         result.push(s);

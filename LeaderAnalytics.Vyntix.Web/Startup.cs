@@ -13,9 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using Stripe;
 using LeaderAnalytics.Vyntix.Web.Models;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using LeaderAnalytics.Vyntix.Web.Services;
 
 namespace LeaderAnalytics.Vyntix.Web
 {
@@ -72,11 +72,26 @@ namespace LeaderAnalytics.Vyntix.Web
             services.AddCors();
             
             // Stripe
-            StripeConfiguration.ApiKey = Configuration["StripeApiKey"];
-            services.AddSingleton(new StripeClient(StripeConfiguration.ApiKey));
+            Stripe.StripeConfiguration.ApiKey = Configuration["StripeApiKey"];
+            services.AddSingleton(new Stripe.StripeClient(Stripe.StripeConfiguration.ApiKey));
 
             // Subscription Plans
             services.AddSingleton(subscriptionPlans);
+
+            // Graph Credentials
+            IConfigurationSection graphSection = Configuration.GetSection("AzureGraph");
+            GraphClientCredentials graphCredentials = new GraphClientCredentials
+            {
+                ClientID = graphSection.GetValue<string>("ClientID"),
+                TenantID = graphSection.GetValue<string>("TenantID"),
+                ClientSecret = graphSection.GetValue<string>("ClientSecret")
+            };
+            GraphService graphService = new GraphService(graphCredentials);
+            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService);
+
+            services.AddSingleton(graphCredentials);
+            services.AddSingleton(graphService);
+            services.AddSingleton(subscriptionService);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

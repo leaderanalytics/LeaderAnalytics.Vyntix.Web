@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using LeaderAnalytics.Vyntix.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Stripe;
 using LeaderAnalytics.Core;
+using LeaderAnalytics.Vyntix.Web.Services;
 
 namespace LeaderAnalytics.Vyntix.Web.Controllers
 {
@@ -15,12 +15,14 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     public class SubscriptionController : Controller
     {
         private List<SubscriptionPlan> subscriptonPlans;
+        private SubscriptionService subscriptionService;
 
-        public SubscriptionController(List<SubscriptionPlan> subscriptonPlans)
+
+        public SubscriptionController(List<SubscriptionPlan> subscriptonPlans, SubscriptionService subscriptionService)
         {
-            this.subscriptonPlans = subscriptonPlans;
+            this.subscriptonPlans = subscriptonPlans ?? throw new ArgumentNullException("subscriptionPlans");
+            this.subscriptionService = subscriptionService ?? throw new ArgumentNullException("subscriptionService");
         }
-
 
         [HttpGet]
         public ActionResult<string> Identity()
@@ -34,5 +36,10 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             return Json(subscriptonPlans.Where(x => x.IsCurrent()));
         }
 
+        [HttpPost]
+        public async Task<string> ApproveSubscriptionOrder(SubscriptionOrder order) 
+        {
+            return await subscriptionService.ApproveSubscriptionOrder(order);    
+        } 
     }
 }

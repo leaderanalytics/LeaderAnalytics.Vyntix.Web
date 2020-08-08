@@ -10,16 +10,13 @@ import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import { GlobalSettings, GlobalContext } from './GlobalSettings';
 
 
-var s = new GlobalSettings();
-s.UserName = "";
-s.CustomerID = "";
-s.SubscriptionID = "";
-
+var s = localStorage.getItem('globalSettings');
+var g: GlobalSettings = s === null ? new GlobalSettings() : JSON.parse(s);
 
 function App() {
 
   return (
-          <GlobalContext.Provider value={s}>
+          <GlobalContext.Provider value={g}>
           <Router>
             <Nav />
               <Switch>
