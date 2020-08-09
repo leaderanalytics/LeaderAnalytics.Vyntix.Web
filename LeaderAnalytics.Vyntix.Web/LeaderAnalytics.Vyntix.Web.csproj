@@ -57,6 +57,8 @@
     <None Remove="ClientApp\src\Components\Contact.tsx" />
     <None Remove="ClientApp\src\Components\Home.tsx" />
     <None Remove="ClientApp\src\Components\nav.tsx" />
+    <None Remove="ClientApp\src\Components\SubConfirmation.tsx" />
+    <None Remove="ClientApp\src\Components\SubLogin.tsx" />
     <None Remove="ClientApp\src\Components\Subscriptions.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.dev.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.prod.tsx" />
@@ -80,6 +82,12 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\Components\SubConfirmation.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\Components\SubLogin.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\Home.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>

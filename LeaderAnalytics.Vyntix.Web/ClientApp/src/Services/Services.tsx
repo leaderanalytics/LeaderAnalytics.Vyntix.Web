@@ -33,7 +33,7 @@ export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
         s.Cost = json[i].cost;
         s.DisplaySequence = json[i].displaySequence;
         s.EndDate = json[i].endDate;
-        s.PlanPaymentProviderID = json[i].planPaymentProviderID;
+        s.PaymentProviderPlanID = json[i].paymentProviderPlanID;
         s.PlanDescription = json[i].planDescription;
         s.StartDate = json[i].startDate;
         result.push(s);

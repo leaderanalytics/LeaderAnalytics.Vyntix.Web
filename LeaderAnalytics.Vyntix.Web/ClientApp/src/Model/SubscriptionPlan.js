@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SubscriptionPlan = /** @class */ (function () {
     function SubscriptionPlan() {
-        this.PlanPaymentProviderID = ""; // ID used by a payment provider i.e. Stripe price ID.
+        this.PaymentProviderPlanID = ""; // ID used by a payment provider i.e. Stripe price ID.
         this.PlanDescription = ""; // Complete description of the plan and it's terms.
         this.Cost = 0; // The amount charged to the customers account each billing period.
         this.BillingPeriods = 2; // The number of times the customer is charged each year.  12 = monthly, 2 = every six months, etc. 
