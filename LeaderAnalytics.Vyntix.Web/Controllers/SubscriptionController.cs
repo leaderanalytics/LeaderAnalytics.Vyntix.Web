@@ -37,9 +37,16 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<string> ApproveSubscriptionOrder(SubscriptionOrder order) 
+        public async Task<ActionResult> ApproveSubscriptionOrder(SubscriptionOrder order) 
         {
-            return await subscriptionService.ApproveSubscriptionOrder(order);    
+            string errorMsg = await subscriptionService.ApproveSubscriptionOrder(order);
+
+            if (string.IsNullOrEmpty(errorMsg))
+                return Ok();
+            else
+                return StatusCode(300, errorMsg);
+
+            
         } 
     }
 }

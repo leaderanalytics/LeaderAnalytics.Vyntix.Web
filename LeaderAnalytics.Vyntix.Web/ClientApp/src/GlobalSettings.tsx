@@ -3,6 +3,7 @@ import { IdToken } from 'msal/lib-commonjs/IdToken';
 import SubscriptionPlan from './Model/SubscriptionPlan';
 
 export class GlobalSettings {
+    public TimeStamp: number = Date.now();
     public UserName: string = "";
     public UserID: string = "";
     public UserEmail: string = "";  // Need this here until I figure out a way to get email from MSGraph.

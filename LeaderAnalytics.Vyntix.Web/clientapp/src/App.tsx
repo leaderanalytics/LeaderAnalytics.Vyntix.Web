@@ -8,10 +8,12 @@ import Contact from './Components/Contact';
 import Subscriptions from './Components/Subscriptions';
 import SubLogin from './Components/SubLogin';
 import SubConfirmation from './Components/SubConfirmation';
+import SubActivationSuccess from './Components/SubActivationSuccess';
+import SubActivationFailure from './Components/SubActivationFailure';
+
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import { GlobalSettings, GlobalContext } from './GlobalSettings';
 
-// todo: Look at timestamp on GlobalSettings and clear localstorage only if it is too old.
 localStorage.clear();
 var s = localStorage.getItem('globalSettings');
 var g: GlobalSettings = s === null ? new GlobalSettings() : JSON.parse(s);
@@ -30,6 +32,8 @@ function App() {
                   <Route exact path="/subscriptions" component={Subscriptions} />
                   <Route exact path="/sublogin" component={SubLogin} />
                   <Route exact path="/subconfirmation" component={SubConfirmation} />
+                  <Route exact path="/subactivationsuccess" component={SubActivationSuccess} />
+                  <Route exact path="/subactivationfailure" component={SubActivationFailure} />
             </Switch>
           </Router>
           </GlobalContext.Provider>
