@@ -10,7 +10,6 @@ export class GlobalSettings {
     public CustomerID: string = ""; 
     public SubscriptionID: string = "";  // Existing paid subscription, if any
     public Token: IdToken | null = null;
-    public LoggedIn: Event = new Event('LoggedIn');
 
     // Order
     public PromoCodes: string = "";
