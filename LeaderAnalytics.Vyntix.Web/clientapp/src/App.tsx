@@ -6,23 +6,19 @@ import Home from './Components/Home';
 import About from './Components/About';
 import Contact from './Components/Contact';
 import Subscriptions from './Components/Subscriptions';
-import SubLogin from './Components/SubLogin';
+import SubSignIn from './Components/SubSignIn';
 import SubConfirmation from './Components/SubConfirmation';
 import SubActivationSuccess from './Components/SubActivationSuccess';
 import SubActivationFailure from './Components/SubActivationFailure';
-
+import { GetAppState } from './Services/Services';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import { GlobalSettings, GlobalContext } from './GlobalSettings';
+import { AppState, GlobalContext } from './AppState';
 
-localStorage.clear();
-var s = localStorage.getItem('globalSettings');
-var g: GlobalSettings = s === null ? new GlobalSettings() : JSON.parse(s);
 
 function App() {
-    
 
-  return (
-          <GlobalContext.Provider value={g}>
+    return (
+        <GlobalContext.Provider value={GetAppState()}>
           <Router>
             <Nav />
               <Switch>
@@ -30,7 +26,7 @@ function App() {
                   <Route exact path="/about/:name/:otherName" component={About} />
                   <Route exact path="/contact" component={Contact} />
                   <Route exact path="/subscriptions" component={Subscriptions} />
-                  <Route exact path="/sublogin" component={SubLogin} />
+                  <Route exact path="/subsignin" component={SubSignIn} />
                   <Route exact path="/subconfirmation" component={SubConfirmation} />
                   <Route exact path="/subactivationsuccess" component={SubActivationSuccess} />
                   <Route exact path="/subactivationfailure" component={SubActivationFailure} />

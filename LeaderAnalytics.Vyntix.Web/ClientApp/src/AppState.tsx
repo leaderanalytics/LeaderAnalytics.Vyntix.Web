@@ -2,7 +2,7 @@
 import { IdToken } from 'msal/lib-commonjs/IdToken';
 import SubscriptionPlan from './Model/SubscriptionPlan';
 
-export class GlobalSettings {
+export class AppState {
     public TimeStamp: number = Date.now();
     public UserName: string = "";
     public UserID: string = "";
@@ -10,11 +10,11 @@ export class GlobalSettings {
     public CustomerID: string = ""; 
     public SubscriptionID: string = "";  // Existing paid subscription, if any
     public Token: IdToken | null = null;
+    public SignInCallback: (isSignedIn: boolean) => void = (isSignedIn) => { };
 
     // Order
     public PromoCodes: string = "";
     public SubscriptionPlan: SubscriptionPlan | null = null;
 };
 
-var s = new GlobalSettings();
-export const GlobalContext = React.createContext<GlobalSettings>(s);
+export const GlobalContext = React.createContext<AppState>(new AppState());

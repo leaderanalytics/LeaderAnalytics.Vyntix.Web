@@ -4,13 +4,14 @@ import { useAsyncEffect } from 'use-async-effect';
 import $ from 'jquery';
 import { GetSubscriptionPlans } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
-import { GlobalContext, GlobalSettings } from '../GlobalSettings';
+import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
+import { SaveAppState } from '../Services/Services';
 
 function Subscriptions() {
-    const globalSettings: GlobalSettings = useContext(GlobalContext);
-    const [promoCodes, setPromoCodes] = useState(globalSettings.PromoCodes);
-    const [selectedPlan, setSelectedPlan] = useState(globalSettings.SubscriptionPlan?.PaymentProviderPlanID ?? '');
+    const appState: AppState = useContext(GlobalContext);
+    const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
+    const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan?.PaymentProviderPlanID ?? '');
     const history = useHistory();
 
     const useFetch = () => {
@@ -46,12 +47,14 @@ function Subscriptions() {
         }
 
         // get the selected subscription
-        globalSettings.SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === selectedPlan)[0];
-        globalSettings.PromoCodes = promoCodes;
+        appState.SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === selectedPlan)[0];
+        appState.PromoCodes = promoCodes;
+        SaveAppState(appState);
+        
         
         // if the user is not logged in, prompt them to log in.
-        if (globalSettings.UserID === null || globalSettings.UserID.length < 2) {
-            history.push("/SubLogin");
+        if (appState.UserID === null || appState.UserID.length < 2) {
+            history.push("/SubSignIn");
         }
         else {
             history.push("/SubConfirmation");

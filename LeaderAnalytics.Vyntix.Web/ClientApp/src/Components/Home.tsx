@@ -1,11 +1,11 @@
 ﻿import React, {useContext} from 'react';
 import { useParams } from 'react-router';
-import { GlobalContext, GlobalSettings } from '../GlobalSettings';
+import { GlobalContext, AppState } from '../AppState';
 
 function Home() {
 
-    const globalSettings: GlobalSettings = useContext(GlobalContext);
-    const userName = globalSettings.UserName;
+    const appState: AppState = useContext(GlobalContext);
+    const userName = appState.UserName;
 
 
     return (

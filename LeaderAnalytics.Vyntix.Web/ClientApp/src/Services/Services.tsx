@@ -1,6 +1,6 @@
 ﻿import { string, number } from "prop-types";
 import SubscriptionPlan from "../Model/SubscriptionPlan";
-import { GlobalContext, GlobalSettings } from '../GlobalSettings';
+import { GlobalContext, AppState } from '../AppState';
 import AppConfig from '../appconfig';
 import * as MSAL from 'msal';
 import MSALConfig from '../msalconfig';
@@ -45,9 +45,9 @@ export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
     return result;
 }
 
-export const SignIn = async (globalSettings: GlobalSettings): Promise<boolean> => {
+export const SignIn = async (appState: AppState): Promise<boolean> => {
 
-    if (globalSettings.UserID != null && globalSettings.UserID.length > 1) {
+    if (appState.UserID != null && appState.UserID.length > 1) {
         alert('You are already signed in.  Sign out before signing in again.')
         return true;
     }
@@ -60,12 +60,11 @@ export const SignIn = async (globalSettings: GlobalSettings): Promise<boolean> =
         const response = await userAgentApplication.loginPopup(AppConfig.loginScopes);
 
         if (response.idToken !== null) {
-            globalSettings.TimeStamp = Date.now();                          // Keep it from expiring.
-            globalSettings.UserName = response.account.name;
-            globalSettings.UserID = response.account.accountIdentifier;
-            globalSettings.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
-            globalSettings.Token = response.idToken;
-            localStorage.setItem('globalSettings', JSON.stringify(globalSettings));
+            appState.UserName = response.account.name;
+            appState.UserID = response.account.accountIdentifier;
+            appState.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
+            appState.Token = response.idToken;
+            SaveAppState(appState);
             success = true;
         }
     }
@@ -80,21 +79,37 @@ export const SignIn = async (globalSettings: GlobalSettings): Promise<boolean> =
     return success;
 }
 
-export const SignOut = (globalSettings: GlobalSettings) => {
+export const SignOut = (appState: AppState) => {
 
     const auth: MSAL.Configuration = new MSALConfig();
     const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
     userAgentApplication.logout();
-    globalSettings.TimeStamp = Date.now();
-    globalSettings.UserName = "";
-    globalSettings.UserID = "";
-    globalSettings.UserEmail = "";
-    globalSettings.CustomerID = "";
-    globalSettings.SubscriptionID = "";
-    globalSettings.Token = null;
-    globalSettings.PromoCodes = "";
-    globalSettings.SubscriptionPlan = null;
-    localStorage.setItem('globalSettings', JSON.stringify(globalSettings));
+
+    appState.UserName = "";
+    appState.UserID = "";
+    appState.UserEmail = "";
+    appState.CustomerID = "";
+    appState.SubscriptionID = "";
+    appState.Token = null;
+    appState.PromoCodes = "";
+    appState.SubscriptionPlan = null;
+    SaveAppState(appState);
+}
+
+export const SaveAppState = (appState: AppState) => {
+    appState.TimeStamp = Date.now();
+    localStorage.setItem('appState', JSON.stringify(appState));
+}
+
+export const GetAppState = (): AppState => {
+
+    var s = localStorage.getItem('appState');
+    var appState: AppState = s === null ? new AppState() : JSON.parse(s);
+
+    if (Date.now() - appState.TimeStamp > 3600000) {
+        SignOut(appState);
+    }
+    return appState;
 }
 
 

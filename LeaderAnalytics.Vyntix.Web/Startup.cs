@@ -73,7 +73,8 @@ namespace LeaderAnalytics.Vyntix.Web
             
             // Stripe
             Stripe.StripeConfiguration.ApiKey = Configuration["StripeApiKey"];
-            services.AddSingleton(new Stripe.StripeClient(Stripe.StripeConfiguration.ApiKey));
+            Stripe.StripeClient stripeClient = new Stripe.StripeClient(Stripe.StripeConfiguration.ApiKey);
+            services.AddSingleton(stripeClient);
 
             // Subscription Plans
             services.AddSingleton(subscriptionPlans);
@@ -87,7 +88,7 @@ namespace LeaderAnalytics.Vyntix.Web
                 ClientSecret = graphSection.GetValue<string>("ClientSecret")
             };
             GraphService graphService = new GraphService(graphCredentials);
-            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService);
+            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService, stripeClient);
 
             services.AddSingleton(graphCredentials);
             services.AddSingleton(graphService);
