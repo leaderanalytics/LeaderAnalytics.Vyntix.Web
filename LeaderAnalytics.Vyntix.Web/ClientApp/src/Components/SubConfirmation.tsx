@@ -13,9 +13,6 @@ function SubConfirmation() {
 
     const Checkout = async () => {
 
-        // get the order from session.
-        
-
         if (appState.UserID === null || appState.UserID.length < 2 || appState.SubscriptionPlan === null)
             return;
 
@@ -43,16 +40,8 @@ function SubConfirmation() {
 
         if (response.status < 300) {
             // Order is OK, redirect to payment processor
-
             const stripe = await loadStripe(AppConfig.StripeApiKey);
-          
             stripe?.redirectToCheckout({ sessionId: approval.sessionID });
-
-            //lineItems: [{ price: appState.SubscriptionPlan?.PaymentProviderPlanID, quantity: 1 }],
-            //    successUrl: AppConfig.host + 'SubActivationSuccess',
-            //        cancelUrl: AppConfig.host + 'SubActivationFailure',
-            //            mode: 'subscription',
-
         }
         else {
 
@@ -79,7 +68,6 @@ function SubConfirmation() {
             <div>
                 <button onClick={Checkout} >Procced to checkout</button>
             </div>
-
 
             <div>
                 <button onClick={() => history.push("/Subscriptions")} >Return to Order</button>

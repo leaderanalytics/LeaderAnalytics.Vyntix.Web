@@ -88,7 +88,8 @@ namespace LeaderAnalytics.Vyntix.Web
                 ClientSecret = graphSection.GetValue<string>("ClientSecret")
             };
             GraphService graphService = new GraphService(graphCredentials);
-            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService, stripeClient);
+            SessionCache sessionCache = new SessionCache();
+            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService, stripeClient, sessionCache);
 
             services.AddSingleton(graphCredentials);
             services.AddSingleton(graphService);
