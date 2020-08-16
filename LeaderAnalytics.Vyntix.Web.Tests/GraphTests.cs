@@ -4,6 +4,7 @@ using System.IO;
 using LeaderAnalytics.Vyntix.Web.Models;
 using LeaderAnalytics.Vyntix.Web.Services;
 using System.Threading.Tasks;
+using Microsoft.Graph;
 
 namespace LeaderAnalytics.Vyntix.Web.Tests
 {
@@ -30,9 +31,10 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
         [Test]
         public async Task GetUserByEmailTest()
         {
+
             string userID = "sam.wheat@outlook.com";
-            bool isValid = await graphService.GetUserByEmailAddress(userID);
-            Assert.IsTrue(isValid);
+            User user = await graphService.GetUserByEmailAddress2(userID);
+            Assert.IsNotNull(user);
         }
     }
 }

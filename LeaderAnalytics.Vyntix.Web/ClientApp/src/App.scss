@@ -1,0 +1,164 @@
+﻿/*
+    https: //github.com/twbs/bootstrap-sass/blob/master/assets/stylesheets/bootstrap/_variables.scss
+
+*/
+
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+
+$body-bg:#1e2226;
+$navbar-dark-color:#AAA0A0;
+
+
+
+/* ---------- Media queries up ---------- */
+
+@include media-breakpoint-up(xs) {
+ 
+}
+
+@include media-breakpoint-up(sm) {
+
+}
+
+@include media-breakpoint-up(md) {
+ 
+}
+
+@include media-breakpoint-up(lg) {
+    .nav-icon {
+        display: none;
+    }
+}
+
+@include media-breakpoint-up(xl) {
+ 
+}
+
+/* ---------- Media queries down ---------- */
+
+@include media-breakpoint-down(xs) {
+}
+
+@include media-breakpoint-down(sm) {
+    
+}
+
+@include media-breakpoint-down(md) {
+    .nav-link {
+        margin-right: auto;
+    }
+}
+
+@include media-breakpoint-down(lg) {
+}
+
+@include media-breakpoint-down(xl) {
+}
+
+/* ---------- Nav bar ---------- */
+
+.nav-icon {
+    margin-right:8px;
+    font-size:18pt;
+}
+
+
+
+
+
+.rh1 {font-size : clamp(40px,4vw,80px);}
+
+.rh2 { font-size: clamp(35px,3.5vw,70px); }
+
+.rh3 { font-size: clamp(30px,3vw,60px); }
+
+.rh4 { font-size: clamp(25px,2.5vw,50px); }
+
+.rh5 { font-size: clamp(20px,2vw,40px); }
+
+.rh6 { font-size: clamp(15px,1.5vw,30px); }
+
+.rp {
+  font-size: clamp(12px,1vw,18px);
+  line-height: 1.5;
+}
+
+.rm1 { margin:1vw; }
+.rm2 { margin:2vw; }
+.rm3 { margin:3vw; }
+.rm5 { margin:5vw; }
+.rm8 { margin:8vw; }
+.rm13 { margin:13vw; }
+
+.rmt1 { margin-top:1vw; }
+.rmt2 { margin-top:2vw; }
+.rmt3 { margin-top:3vw; }
+.rmt5 { margin-top:5vw; }
+.rmt8 { margin-top:8vw; }
+.rmt13 { margin-top:13vw; }
+
+.rmr1 { margin-right:1vw; }
+.rmr2 { margin-right:2vw; }
+.rmr3 { margin-right:3vw; }
+.rmr5 { margin-right:5vw; }
+.rmr8 { margin-right:8vw; }
+.rmr13 { margin-right:13vw; }
+
+.rmb1 { margin-bottom:1vw; }
+.rmb2 { margin-bottom:2vw; }
+.rmb3 { margin-bottom:3vw; }
+.rmb5 { margin-bottom:5vw; }
+.rmb8 { margin-bottom:8vw; }
+.rmb13 { margin-bottom:13vw; }
+
+.rml1 { margin-left:1vw; }
+.rml2 { margin-left:2vw; }
+.rml3 { margin-left:3vw; }
+.rml5 { margin-left:5vw; }
+.rml8 { margin-left:8vw; }
+.rml13 { margin-left:13vw; }
+
+
+.rp1 { padding:1vw; }
+.rp2 { padding:2vw; }
+.rp3 { padding:3vw; }
+.rp5 { padding:5vw; }
+.rp8 { padding:8vw; }
+.rp13 { padding:13vw; }
+
+.rpt1 { padding-top:1vw; }
+.rpt2 { padding-top:2vw; }
+.rpt3 { padding-top:3vw; }
+.rpt5 { padding-top:5vw; }
+.rpt8 { padding-top:8vw; }
+.rpt13 { padding-top:13vw; }
+
+.rpr1 { padding-right:1vw; }
+.rpr2 { padding-right:2vw; }
+.rpr3 { padding-right:3vw; }
+.rpr5 { padding-right:5vw; }
+.rpr8 { padding-right:8vw; }
+.rpr13 { padding-right:13vw; }
+
+.rpb1 { padding-bottom:1vw; }
+.rpb2 { padding-bottom:2vw; }
+.rpb3 { padding-bottom:3vw; }
+.rpb5 { padding-bottom:5vw; }
+.rpb8 { padding-bottom:8vw; }
+.rpb13 { padding-bottom:13vw; }
+
+.rpl1 { padding-left:1vw; }
+.rpl2 { padding-left:2vw; }
+.rpl3 { padding-left:3vw; }
+.rpl5 { padding-left:5vw; }
+.rpl8 { padding-left:8vw; }
+.rpl13 { padding-left:13vw; }
+
+
+
+
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+

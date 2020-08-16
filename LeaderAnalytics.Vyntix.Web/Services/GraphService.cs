@@ -16,11 +16,12 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 {
 
     // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/755
+    // https://docs.microsoft.com/en-us/answers/questions/65589/how-to-look-up-a-user-by-personal-email-address.html
 
     public class GraphService
     {
         private GraphClientCredentials credentials;
-        private const string _endpoint = "https://graph.microsoft.com/v1.0";
+        private const string _endpoint = "https://graph.microsoft.com/beta";
         private string _accessToken;
 
         public GraphService(GraphClientCredentials credentials)
@@ -37,8 +38,6 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             try
             {
                 user = await client.Users[userID].Request().GetAsync(); 
-                //user = await client.Users[userID].Request().Select(x => x.Mail).GetAsync(); 
-                //user = await client.Users[userID].Request().Select(x => x.Identities).GetAsync();
             }
             catch (Microsoft.Graph.ServiceException)
             {
@@ -56,6 +55,20 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             IGraphServiceUsersCollectionPage users3 = await client.Users.Request().Filter($"signInNames/any(x:x/value eq '{email}')").GetAsync();
             return users.Count > 0;
         }
+
+
+        public async Task<User> GetUserByEmailAddress2(string email)
+        {
+            GraphServiceClient client = GetGraphServiceClient();
+            IGraphServiceUsersCollectionPage users = await client.Users.Request().Filter($"otherMails/any(id:id eq '{email}')").GetAsync();
+            var nonnullusers = users.Where(x => x.OtherMails?.Any() ?? false).ToList(); // count = 0
+            
+            users = await client.Users.Request().Filter($"identities/any(id:id/issuer eq 'LeaderAnalytics.onmicrosoft.com' and id/issuerAssignedId eq '{email}')").GetAsync();
+            nonnullusers = users.Where(x => x.Id == email).ToList(); // count = 0
+
+            return users[0];
+        }
+
 
 
 

@@ -2,6 +2,7 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
+
 html, body {
     height: 100%;
 }
@@ -101,7 +102,7 @@ a {
     }
 
 body {
-    background: #fff none repeat scroll 0 0;
+    background: #1e2226 none repeat scroll 0 0;
     color: #444;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
@@ -299,6 +300,9 @@ div#preloader {
             color: white;
         }
 
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
 /*--------------------------------------------------------------
 # Subscriptions
 --------------------------------------------------------------*/

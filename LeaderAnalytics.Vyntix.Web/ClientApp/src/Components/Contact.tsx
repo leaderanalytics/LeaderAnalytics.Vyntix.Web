@@ -31,8 +31,8 @@ function Contact() {
     return (
         <div>
             <div>Contact</div>
-            <div>Location: {currentPath}</div>
-            <div>search: {searchParams}</div>
+            <div>Location: </div>
+            <div>search: </div>
             <div>
                 <button onClick={() => setCount(count + 1)}>Get a user</button>
             </div>

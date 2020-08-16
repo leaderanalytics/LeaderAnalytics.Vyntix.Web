@@ -11,3 +11,10 @@
 See .csproj file:
 <Project Sdk="Microsoft.NET.Sdk.Web" InitialTargets="CopyMSAL"> Note "InitialTargets"
 At build time,  ClientApp/src/Config/msalconfig.???.tsx is copied to ClientApp/src overwriting the existing file.
+
+
+https://preview.themeforest.net/item/wave-finance-and-investment-html-template/full_screen_preview/27458147
+
+
+
+

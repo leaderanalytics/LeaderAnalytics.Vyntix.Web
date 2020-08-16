@@ -54,15 +54,16 @@
 
   <ItemGroup>
     <None Remove="ClientApp\src\AppState.tsx" />
-    <None Remove="ClientApp\src\Components\About.tsx" />
     <None Remove="ClientApp\src\Components\Contact.tsx" />
+    <None Remove="ClientApp\src\Components\Documentation.tsx" />
+    <None Remove="ClientApp\src\Components\Downloads.tsx" />
     <None Remove="ClientApp\src\Components\Home.tsx" />
-    <None Remove="ClientApp\src\Components\nav.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationFailure.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationSuccess.tsx" />
     <None Remove="ClientApp\src\Components\SubConfirmation.tsx" />
     <None Remove="ClientApp\src\Components\Subscriptions.tsx" />
     <None Remove="ClientApp\src\Components\SubSignIn.tsx" />
+    <None Remove="ClientApp\src\Components\TopNav.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.dev.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.prod.tsx" />
     <None Remove="ClientApp\src\Model\OrderApprovalResponse.tsx" />
@@ -85,6 +86,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\Components\Downloads.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\SubActivationFailure.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -106,13 +110,13 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Config\AppConfig.dev.tsx" />
     <TypeScriptCompile Include="ClientApp\src\AppState.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\Components\About.tsx">
+    <TypeScriptCompile Include="ClientApp\src\Components\Documentation.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\Contact.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="ClientApp\src\Components\Nav.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\Components\TopNav.tsx" />
     <TypeScriptCompile Include="ClientApp\src\Model\OrderApprovalResponse.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
