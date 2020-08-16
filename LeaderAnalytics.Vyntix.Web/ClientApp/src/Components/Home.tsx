@@ -11,8 +11,8 @@ function Home() {
     return (
         <div>
     
-            This is home
-            <div>UserName is {userName}</div>
+
+            <div className="rh1">Build models that <i>lead</i></div>
              
         </div>
         
