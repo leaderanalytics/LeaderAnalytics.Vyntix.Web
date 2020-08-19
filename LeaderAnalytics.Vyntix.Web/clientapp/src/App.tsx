@@ -17,21 +17,23 @@ function App() {
 
     return (
         <GlobalContext.Provider value={GetAppState()}>
-          <Router>
-            <TopNav />
-              <Switch>
-                <Route exact path="/" component={Home} />
-                <Route exact path="/contact" component={Contact} />
-                <Route exact path="/documentation" component={Documentation} />
-                <Route exact path="/downloads" component={Downloads} />
-                <Route exact path="/subactivationsuccess" component={SubActivationSuccess} />
-                <Route exact path="/subactivationfailure" component={SubActivationFailure} />
-                <Route exact path="/subconfirmation" component={SubConfirmation} />
-                <Route exact path="/subscriptions" component={Subscriptions} />
-                <Route exact path="/subsignin" component={SubSignIn} />
-            </Switch>
-          </Router>
-          </GlobalContext.Provider>
+            <Router>
+                <TopNav />
+                <div>   /* Do not use container here.  We don't want 15 px padding.  */
+                    <Switch>
+                        <Route exact path="/" component={Home} />
+                        <Route exact path="/contact" component={Contact} />
+                        <Route exact path="/documentation" component={Documentation} />
+                        <Route exact path="/downloads" component={Downloads} />
+                        <Route exact path="/subactivationsuccess" component={SubActivationSuccess} />
+                        <Route exact path="/subactivationfailure" component={SubActivationFailure} />
+                        <Route exact path="/subconfirmation" component={SubConfirmation} />
+                        <Route exact path="/subscriptions" component={Subscriptions} />
+                        <Route exact path="/subsignin" component={SubSignIn} />
+                    </Switch>
+                </div>
+            </Router>
+        </GlobalContext.Provider>
   );
 }
 

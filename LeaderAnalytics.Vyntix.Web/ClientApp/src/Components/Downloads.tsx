@@ -6,7 +6,7 @@ function Downloads() {
     return (
         <div>
 
-            <div>
+            <div className="container-fluid content-root">
                 This is Downloads
             </div>
         </div>

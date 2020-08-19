@@ -4,7 +4,7 @@
 function Documentation() {
 
     return (
-        <div>
+        <div className="container-fluid content-root">
 
             <div>
                 This is Documentation

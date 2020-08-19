@@ -1,16 +1,18 @@
 ﻿/*
-    https://github.com/twbs/bootstrap-sass/blob/master/assets/stylesheets/bootstrap/_variables.scss
+    https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss
 
+    https://react-bootstrap.github.io/components/alerts/
 */
 
 @import "../node_modules/bootstrap/scss/functions";
 @import "../node_modules/bootstrap/scss/variables";
 @import "../node_modules/bootstrap/scss/mixins";
 
-/* ---------- Variables ---------- */
+/* ---------- Variables - bootstrap ---------- */
 
 
-$body-bg:#1e2226;
+//$body-bg:#1e2226;
+$body-bg: #474853;
 $body-color:yellow;
 $primary:yellow;
 $text-color:yellow;
@@ -19,6 +21,14 @@ $theme-colors: (
 );
 
 $navbar-dark-color:#AAA0A0;
+
+$accent1:#844D36;
+$accent2:#86B3D1;
+$accent3:#8E8268;
+$accent4:#FEF9C7;
+
+/* ---------- Variables - app ---------- */
+$app-navbar-height:90px;
 
 
 
@@ -67,7 +77,31 @@ $navbar-dark-color:#AAA0A0;
 @include media-breakpoint-down(xl) {
 }
 
+/* ---------- App level ---------- */
+.content-root {
+    position:absolute;
+    top:$app-navbar-height;
+}
+.center-content {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.container-fluid #banner-image {
+    padding-left:0px;
+    padding-right:0px;
+
+}
+#banner-image {
+    width:100%;
+    height:auto;
+}
+
 /* ---------- Nav bar ---------- */
+
+.nav-bg {
+    background-color: $body-bg;
+}
 
 .nav-icon {
     margin-right:8px;
@@ -78,19 +112,60 @@ $navbar-dark-color:#AAA0A0;
     height: auto;
 }
 
+.nav-container {
+    border-bottom:solid 3px black;
+}
 
 
+/* ---------- Home ---------- */
 
-.rh1 {font-size : clamp(40px,4vw,80px);}
+.info-box {
+    align-self:center;
+    border:solid 3px yellow;
+    display:flex;
+    flex-direction:column;
+    min-width:400px;
+}
 
+.info-box-icon {
+    color: $accent2;
+    align-self:center;
+}
+
+.info-box-header {
+    text-align: center;
+    color:$accent2;
+}
+
+
+.info-box-text {
+    text-align:left;
+    color:$accent3;
+}
+
+.info-box-grid {
+    display:flex;
+    flex-direction:row;
+}
+
+.info-box-text ul {
+    list-style-type: none;
+}
+.info-box-grid svg {
+    margin-right:8px;
+    margin-top:10px;
+}
+
+.info-box-grid p {
+ 
+}
+/* ---------- Relative layout  ---------- */
+
+.rh1 { font-size: clamp(40px,4vw,80px); }
 .rh2 { font-size: clamp(35px,3.5vw,70px); }
-
 .rh3 { font-size: clamp(30px,3vw,60px); }
-
 .rh4 { font-size: clamp(25px,2.5vw,50px); }
-
 .rh5 { font-size: clamp(20px,2vw,40px); }
-
 .rh6 { font-size: clamp(15px,1.5vw,30px); }
 
 .rp {

@@ -97,39 +97,41 @@ function Subscriptions() {
         return (<div>loading...</div>);
 
     return (
-        <form  onSubmit={handleSubmit}>
+        <div className="container-fluid content-root">
+            <form  onSubmit={handleSubmit}>
 
-            <div id="promoCodes" >
-                <label>Enter promo codes, if any, here.  Seperate multiple codes with a comma:</label>
-                <input type="text" value={promoCodes} onChange={handlePromoCodeChange}></input>
-            </div>
-
-            <div id="subPlans" className="sub-plan-grid">
-                <div>
-                    <span>Subscribe</span>
+                <div id="promoCodes" >
+                    <label>Enter promo codes, if any, here.  Seperate multiple codes with a comma:</label>
+                    <input type="text" value={promoCodes} onChange={handlePromoCodeChange}></input>
                 </div>
 
-                <div>
-                    <span>Plan description</span>
+                <div id="subPlans" className="sub-plan-grid">
+                    <div>
+                        <span>Subscribe</span>
+                    </div>
+
+                    <div>
+                        <span>Plan description</span>
+                    </div>
+
+                    <div>
+                        <span>Monthly cost</span>
+                    </div>
+
+                    <div>
+                        <span>Subscription duration</span>
+                    </div>
+
+                    <div>
+                        <span>Total subscription cost</span>
+                    </div>
+
+                    { renderPlans(plans) }
+
                 </div>
-
-                <div>
-                    <span>Monthly cost</span>
-                </div>
-
-                <div>
-                    <span>Subscription duration</span>
-                </div>
-
-                <div>
-                    <span>Total subscription cost</span>
-                </div>
-
-                { renderPlans(plans) }
-
-            </div>
-            <button type="submit">Continue</button>
-        </form>
+                <button type="submit">Continue</button>
+            </form>
+        </div>
     )
 }
 export default Subscriptions;

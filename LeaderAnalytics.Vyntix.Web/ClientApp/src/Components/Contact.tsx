@@ -29,7 +29,7 @@ function Contact() {
 
 
     return (
-        <div>
+        <div className="container-fluid content-root">
             <div>Contact</div>
             <div>Location: </div>
             <div>search: </div>

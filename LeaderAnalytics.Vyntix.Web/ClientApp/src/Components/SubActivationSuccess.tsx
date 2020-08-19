@@ -7,7 +7,7 @@ function SubActivationSuccess() {
     const sessionID = location.search.split('=')[1]; 
 
     return (
-        <div>
+        <div className="container-fluid content-root">
             <div>About {sessionID} </div>
 
             <div>

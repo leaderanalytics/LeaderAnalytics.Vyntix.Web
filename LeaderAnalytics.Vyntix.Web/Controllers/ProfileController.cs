@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LeaderAnalytics.Vyntix.Web.Controllers
 {
+    [Route("[controller]/[action]")]
+    [ApiController]
     public class ProfileController : Controller
     {
         [Authorize]
-        public IActionResult List()
+        
+        public IActionResult List() //dummy test method
         {
-            return View();
+            return Ok();
         }
     }
 }

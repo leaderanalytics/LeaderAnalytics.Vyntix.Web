@@ -35,7 +35,7 @@ function SubSignIn() {
     }
   
     return (
-        <div>
+        <div className="container-fluid content-root">
             <div>{appState.SubscriptionPlan?.PlanDescription}</div>
 
             <div>

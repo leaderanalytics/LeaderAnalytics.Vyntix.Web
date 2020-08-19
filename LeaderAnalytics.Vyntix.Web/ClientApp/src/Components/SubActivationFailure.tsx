@@ -9,7 +9,7 @@ function SubActivationFailure() {
         <div>
             <div>About {name} and {otherName}</div>
 
-            <div>
+            <div className="container-fluid content-root">
                 This is SubActivationFailure
             </div>
         </div>
