@@ -25,8 +25,8 @@ function Documentation() {
                     </div>
 
                     <div className="footer-cell">
-                            <a href="https://github.com/leaderanalytics" target="_blank" ><FontAwesomeIcon icon={faUsers} /><span>Community</span></a>
-                            <Nav.Link as={NavLink} to="/Documentation" href="/Documentation" ><FontAwesomeIcon icon={faBook} /><span>Documentation</span></Nav.Link>
+                        <Nav.Link href="https://github.com/leaderanalytics" target="_blank" ><FontAwesomeIcon icon={faUsers} /><span>Community</span></Nav.Link>
+                        <Nav.Link as={NavLink} to="/Documentation" href="/Documentation" ><FontAwesomeIcon icon={faBook} /><span>Documentation</span></Nav.Link>
                     </div>
 
                     <div className="footer-cell">
