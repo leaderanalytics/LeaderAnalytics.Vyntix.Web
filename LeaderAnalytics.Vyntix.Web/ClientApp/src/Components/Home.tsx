@@ -2,7 +2,9 @@
 import { useParams } from 'react-router';
 import { Container, Image, Row, Col } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
-import platform from '../Assets/platform1.png';
+import models_that_lead from '../Assets/build_models_that_lead.png';
+import managing_the_future from '../Assets/the_platform_for_managing_the_future2.png';
+import number_jumble from '../Assets/number_jumble.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDatabase, faCheck, faBezierCurve, faMoneyCheckAlt, faChartLine, faSearchDollar } from '@fortawesome/free-solid-svg-icons';
 
@@ -15,13 +17,13 @@ function Home() {
     return (
         <div>
             <div className="center-content">  
-                <Image src={platform} fluid id="banner-image" />
+                <Image src={models_that_lead} fluid id="banner-image" />
             </div>
 
-            <div className="container-fluid">
-                <Container fluid>
+            <div className="container-fluid dark-bg">
+                <Container fluid >
                     <Row>
-                        <Col className="rmt1">
+                        <Col className="rm2">
                             <div className="info-box rp1">
                                 <FontAwesomeIcon icon={faDatabase} className="info-box-icon rh5" />
                                 <div className="info-box-header rm1 rh5">
@@ -48,7 +50,7 @@ function Home() {
 
 
 
-                        <Col className="rmt1" >
+                        <Col className="rm2" >
                             <div className="info-box rp1">
                                 <FontAwesomeIcon icon={faBezierCurve} className="info-box-icon rh5" />
                                 <div className="info-box-header rm1 rh5">
@@ -74,7 +76,7 @@ function Home() {
                         </Col>
                     </Row>
                     <Row>
-                        <Col className="rmt1" >
+                        <Col className="rm2" >
                             <div className="info-box rp1">
                                 <FontAwesomeIcon icon={faChartLine} className="info-box-icon rh5" />
                                 <div className="info-box-header rm1 rh5">
@@ -115,7 +117,7 @@ function Home() {
                         </Col>
 
 
-                        <Col className="rmt1" >
+                        <Col className="rm2" >
                             <div className="info-box rp1">
                                 <FontAwesomeIcon icon={faSearchDollar} className="info-box-icon rh5" />
                                 <div className="info-box-header rm1 rh5">
@@ -142,6 +144,50 @@ function Home() {
                         </Col>
                     </Row>
                 </Container>
+            </div>
+
+            <div className="container-fluid light-bg">
+                <div className=" rh6 rp2" >
+                    <div className="center-content rml1">
+                        <Image src={managing_the_future} fluid />
+                    </div>
+
+                    <div className="rh6"  >
+                        <div id="number_jumble" className="float-right" >
+                            <Image src={number_jumble}  />
+                        </div>
+
+                        <p>
+                            Vyntix simplifies forecast management. 
+                        </p>
+
+                        <p>
+                            When you create a forecast and save it you simply merge your forecast into the same data file as your historical data.  
+                            This allows you to query and plot your forecasts in exactly the same way you query and plot historical data.
+                        </p>
+
+                        <p>
+                            When you save a forecast in Vyntix, you also save a bit of metadata that allows you to trace your forecast back to the model and 
+                            the parameters that were used to create it.  
+                        </p>
+
+                        <p>
+                            Vyntix natively supports the concept of data vintages as part of it's unique data file structure.  Data vintages allow you to continuously merge
+                            your forecasts into your data stream without deleting or overwriting prior forecasts.  You can merge forecasts for various future periods and add new
+                            forecasts as the forecast window closes.  You can also merge forecasts from any number of models using multiple parameter configurations. 
+                        </p>
+
+                        <p>
+                            Data vintages are also useful for when you want to avoid look-ahead bias when using a historical cut-off period for dependent variables.  
+                            See the documentation for more information.
+                        </p>
+
+                        <p>
+                            You can use data from any data provider in Vyntix.  Vyntix ships with a downloader for <a href="https://fred.stlouisfed.org/" target="_blank" >FRED</a> that 
+                            allows you to download and use data vintages that are maintained by the Federal Reserve Bank of St. Louis.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     )

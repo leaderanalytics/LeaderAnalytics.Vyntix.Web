@@ -57,6 +57,7 @@
     <None Remove="ClientApp\src\Components\Contact.tsx" />
     <None Remove="ClientApp\src\Components\Documentation.tsx" />
     <None Remove="ClientApp\src\Components\Downloads.tsx" />
+    <None Remove="ClientApp\src\Components\Footer.tsx" />
     <None Remove="ClientApp\src\Components\Home.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationFailure.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationSuccess.tsx" />
@@ -86,6 +87,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\Components\Footer.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\Downloads.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import './App.scss';
+import './Assets/fonts/entsans.ttf';
 //import '../node_modules/bootstrap/dist/js/bootstrap.min.js';
 
 ReactDOM.render(

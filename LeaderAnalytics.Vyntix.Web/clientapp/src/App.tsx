@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import TopNav from './Components/TopNav';
+import Footer from './Components/Footer';
 import Home from './Components/Home';
 import Contact from './Components/Contact';
 import Subscriptions from './Components/Subscriptions';
@@ -32,6 +33,7 @@ function App() {
                         <Route exact path="/subsignin" component={SubSignIn} />
                     </Switch>
                 </div>
+                <Footer/>
             </Router>
         </GlobalContext.Provider>
   );

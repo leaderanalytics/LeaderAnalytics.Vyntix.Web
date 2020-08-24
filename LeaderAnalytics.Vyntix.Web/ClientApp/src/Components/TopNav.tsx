@@ -25,8 +25,8 @@ const TopNav = () => {
 
     return (
         <div>
-            <Navbar variant="dark" expand="lg" collapseOnSelect fixed="top" className="nav-container nav-bg">
-                <Navbar.Brand href="/Home">
+            <Navbar variant="dark" expand="lg" collapseOnSelect fixed="top" className="nav-container dark-bg">
+                <Navbar.Brand href="/">
                     <Image src={logo} className="logo-large" />
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" >
