@@ -4,6 +4,7 @@ import Footer from './Components/Footer';
 import Home from './Components/Home';
 import Contact from './Components/Contact';
 import Subscriptions from './Components/Subscriptions';
+import SubPlans from './Components/SubPlans';
 import SubSignIn from './Components/SubSignIn';
 import SubConfirmation from './Components/SubConfirmation';
 import SubActivationSuccess from './Components/SubActivationSuccess';
@@ -15,9 +16,9 @@ import Documentation from './Components/Documentation';
 import Downloads from './Components/Downloads';
 
 function App() {
-
+    const appState: AppState = GetAppState();
     return (
-        <GlobalContext.Provider value={GetAppState()}>
+        <GlobalContext.Provider value={appState}>
             <Router>
                 <TopNav />
                 <div>   /* Do not use container here.  We don't want 15 px padding.  */

@@ -13,12 +13,12 @@
 
 
 //$body-bg: #474853;
-$body-color:yellow;
-$primary:yellow;
-$text-color:yellow;
-$theme-colors: (
-    primary: $primary
-);
+//$body-color:yellow;
+//$primary:yellow;
+//$text-color:yellow;
+//$theme-colors: (
+//    primary: $primary
+//);
 
 $navbar-dark-color:#AAA0A0;
 
@@ -79,8 +79,9 @@ $app-navbar-height:90px;
 
 /* ---------- App level ---------- */
 .content-root {
-    position:absolute;
-    top:$app-navbar-height;
+    
+    margin-top:$app-navbar-height;
+    min-height:100vh;
 }
 .center-content {
     display:flex;
@@ -204,6 +205,16 @@ $app-navbar-height:90px;
         max-width: 100%;
     }
 }
+
+/* --------------------------------------- 
+# Subscriptions
+--------------------------------------- */
+.sub-plan-grid {
+    display:grid;
+    grid-template-columns:auto auto auto auto auto;
+
+}
+
 
 /* --------------------------------------- 
 # Footer 
