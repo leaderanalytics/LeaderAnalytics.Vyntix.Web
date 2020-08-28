@@ -183,7 +183,12 @@ function Home() {
                         </p>
 
                         <p>
-                            You can use data from any data provider in Vyntix.  Vyntix ships with a downloader for <a href="https://fred.stlouisfed.org/" target="_blank" >FRED</a> that 
+                            Because you have a single, searchable repository you can continuously refine your forecasts via a process of systemic elimination.  
+                            You can also easily search expired forecasts thus avoiding building the same model twice.
+                        </p>
+
+                        <p>
+                            You can use data from any data provider in Vyntix.  Vyntix includes a downloader for <a href="https://fred.stlouisfed.org/" target="_blank" >FRED</a> that 
                             allows you to download and use data vintages that are maintained by the Federal Reserve Bank of St. Louis.
                         </p>
                     </div>

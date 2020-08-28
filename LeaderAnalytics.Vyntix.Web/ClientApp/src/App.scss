@@ -108,6 +108,10 @@ $app-navbar-height:90px;
     background-color: $accent5;
     color: $accent3;
 }
+.medium-bg {
+    background-color:$accent3;
+    color:$accent5;
+}
 
 /*--------------------------------------------------------------
 # Brand
@@ -149,7 +153,8 @@ $app-navbar-height:90px;
 }
 
 .nav-container {
-    border-bottom:solid 3px black;
+    border-bottom: solid 3px black;
+    height: $app-navbar-height;
 }
 
 
@@ -206,13 +211,74 @@ $app-navbar-height:90px;
     }
 }
 
+
+/* --------------------------------------- 
+# Subscription Types
+--------------------------------------- */
+#subPlanTypes {
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+}
+.subPlanType {
+    display:flex;
+    flex-direction:column;
+    flex-basis:50%;
+    border:solid 5px black;
+    margin-top:2vh;
+    margin-left:1vw;
+    margin-right:1vw;
+    
+}
+#banner {
+    display: flex;
+    flex-direction: column;
+    align-content:center;
+    justify-content:center;
+}
+
+#bannerHeadline {
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+}
+
+#bannerObjects {
+    display:flex;
+    flex-direction:row;
+    justify-content:space-around;
+}
+.bannerObject {
+    border-top:solid 1px black;
+    margin:2vw;
+    padding:1vw;
+}
+
+.subPlanType:hover {
+    border: solid 5px $accent1;
+}
+
+#subPlanTypeGutter {
+    width: 2vw;
+    
+}
+.acceptableUse, .nonAcceptableUse {
+    margin-top:2vh;
+}
+.acceptableUse {
+    background-color:lightgreen;
+}
+.nonAcceptableUse {
+    background-color:lightcoral;
+}
+
+
 /* --------------------------------------- 
 # Subscriptions
 --------------------------------------- */
 .sub-plan-grid {
-    display:grid;
-    grid-template-columns:auto auto auto auto auto;
-
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
 }
 
 
