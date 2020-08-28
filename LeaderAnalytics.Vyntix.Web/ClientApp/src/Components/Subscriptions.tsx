@@ -15,11 +15,29 @@ import nonbusinesstxt from '../Assets/non-business-use-txt.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBible, faServer } from '@fortawesome/free-solid-svg-icons';
 function Subscriptions() {
-
+    const appState: AppState = useContext(GlobalContext);
+    const history = useHistory();
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         const elem = document.activeElement as any;
         const planChoice = elem.value;
+
+        if (planChoice === "0")                               
+            history.push("/Subscriptions"); // Business subscription
+        else if (planChoice === "1") {
+            // Non-business subscription
+            var plan: SubscriptionPlan = new SubscriptionPlan();
+            plan.PaymentProviderPlanID = "NONBUSINESS";
+            appState.SubscriptionPlan = plan;
+
+            // if the user is not logged in, prompt them to log in.
+            if (appState.UserID === null || appState.UserID.length < 2) {
+                history.push("/SubSignIn");
+            }
+            else {
+                history.push("/SubConfirmation");
+            }
+        }
     }
 
     return (
@@ -37,7 +55,7 @@ function Subscriptions() {
                         <Image src={businesstxt} fluid />
                         <div className="subPlanTypeDescription rp1 rh6">
                             <p>
-                                This subscription is intended for companies and individuals who use the subscription in the operation of
+                                This subscription is intended for companies and individuals who use the service in the operation of
                                 their business.
                             </p>
                             <p>
@@ -52,12 +70,12 @@ function Subscriptions() {
                             </p>
                             <p>
                                 Our tiered pricing is an outstanding value for companies of all sizes.  We offer
-                                extraordinary value to small businesses including individual Consultants, 
-                                Freelancers, Advisors, and Bloggers.  
+                                extraordinary value to small businesses including individual consultants, 
+                                freelancers, advisors, and bloggers.  
                             </p>
                       
                         </div>
-                        <button type="submit" value={1}>Business use subscription</button>
+                        <button type="submit" value={0}>Business use subscription</button>
                     </div>
                     <div id="subPlanTypeGutter">&nbsp;</div>
                     <div className="subPlanType">
@@ -81,22 +99,22 @@ function Subscriptions() {
 
                                 <ul>
                                     <li>
-                                        Bloggers and Authors who receive authorship fees, subscription fees, advertising revenue, royalties,
+                                        Bloggers and authors who receive authorship fees, subscription fees, advertising revenue, royalties,
                                         or promotional exposure for a business in which they have an interest.
                                     </li>
-                                    <li>Consultants, Advisors, and Wealth Managers who receive payment or benefit of any kind.</li>
+                                    <li>Consultants, advisors, and wealth managers who receive payment or benefit of any kind.</li>
                                     <li>Software developers who incorporate the subscription into their product which is sold or licensed.</li>
                                 </ul>
                             </div>
 
                             <div className="acceptableUse rp1">
                                 <p>
-                                    Examples of activities where this subscription may be used include:
+                                    Activities where this subscription may be used are limited to:
                                 </p>
 
                                 <ul>
                                     <li>Individual investors who manage funds for themselves and their immediate families only.</li>
-                                    <li>Students and instructors who use the subscription in an academic setting.</li>
+                                    <li>Students and instructors who use the subscription in an academic environment.</li>
                                 </ul>
                             </div>
                             <p>
@@ -104,7 +122,7 @@ function Subscriptions() {
                                 cost of data from any vendor.
                             </p>
                         </div>
-                        <button type="submit" value={0}>Non-business use subscription</button>
+                        <button type="submit" value={1}>Non-business use subscription</button>
                     </div>
                 </div>
             </form>
