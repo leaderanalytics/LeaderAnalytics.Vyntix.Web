@@ -11,7 +11,7 @@ export class AppState {
     public SubscriptionID: string = "";  // Existing paid subscription, if any
     public Token: IdToken | null = null;
     public SignInCallback: (isSignedIn: boolean) => void = (isSignedIn) => { };
-
+    public RenderTopNav: () => void = () => { };
     // Order
     public PromoCodes: string = "";
     public SubscriptionPlan: SubscriptionPlan | null = null;

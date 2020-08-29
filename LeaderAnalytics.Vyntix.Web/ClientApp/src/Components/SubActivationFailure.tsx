@@ -3,8 +3,8 @@ import { useParams } from 'react-router';
 
 function SubActivationFailure() {
 
-    const { name } = useParams();
-    const { otherName } = useParams();
+    const  name  = useParams();
+    const  otherName  = useParams();
     return (
         <div>
             <div>About {name} and {otherName}</div>

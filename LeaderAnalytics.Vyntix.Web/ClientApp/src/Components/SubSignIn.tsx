@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom'
 import { GlobalContext, AppState } from '../AppState';
@@ -6,6 +6,7 @@ import { SignIn } from '../Services/Services';
 
 function SubSignIn() {
     const appState: AppState = useContext(GlobalContext);
+    var [isSignedIn, setisSignedIn] = useState(appState.UserID != null && appState.UserID.length > 1);
     const history = useHistory();
 
     // The SignIn method in the Nav component calls the method that is assigned to appState.SignInCallback.
@@ -19,11 +20,12 @@ function SubSignIn() {
         appState.SignInCallback = (x) => { }; // this gets called when this component unloads.
     }, []);
 
-
-
+    
     const LocalSignIn = async () => {
-        const isSignedIn = await SignIn(appState);
+        isSignedIn = await SignIn(appState);
+        setisSignedIn(isSignedIn);
         SignInCallback(isSignedIn);
+        appState.RenderTopNav();
     }
 
     const SignInCallback = (isSignedIn: boolean) => {

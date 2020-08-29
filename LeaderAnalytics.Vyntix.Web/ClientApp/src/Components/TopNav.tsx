@@ -1,5 +1,6 @@
-﻿import React, { useState, useContext } from 'react';
+﻿import React, { useState, useContext, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch, Link, NavLink } from 'react-router-dom';
+import { useAsyncEffect } from 'use-async-effect';
 import { GlobalContext, AppState } from '../AppState';
 import { SignIn, SignOut } from '../Services/Services';
 import { Button, Navbar, NavDropdown, Nav, Form, FormControl, Container, Image } from 'react-bootstrap';
@@ -10,18 +11,25 @@ import logo from '../Assets/VyntixLogo.png';
 
 const TopNav = () => {
     const appState: AppState = useContext(GlobalContext);
-    var [isSignedIn, setisSignedIn] = useState(appState.UserID != null && appState.UserID.length > 1);
+    const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);
+    appState.RenderTopNav = () => {
+
+        setisSignedIn(appState.UserID !== null && appState.UserID.length > 1)
+
+
+    };
+
+    
 
     const LocalSignIn = async () => {
-        isSignedIn = await SignIn(appState);
+        const x = await SignIn(appState);
 
-        setisSignedIn(isSignedIn);
+        setisSignedIn(x);
 
         if (isSignedIn) {
             appState.SignInCallback?.call(null, isSignedIn);
         }
     }
-
 
     return (
         <Navbar variant="dark" expand="lg" collapseOnSelect fixed="top" className="nav-container dark-bg">
@@ -38,9 +46,9 @@ const TopNav = () => {
                     <Nav.Link className="rh6" as={NavLink} to="/Documentation" href="/Documentation" eventKey="3"><FontAwesomeIcon icon={faBook} className="nav-toggle nav-icon" />Documentation</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Downloads" href="/Downloads" eventKey="4"><FontAwesomeIcon icon={faDownload} className="nav-toggle nav-icon" />Downloads</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Contact" href="/Contact" eventKey="5"><FontAwesomeIcon icon={faEnvelope} className="nav-toggle nav-icon" />Contact Us</Nav.Link>
-                        
-                    { isSignedIn ?
-                        <Nav.Link className="rh6" to="/" as={NavLink} onClick={() => SignOut(appState)} eventKey="6" exact  activeClassName="zzz"><FontAwesomeIcon icon={faSignOutAlt} className="nav-toggle nav-icon" />Sign out</Nav.Link>
+
+                    {isSignedIn ?
+                        <Nav.Link className="rh6" to="/" as={NavLink} onClick={() => SignOut(appState)} eventKey="6" exact activeClassName="zzz"><FontAwesomeIcon icon={faSignOutAlt} className="nav-toggle nav-icon" />Sign out</Nav.Link>
                         :
                         <Nav.Link className="rh6" to="/" as={NavLink} onClick={LocalSignIn} eventKey="7" exact activeClassName="zzz"><FontAwesomeIcon icon={faSignInAlt} className="nav-toggle nav-icon" />Sign in</Nav.Link>
                     }
