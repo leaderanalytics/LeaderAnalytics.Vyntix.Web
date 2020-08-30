@@ -274,14 +274,56 @@ $app-navbar-height:90px;
 
 
 /* --------------------------------------- 
-# Subscriptions
+# Subscription plans
 --------------------------------------- */
 .sub-plan-grid {
-    display: grid;
-    grid-template-columns: auto auto auto auto auto;
+    display: flex;
+    flex-direction:column;
 }
 
+.gridrow, .gridheaderrow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left:15px;
+    border: solid 1px transparent;
+}
 
+.cell-sub {width:15%;}
+.cell-desc {width:35%;}
+.cell-cost {width:15%;}
+.cell-dur {width:15%;}
+.cell-total {width:15%;}
+
+.cell-sub {margin-right:6px; }
+.cell-total { margin-left:6px; }
+.cell-desc .cell-cost, .cell-dur {
+    margin-left:6px;
+    margin-right:6px;
+}
+
+.gridrow:hover {
+    background-color: rgba(68, 88, 144, 0.3);
+}
+
+.sub-plan-grid-header {
+    text-align:left;
+    color:$accent2;
+    background-color:$accent1;
+    margin-bottom:1vw;
+}
+
+.subscribeCheckbox {
+    height: clamp(20px,2vw,40px);
+    width: clamp(20px,2vw,40px);
+}
+
+.selectedPlan {
+    border: solid 1px black;
+    box-shadow: inset 0px 0px 20px 20px rgba(68, 88, 144, 0.3);
+}
 /* --------------------------------------- 
 # Footer 
     --------------------------------------- */
@@ -365,7 +407,7 @@ $app-navbar-height:90px;
 .rh3 { font-size: clamp(30px,3vw,60px); }
 .rh4 { font-size: clamp(25px,2.5vw,50px); }
 .rh5 { font-size: clamp(20px,2vw,40px); }
-.rh6 { font-size: clamp(15px,1.5vw,30px); }
+.rh6 { font-size: clamp(15px,1.1vw,30px); }
 
 .rp {
   font-size: clamp(12px,1vw,18px);

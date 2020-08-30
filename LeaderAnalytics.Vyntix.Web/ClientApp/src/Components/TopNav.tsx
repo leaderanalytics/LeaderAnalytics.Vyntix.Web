@@ -40,7 +40,7 @@ const TopNav = () => {
                 <FontAwesomeIcon icon={faBars} className="nav-toggle" />
             </Navbar.Toggle>
             <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="nav-fill w-100 ">
+                <Nav className="nav-fill w-100 dark-bg">
                     <Nav.Link className="rh6" as={NavLink} to="/" href="/" exact eventKey="1" ><FontAwesomeIcon icon={faHome} className="nav-toggle nav-icon" />Home</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Subscriptions" href="/Subscriptions" eventKey="2"><FontAwesomeIcon icon={faKey} className="nav-toggle nav-icon" />Subscribe</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Documentation" href="/Documentation" eventKey="3"><FontAwesomeIcon icon={faBook} className="nav-toggle nav-icon" />Documentation</Nav.Link>

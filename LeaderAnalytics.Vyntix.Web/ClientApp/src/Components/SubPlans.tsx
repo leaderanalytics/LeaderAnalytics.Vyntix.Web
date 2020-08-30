@@ -6,7 +6,7 @@ import { GetSubscriptionPlans } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
-import { SaveAppState } from '../Services/Services';
+import { SaveAppState, FormatMoney } from '../Services/Services';
 
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
@@ -63,28 +63,28 @@ function SubPlans() {
 
     const renderPlans = (plans: SubscriptionPlan[]) => {
         return (
-            plans.map((val, i) => (
-                <>
-                    <div >
-                        <input checked={(val).PaymentProviderPlanID === selectedPlan} onChange={handleSelectionChange} type="checkbox" data-providerid={(val).PaymentProviderPlanID}></input>
+            plans.filter(x => x.DisplaySequence > 0).sort(x => x.DisplaySequence).map((val, i) => (
+                <div className={(val).PaymentProviderPlanID === selectedPlan ? "gridrow selectedPlan" : "gridrow"}>
+                    <div className="cell-sub">
+                        <input checked={(val).PaymentProviderPlanID === selectedPlan} onChange={handleSelectionChange} type="checkbox" data-providerid={(val).PaymentProviderPlanID} className="subscribeCheckbox"></input>
                     </div>
 
-                    <div>
+                    <div className="cell-desc">
                         <span >{(val).PlanDescription}</span>
                     </div>
 
-                    <div>
-                        <span>{(val).MonthlyCost}</span>
+                    <div className="cell-cost">
+                        <span>{FormatMoney((val).MonthlyCost)}</span>
                     </div>
 
-                    <div>
-                        <span>6 Months</span>
+                    <div className="cell-dur">
+                        <span>{(12 / val.BillingPeriods).toString() + ((12 / val.BillingPeriods) === 1 ? ' Month' : ' Months') }</span>
                     </div>
 
-                    <div>
-                        <span>{(val).Cost}</span>
+                    <div className="cell-total">
+                        <span>{FormatMoney((val).Cost)}</span>
                     </div>
-                </>
+                </div>
             ))
         )
     }
@@ -97,7 +97,7 @@ function SubPlans() {
         return (<div>loading...</div>);
 
     return (
-        <div className="container-fluid content-root">
+        <div className="container-fluid content-root dark-bg">
             <form onSubmit={handleSubmit}>
 
                 <div id="promoCodes" >
@@ -105,31 +105,18 @@ function SubPlans() {
                     <input type="text" value={promoCodes} onChange={handlePromoCodeChange}></input>
                 </div>
 
-                <div id="subPlans" className="sub-plan-grid">
-                    <div>
-                        <span>Subscribe</span>
-                    </div>
-
-                    <div>
-                        <span>Plan description</span>
-                    </div>
-
-                    <div>
-                        <span>Monthly cost</span>
-                    </div>
-
-                    <div>
-                        <span>Subscription duration</span>
-                    </div>
-
-                    <div>
-                        <span>Total subscription cost</span>
-                    </div>
-
+                <div id="subPlans" className="sub-plan-grid rh6">
+                    <div className="sub-plan-grid-header gridheaderrow" >
+                        <div className="cell-sub">Subscribe</div>
+                        <div className="cell-desc">Plan description</div>
+                        <div className="cell-cost">Monthly cost</div>
+                        <div className="cell-dur">Duration</div>
+                        <div className="cell-total">Total cost</div>
+                     </div>   
                     {renderPlans(plans)}
 
                 </div>
-                <button type="submit">Continue</button>
+                <button type="submit" className="btn btn-primary">Continue</button>
             </form>
         </div>
     )

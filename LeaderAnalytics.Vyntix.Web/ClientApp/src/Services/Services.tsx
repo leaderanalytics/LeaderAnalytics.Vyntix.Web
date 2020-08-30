@@ -106,10 +106,22 @@ export const GetAppState = (): AppState => {
     var s = localStorage.getItem('appState');
     var appState: AppState = s === null ? new AppState() : JSON.parse(s);
 
-    if (Date.now() - appState.TimeStamp > 3600000) {
+    if (Date.now() - appState.TimeStamp > 3600000 && appState.Token !== null) {
         SignOut(appState);
     }
     return appState;
 }
 
 
+export const FormatMoney = (num: number) => {
+    var formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
+
+    return formatter.format(num); 
+}
+
+
+
+    

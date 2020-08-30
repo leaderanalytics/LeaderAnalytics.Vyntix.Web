@@ -31,6 +31,7 @@ function App() {
                     <Route exact path="/subconfirmation" component={SubConfirmation} />
                     <Route exact path="/subscriptions" component={Subscriptions} />
                     <Route exact path="/subsignin" component={SubSignIn} />
+                    <Route exact path="/subplans" component={SubPlans} />
                 </Switch>
                 <Footer/>
             </Router>

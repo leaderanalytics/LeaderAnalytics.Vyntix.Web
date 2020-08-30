@@ -23,7 +23,7 @@ function Subscriptions() {
         const planChoice = elem.value;
 
         if (planChoice === "0")                               
-            history.push("/Subscriptions"); // Business subscription
+            history.push("/SubPlans"); // Business subscription
         else if (planChoice === "1") {
             // Non-business subscription
             var plan: SubscriptionPlan = new SubscriptionPlan();
