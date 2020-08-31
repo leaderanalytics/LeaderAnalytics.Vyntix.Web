@@ -114,7 +114,9 @@ function SubPlans() {
         <div className="container-fluid content-root dark-bg">
 
 
-
+            <p>
+                Pricing promise: Our pricing is completely transparent.  There are no upsells, undocumented limitations, or hidden charges.
+            </p>
             <form onSubmit={handleSubmit}>
 
                 <div id="promoCodes" >

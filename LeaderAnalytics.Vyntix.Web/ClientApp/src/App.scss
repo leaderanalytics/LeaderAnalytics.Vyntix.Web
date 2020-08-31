@@ -258,10 +258,6 @@ $app-navbar-height:90px;
     border: solid 5px $accent1;
 }
 
-#subPlanTypeGutter {
-    width: 2vw;
-    
-}
 .acceptableUse, .nonAcceptableUse {
     margin-top:2vh;
 }
@@ -272,13 +268,38 @@ $app-navbar-height:90px;
     background-color:lightcoral;
 }
 
+.continueButton {
+    align-self: center;
+
+    div {
+        padding-top: 1vw;
+        padding-bottom: 1vw;
+        display:flex;
+        flex-direction:row;
+        justify-items:center;
+        align-items:center;
+    }
+
+    svg {
+        margin-left: 6px;
+    }
+}
+
+@include media-breakpoint-down(md) {
+
+    #subPlanTypes {
+        flex-direction: column;
+    }
+}
+
+
 
 /* --------------------------------------- 
 # Subscription plans
 --------------------------------------- */
 .sub-plan-grid {
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
 }
 
 .gridrow, .gridheaderrow {

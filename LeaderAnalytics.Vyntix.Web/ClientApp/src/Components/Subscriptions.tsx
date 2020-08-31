@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { useState, useContext, SyntheticEvent } from 'react';
-import { Image } from 'react-bootstrap';
+import { Image, Button } from 'react-bootstrap';
 import { useAsyncEffect } from 'use-async-effect';
 import $ from 'jquery';
 import { GetSubscriptionPlans } from '../Services/Services';
@@ -12,8 +12,10 @@ import business from '../Assets/business-use.png';
 import nonbusiness from '../Assets/non-business-use.png';
 import businesstxt from '../Assets/business-use-txt.png';
 import nonbusinesstxt from '../Assets/non-business-use-txt.png';
+import freetrial from '../Assets/free-trial.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBible, faServer } from '@fortawesome/free-solid-svg-icons';
+import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
+
 function Subscriptions() {
     const appState: AppState = useContext(GlobalContext);
     const history = useHistory();
@@ -56,11 +58,9 @@ function Subscriptions() {
                         <div className="subPlanTypeDescription rp1 rh6">
                             <p>
                                 This subscription is intended for companies and individuals who use the service in the operation of
-                                their business.
+                                a business.
                             </p>
-                            <p>
-                                Pricing promise: Our pricing is completely transparent.  There are no upsells, undocumented limitations, or hidden charges.
-                            </p>
+                            <Image src={freetrial} fluid />
                             <p>
                                 FREE 30 day trial, no credit card required.
                             </p>
@@ -75,9 +75,14 @@ function Subscriptions() {
                             </p>
                       
                         </div>
-                        <button type="submit" value={0}>Business use subscription</button>
+                        <Button type="submit" value={0} className="continueButton">
+                            <div className="rh5">
+                                <div>Choose a Business use subscription</div>
+                                <FontAwesomeIcon className="rh2" icon={faArrowCircleRight} />
+                            </div>
+                        </Button>
                     </div>
-                    <div id="subPlanTypeGutter">&nbsp;</div>
+                    
                     <div className="subPlanType">
                         <Image src={nonbusiness} fluid />
                         <Image src={nonbusinesstxt} fluid />
@@ -85,10 +90,10 @@ function Subscriptions() {
                             
                             <p>
                                 This subscription may only be used by individual researchers, individual investors, students, and instructors. 
-                                It may not be used for any business purpose. 
+                                It may not be used for any business activity. 
                             </p>
                             <p>
-                                A business purpose is any activity that directly or indirectly results in payment or 
+                                A business activity is any activity that directly or indirectly results in payment or 
                                 benefit of any kind being received.
                             </p>
 
