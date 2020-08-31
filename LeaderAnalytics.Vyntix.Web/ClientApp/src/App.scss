@@ -154,7 +154,7 @@ $app-navbar-height:90px;
 
 .nav-container {
     border-bottom: solid 3px black;
-    height: $app-navbar-height;
+    min-height: $app-navbar-height;
 }
 
 
@@ -289,19 +289,29 @@ $app-navbar-height:90px;
     padding-bottom: 4px;
     padding-left:15px;
     border: solid 1px transparent;
+
 }
 
-.cell-sub {width:15%;}
-.cell-desc {width:35%;}
-.cell-cost {width:15%;}
-.cell-dur {width:15%;}
-.cell-total {width:15%;}
+.cell-sub {width:10%;}
+.cell-desc {width:50%;}
+.cell-cost {width:10%;}
+.cell-dur {width:10%;}
+.cell-total {width:10%;}
 
 .cell-sub {margin-right:6px; }
-.cell-total { margin-left:6px; }
-.cell-desc .cell-cost, .cell-dur {
+.cell-total {
+    margin-left: 6px;
+
+    span {
+        cursor: default;
+    }
+}
+.cell-desc, .cell-cost, .cell-dur {
     margin-left:6px;
     margin-right:6px;
+    span {
+        cursor:default;
+    }
 }
 
 .gridrow:hover {
@@ -324,6 +334,25 @@ $app-navbar-height:90px;
     border: solid 1px black;
     box-shadow: inset 0px 0px 20px 20px rgba(68, 88, 144, 0.3);
 }
+
+
+@include media-breakpoint-down(md) {
+    .cell-sub {width:10%;}
+    .cell-desc {width:40%;}
+    .cell-cost {width:15%;}
+    .cell-dur {width:15%;}
+    .cell-total {width:15%;}
+
+    .cell-sub {margin-right:6px; }
+    .cell-total { margin-left:6px; }
+    .cell-desc .cell-cost, .cell-dur {
+        margin-left:6px;
+        margin-right:6px;
+    }
+}
+
+
+
 /* --------------------------------------- 
 # Footer 
     --------------------------------------- */

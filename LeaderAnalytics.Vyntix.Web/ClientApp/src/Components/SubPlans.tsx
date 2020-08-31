@@ -7,6 +7,7 @@ import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
 import { SaveAppState, FormatMoney } from '../Services/Services';
+import { Button } from 'react-bootstrap';
 
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
@@ -36,6 +37,19 @@ function SubPlans() {
 
     const handleSelectionChange = (event: any) => setSelectedPlan(event.target.checked ? event.target.dataset.providerid : '');
 
+    const handleRowSelectionChange = (event: any) => {
+        var target = event.target;
+        var plan = target.dataset.providerid;
+
+        if (plan === undefined) {
+            while (target.parentNode !== null && target.parentNode !== undefined && plan === undefined) {
+                target = target.parentNode;
+                plan = target.dataset.providerid;
+            }
+        }
+
+        setSelectedPlan(plan === selectedPlan ? '' : plan);
+    }
     const handlePromoCodeChange = (event: any) => setPromoCodes(event.target.value);
 
     const handleSubmit = async (event: SyntheticEvent) => {
@@ -64,13 +78,13 @@ function SubPlans() {
     const renderPlans = (plans: SubscriptionPlan[]) => {
         return (
             plans.filter(x => x.DisplaySequence > 0).sort(x => x.DisplaySequence).map((val, i) => (
-                <div className={(val).PaymentProviderPlanID === selectedPlan ? "gridrow selectedPlan" : "gridrow"}>
+                <div  className={(val).PaymentProviderPlanID === selectedPlan ? "gridrow selectedPlan" : "gridrow"} data-providerid={(val).PaymentProviderPlanID} onClick={handleRowSelectionChange}>
                     <div className="cell-sub">
                         <input checked={(val).PaymentProviderPlanID === selectedPlan} onChange={handleSelectionChange} type="checkbox" data-providerid={(val).PaymentProviderPlanID} className="subscribeCheckbox"></input>
                     </div>
 
                     <div className="cell-desc">
-                        <span >{(val).PlanDescription}</span>
+                        <span>{(val).PlanDescription}</span>
                     </div>
 
                     <div className="cell-cost">
@@ -98,6 +112,9 @@ function SubPlans() {
 
     return (
         <div className="container-fluid content-root dark-bg">
+
+
+
             <form onSubmit={handleSubmit}>
 
                 <div id="promoCodes" >
@@ -107,14 +124,13 @@ function SubPlans() {
 
                 <div id="subPlans" className="sub-plan-grid rh6">
                     <div className="sub-plan-grid-header gridheaderrow" >
-                        <div className="cell-sub">Subscribe</div>
+                        <div className="cell-sub">Select</div>
                         <div className="cell-desc">Plan description</div>
                         <div className="cell-cost">Monthly cost</div>
                         <div className="cell-dur">Duration</div>
                         <div className="cell-total">Total cost</div>
                      </div>   
                     {renderPlans(plans)}
-
                 </div>
                 <button type="submit" className="btn btn-primary">Continue</button>
             </form>
