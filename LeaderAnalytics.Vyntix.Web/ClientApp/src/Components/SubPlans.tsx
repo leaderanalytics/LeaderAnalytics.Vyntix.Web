@@ -8,6 +8,9 @@ import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
 import { SaveAppState, FormatMoney } from '../Services/Services';
 import { Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
+
 
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
@@ -117,6 +120,11 @@ function SubPlans() {
             <p>
                 Pricing promise: Our pricing is completely transparent.  There are no upsells, undocumented limitations, or hidden charges.
             </p>
+
+            <p>
+                Leader Analytics does not sell data and none of our subscription plans include the
+                cost of data from any vendor.
+                            </p>
             <form onSubmit={handleSubmit}>
 
                 <div id="promoCodes" >
@@ -134,7 +142,12 @@ function SubPlans() {
                      </div>   
                     {renderPlans(plans)}
                 </div>
-                <button type="submit" className="btn btn-primary">Continue</button>
+                <Button type="submit" value={0} className="continueButton">
+                    <div className="rh6">
+                        <div>Continue</div>
+                        <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />
+                    </div>
+                </Button>
             </form>
         </div>
     )

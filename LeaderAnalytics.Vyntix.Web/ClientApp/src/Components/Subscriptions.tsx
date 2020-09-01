@@ -43,7 +43,7 @@ function Subscriptions() {
     }
 
     return (
-        <div className="container-fluid content-root light-bg rpt2">
+        <div className="container-fluid content-root dark-bg rpt2">
             <div id="banner">
                 <div id="bannerHeadline" className="rp1 rh6">
                     <span className="rh5">Choose a subscription plan for your usage scenario</span>
@@ -54,65 +54,71 @@ function Subscriptions() {
                 <div id="subPlanTypes">
                     <div className="subPlanType">
                         <Image src={business} fluid />
-                        <Image src={businesstxt} fluid />
+                        <Image src={businesstxt} className="subTypeText" />
                         <div className="subPlanTypeDescription rp1 rh6">
                             <p>
                                 This subscription is intended for companies and individuals who use the service in the operation of
                                 a business.
                             </p>
-                            <Image src={freetrial} fluid />
-                            <p>
-                                FREE 30 day trial, no credit card required.
-                            </p>
-                            <p>
-                                Leader Analytics does not sell data and none of our subscription plans include the
-                                cost of data from any vendor. 
-                            </p>
+                            <div id="freeTrialImg">
+                                <Image src={freetrial} fluid />
+                            </div>
+                            
                             <p>
                                 Our tiered pricing is an outstanding value for companies of all sizes.  We offer
-                                extraordinary value to small businesses including individual consultants, 
+                                extraordinary value to small businesses as well as individual consultants, 
                                 freelancers, advisors, and bloggers.  
+                            </p>
+
+                            <p>
+                                Start managing your forecasts today.  Click the button below to get started with 
+                                a FREE 30 day trial or a subscription sized for your business.
                             </p>
                       
                         </div>
                         <Button type="submit" value={0} className="continueButton">
-                            <div className="rh5">
-                                <div>Choose a Business use subscription</div>
-                                <FontAwesomeIcon className="rh2" icon={faArrowCircleRight} />
+                            <div className="rh6">
+                                <div>Choose a business use subscription</div>
+                                <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />
                             </div>
                         </Button>
                     </div>
                     
                     <div className="subPlanType">
                         <Image src={nonbusiness} fluid />
-                        <Image src={nonbusinesstxt} fluid />
+                        <Image src={nonbusinesstxt} className="subTypeText" />
                         <div className="subPlanTypeDescription rp1 rh6">
                             
                             <p>
                                 This subscription may only be used by individual researchers, individual investors, students, and instructors. 
                                 It may not be used for any business activity. 
-                            </p>
-                            <p>
+                            
                                 A business activity is any activity that directly or indirectly results in payment or 
                                 benefit of any kind being received.
                             </p>
 
-                            <div className="nonAcceptableUse rp1">
+                            <p id="nonBusinessFreeText" className="rp1">
+                                Non-business use subscriptions are FREE and include all of the functionality of business subscriptions.
+                            </p>
+
+                            <div className="nonAcceptableUse rp1 rh7">
                                 <p>
                                     Examples of business activities where this subscription may not be used include:
                                 </p>
 
                                 <ul>
                                     <li>
-                                        Bloggers and authors who receive authorship fees, subscription fees, advertising revenue, royalties,
-                                        or promotional exposure for a business in which they have an interest.
+                                        Bloggers, authors, consultants, advisors, and wealth managers who work with the 
+                                        expectation of payment or benefit of any kind.
+                                        Benefit incluces authorship fees, subscription fees, advertising revenue, royalties, profit sharing,
+                                        or promotional exposure for a business in which there is an interest.
                                     </li>
-                                    <li>Consultants, advisors, and wealth managers who receive payment or benefit of any kind.</li>
                                     <li>Software developers who incorporate the subscription into their product which is sold or licensed.</li>
+                                    <li>Any activity within any group or organization that works with the expectation of payment, benefit, or profit.</li>
                                 </ul>
                             </div>
 
-                            <div className="acceptableUse rp1">
+                            <div className="acceptableUse rp1 rh7">
                                 <p>
                                     Activities where this subscription may be used are limited to:
                                 </p>
@@ -122,12 +128,14 @@ function Subscriptions() {
                                     <li>Students and instructors who use the subscription in an academic environment.</li>
                                 </ul>
                             </div>
-                            <p>
-                                Leader Analytics does not sell data and none of our subscription plans include the
-                                cost of data from any vendor.
-                            </p>
+                      
                         </div>
-                        <button type="submit" value={1}>Non-business use subscription</button>
+                        <Button type="submit" value={1} className="continueButton">
+                            <div className="rh6">
+                                <div>Choose a non-business use subscription</div>
+                                <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />
+                            </div>
+                        </Button>
                     </div>
                 </div>
             </form>

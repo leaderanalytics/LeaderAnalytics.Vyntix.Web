@@ -219,16 +219,17 @@ $app-navbar-height:90px;
     display:flex;
     flex-direction:row;
     justify-content:center;
+    padding-bottom:2vw;
 }
 .subPlanType {
-    display:flex;
-    flex-direction:column;
-    flex-basis:50%;
-    border:solid 5px black;
-    margin-top:2vh;
-    margin-left:1vw;
-    margin-right:1vw;
-    
+    display: flex;
+    flex-direction: column;
+    flex-basis: 50%;
+    border: solid 5px black;
+    margin-top: 2vh;
+    margin-left: 1vw;
+    margin-right: 1vw;
+    padding-bottom: 2vw;
 }
 #banner {
     display: flex;
@@ -241,6 +242,7 @@ $app-navbar-height:90px;
     display: flex;
     flex-direction: column;
     align-items:center;
+    color:$accent4;
 }
 
 #bannerObjects {
@@ -259,7 +261,8 @@ $app-navbar-height:90px;
 }
 
 .acceptableUse, .nonAcceptableUse {
-    margin-top:2vh;
+    margin-top: 2vh;
+    color: $accent5;
 }
 .acceptableUse {
     background-color:lightgreen;
@@ -268,16 +271,32 @@ $app-navbar-height:90px;
     background-color:lightcoral;
 }
 
+.subTypeText {
+    width:30vw;
+    min-width:250px;
+    align-self:center;
+    justify-self:center;
+}
+#freeTrialImg {
+    float:right;
+    width:15vw;
+    min-width:150px;
+}
+
+#nonBusinessFreeText {
+ background-color:$accent4;
+ 
+}
 .continueButton {
     align-self: center;
 
     div {
-        padding-top: 1vw;
-        padding-bottom: 1vw;
-        display:flex;
-        flex-direction:row;
-        justify-items:center;
-        align-items:center;
+        padding-top: .5vw;
+        padding-bottom: .5vw;
+        display: flex;
+        flex-direction: row;
+        justify-items: center;
+        align-items: center;
     }
 
     svg {
@@ -458,7 +477,7 @@ $app-navbar-height:90px;
 .rh4 { font-size: clamp(25px,2.5vw,50px); }
 .rh5 { font-size: clamp(20px,2vw,40px); }
 .rh6 { font-size: clamp(15px,1.1vw,30px); }
-
+.rh7 { font-size: clamp(13px,.9vw,26px); }
 .rp {
   font-size: clamp(12px,1vw,18px);
   line-height: 1.5;
