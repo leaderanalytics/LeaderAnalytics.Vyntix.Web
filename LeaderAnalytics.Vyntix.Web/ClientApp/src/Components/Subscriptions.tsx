@@ -45,7 +45,7 @@ function Subscriptions() {
     return (
         <div className="container-fluid content-root dark-bg rpt2">
             <div id="banner">
-                <div id="bannerHeadline" className="rp1 rh6">
+                <div className="pageBanner rp1">
                     <span className="rh5">Choose a subscription plan for your usage scenario</span>
                 </div>
             </div>
@@ -98,7 +98,7 @@ function Subscriptions() {
                             </p>
 
                             <p id="nonBusinessFreeText" className="rp1">
-                                Non-business use subscriptions are FREE and include all of the functionality of business subscriptions.
+                                Non-business use subscriptions are FREE and include all of the functionality of business use subscriptions.
                             </p>
 
                             <div className="nonAcceptableUse rp1 rh7">

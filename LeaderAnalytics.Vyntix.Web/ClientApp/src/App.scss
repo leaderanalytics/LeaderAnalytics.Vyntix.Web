@@ -113,6 +113,13 @@ $app-navbar-height:90px;
     color:$accent5;
 }
 
+.pageBanner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: $accent4;
+}
+
 /*--------------------------------------------------------------
 # Brand
 --------------------------------------------------------------*/
@@ -238,12 +245,7 @@ $app-navbar-height:90px;
     justify-content:center;
 }
 
-#bannerHeadline {
-    display: flex;
-    flex-direction: column;
-    align-items:center;
-    color:$accent4;
-}
+
 
 #bannerObjects {
     display:flex;
@@ -316,6 +318,64 @@ $app-navbar-height:90px;
 /* --------------------------------------- 
 # Subscription plans
 --------------------------------------- */
+
+#subPlansTopContainer {
+    display: flex;
+    flex-direction: row;
+    background-image: url(./Assets/blue-neural.png);
+    background-size:cover;
+    background-repeat:no-repeat;
+    background-position:top left;
+    background-clip:border-box;
+}
+
+#subPlansLeft {
+
+}
+
+#subPlansRight {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: center;
+    align-items:center;
+}
+
+#fourGuysImg {
+    width:30vw;
+    min-width:250px;
+}
+.disclosureCard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: $accent4;
+    color: $accent5;
+    opacity: 0.8;
+
+    p > svg {
+        margin-right: 8px;
+    }
+}
+
+.disclosureCardHeader {
+    color:$accent2;
+    display:flex;
+    align-self:center;
+    flex-direction:column;
+    align-items:center;
+}
+
+#promoCodes {
+    background-color: $accent4;
+    color: $accent5;
+    border:solid 1px black;
+    input {
+        margin-left:8px;
+        width:200px;
+    }
+}
+
 .sub-plan-grid {
     display: flex;
     flex-direction: column;
@@ -377,17 +437,52 @@ $app-navbar-height:90px;
 
 
 @include media-breakpoint-down(md) {
-    .cell-sub {width:10%;}
-    .cell-desc {width:40%;}
-    .cell-cost {width:15%;}
-    .cell-dur {width:15%;}
-    .cell-total {width:15%;}
 
-    .cell-sub {margin-right:6px; }
-    .cell-total { margin-left:6px; }
+    #subPlansTopContainer {
+        flex-direction: column;
+    }
+
+    #subPlansLeft {
+        display:flex;
+        justify-content:center;
+        img {
+            width:80vw;
+            height:auto;
+        }
+    }
+
+
+    .cell-sub {
+        width: 10%;
+    }
+
+    .cell-desc {
+        width: 40%;
+    }
+
+    .cell-cost {
+        width: 15%;
+    }
+
+    .cell-dur {
+        width: 15%;
+    }
+
+    .cell-total {
+        width: 15%;
+    }
+
+    .cell-sub {
+        margin-right: 6px;
+    }
+
+    .cell-total {
+        margin-left: 6px;
+    }
+
     .cell-desc .cell-cost, .cell-dur {
-        margin-left:6px;
-        margin-right:6px;
+        margin-left: 6px;
+        margin-right: 6px;
     }
 }
 
@@ -519,6 +614,7 @@ $app-navbar-height:90px;
 .rml13 { margin-left:13vw; }
 
 
+.rp05 { padding:.5vw; }
 .rp1 { padding:1vw; }
 .rp2 { padding:2vw; }
 .rp3 { padding:3vw; }

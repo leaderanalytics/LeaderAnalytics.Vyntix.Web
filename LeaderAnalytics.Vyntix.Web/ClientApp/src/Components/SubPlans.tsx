@@ -1,16 +1,16 @@
 ﻿import React from 'react';
 import { useState, useContext, SyntheticEvent } from 'react';
 import { useAsyncEffect } from 'use-async-effect';
-import $ from 'jquery';
 import { GetSubscriptionPlans } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
 import { SaveAppState, FormatMoney } from '../Services/Services';
-import { Button } from 'react-bootstrap';
+import { Image, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
-
+import { faArrowCircleRight, faStar, faCheck } from '@fortawesome/free-solid-svg-icons';
+import fourGuys from '../Assets/fourguys.jpg';
+import blueNeural from '../Assets/blue-neural.png';
 
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
@@ -116,18 +116,41 @@ function SubPlans() {
     return (
         <div className="container-fluid content-root dark-bg">
 
+            <div className="pageBanner rp1">
+                <span className="rh5">Subscription plans</span>
+            </div>
 
-            <p>
-                Pricing promise: Our pricing is completely transparent.  There are no upsells, undocumented limitations, or hidden charges.
-            </p>
+            <div id="subPlansTopContainer">
+                <div id="subPlansLeft">
+                    <Image src={fourGuys} id="fourGuysImg" />
+                </div>
 
-            <p>
-                Leader Analytics does not sell data and none of our subscription plans include the
-                cost of data from any vendor.
+                <div id="subPlansRight">
+
+                    <div className="disclosureCard rp1 rmb1 rm1">
+                        <div className="disclosureCardHeader">
+                            <FontAwesomeIcon className="rh4" icon={faStar} />
+                            <p className="rh5">
+                                Pricing and quality guarantee
                             </p>
+                        </div>
+                        <p className="rh6">
+                            <FontAwesomeIcon icon={faCheck} />
+                            Our pricing is completely transparent.  There are no upsells, undocumented limitations, or hidden charges.
+                        </p>
+                        <p className="rh6">
+                            <FontAwesomeIcon icon={faCheck} />
+                            Our software contains no spyware, adware, or any other kind of malware.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            
+
             <form onSubmit={handleSubmit}>
 
-                <div id="promoCodes" >
+                <div id="promoCodes" className="rmt1 rmb1 rp1" >
                     <label>Enter promo codes, if any, here.  Seperate multiple codes with a comma:</label>
                     <input type="text" value={promoCodes} onChange={handlePromoCodeChange}></input>
                 </div>
