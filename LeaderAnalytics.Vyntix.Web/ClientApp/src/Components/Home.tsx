@@ -12,8 +12,6 @@ function Home() {
 
     const appState: AppState = useContext(GlobalContext);
     const userName = appState.UserName;
-
-
     return (
         <div>
             <div className="center-content">  

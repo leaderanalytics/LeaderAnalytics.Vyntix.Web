@@ -57,6 +57,7 @@
   <ItemGroup>
     <None Remove="ClientApp\src\AppState.tsx" />
     <None Remove="ClientApp\src\Components\Contact.tsx" />
+    <None Remove="ClientApp\src\Components\Dialog.tsx" />
     <None Remove="ClientApp\src\Components\Documentation.tsx" />
     <None Remove="ClientApp\src\Components\Downloads.tsx" />
     <None Remove="ClientApp\src\Components\Footer.tsx" />
@@ -90,6 +91,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\Components\Dialog.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\SubPlans.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>

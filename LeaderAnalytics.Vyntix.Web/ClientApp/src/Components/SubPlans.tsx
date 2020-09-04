@@ -1,21 +1,25 @@
 ﻿import React from 'react';
 import { useState, useContext, SyntheticEvent } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import { useAsyncEffect } from 'use-async-effect';
 import { GetSubscriptionPlans } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
 import { SaveAppState, FormatMoney } from '../Services/Services';
-import { Image, Button } from 'react-bootstrap';
+import { Image, Button, Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowCircleRight, faStar, faCheck } from '@fortawesome/free-solid-svg-icons';
-import fourGuys from '../Assets/fourguys.jpg';
-import blueNeural from '../Assets/blue-neural.png';
+import { faArrowCircleRight, faStar, faCheck, faTools } from '@fortawesome/free-solid-svg-icons';
+import fourGuys from '../Assets/fourguys1.jpg';
+import blueNeural from '../Assets/blue-neural1.png';
+import Dialog from './Dialog';
+
 
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
     const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
     const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan?.PaymentProviderPlanID ?? '');
+    const [message, setMessage] = useState('');
     const history = useHistory();
 
     const useFetch = () => {
@@ -53,13 +57,14 @@ function SubPlans() {
 
         setSelectedPlan(plan === selectedPlan ? '' : plan);
     }
+
     const handlePromoCodeChange = (event: any) => setPromoCodes(event.target.value);
 
     const handleSubmit = async (event: SyntheticEvent) => {
         event.preventDefault();
 
         if (selectedPlan?.length < 1 ?? true) {
-            alert("Please choose a subscription.");
+            setMessage("Please choose a subscription plan.");
             return;
         }
 
@@ -105,7 +110,7 @@ function SubPlans() {
             ))
         )
     }
-
+       
 
     // -------------------------------------
     const { plans, loading } = (useFetch())
@@ -113,9 +118,11 @@ function SubPlans() {
     if (loading || plans === null || plans.length == 0)
         return (<div>loading...</div>);
 
+
+
     return (
         <div className="container-fluid content-root dark-bg">
-
+            <Dialog message={message} callback={() => setMessage('')} />
             <div className="pageBanner rp1">
                 <span className="rh5">Subscription plans</span>
             </div>
@@ -146,6 +153,16 @@ function SubPlans() {
                 </div>
             </div>
 
+            <div id="freeSubContainer" className=" rh6 rp1 rmt1">
+                <FontAwesomeIcon icon={faTools} className="rh5 rm1" />
+                <p>
+                    Vyntix is still under development.  All business use subscriptons are FREE until the service is officially released.
+                    Please choose the subscription plan that applies to you from the list below and click Continue.  You will be prompted to create an account however you will not be asked for a 
+                    credit card.  You can you renew your subscription at no cost as often as you wish while Vyntix is under develpment.  Free business use subscriptions will expire
+                    approximately thirty days after Vyntix is released. See the <Link className="rh6"  to="/Documentation" >Documentation</Link> page for estimated pricing.
+                </p>
+                <FontAwesomeIcon icon={faTools} className="rh5 rm1" />
+            </div>
             
 
             <form onSubmit={handleSubmit}>
@@ -165,7 +182,7 @@ function SubPlans() {
                      </div>   
                     {renderPlans(plans)}
                 </div>
-                <Button type="submit" value={0} className="continueButton">
+                <Button type="submit" value={0} className="continueButton rmt1 rmb1" >
                     <div className="rh6">
                         <div>Continue</div>
                         <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />

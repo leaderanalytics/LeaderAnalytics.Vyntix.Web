@@ -27,6 +27,12 @@ $accent2:#86B3D1;
 $accent3:#8E8268;
 $accent4:white; /*#FEF9C7;*/
 $accent5:#1e2226;
+
+$modal-accent1: #8D8741;
+$modal-accent2: #659DBD;
+$modal-accent3: #DAAD86;
+$modal-accent4: #BC986A;
+$modal-accent5: #FBEEC1;
 /* ---------- Variables - app ---------- */
 $app-navbar-height:90px;
 
@@ -78,6 +84,9 @@ $app-navbar-height:90px;
 }
 
 /* ---------- App level ---------- */
+a {
+    color:$accent4 !important;
+}
 .content-root {
     
     margin-top:$app-navbar-height;
@@ -366,13 +375,25 @@ $app-navbar-height:90px;
     align-items:center;
 }
 
+#freeSubContainer {
+    
+    border:yellow 6px dashed;
+    display:flex;
+    flex-direction:row;
+
+    svg {
+        color:yellow;
+    }
+}
+
 #promoCodes {
     background-color: $accent4;
     color: $accent5;
-    border:solid 1px black;
+    border: solid 1px black;
+
     input {
-        margin-left:8px;
-        width:200px;
+        margin-left: 8px;
+        width: 200px;
     }
 }
 
@@ -563,6 +584,36 @@ $app-navbar-height:90px;
     .grow-align-right, .grow-align-right p {
         text-align: center;
     }
+}
+
+/* --------------------------------------- 
+# Modal 
+    --------------------------------------- */
+.modal-container {
+    box-shadow: 0 10px 29px 0 rgba(68, 88, 144, 1.0);
+    border: 3px $modal-accent1 solid;
+    border-radius: calc(0.3rem - 1px);
+    background-color: $modal-accent2;
+}
+
+.modal-header {
+    background-color: $modal-accent2;
+    color: $modal-accent3;
+    svg {
+        margin-right:6px;
+    }
+    
+}
+.modal-body {
+    background-color: $modal-accent2;
+    color: $modal-accent5;
+    
+}
+
+.modal-footer {
+    background-color: $modal-accent2;
+    color: $modal-accent5;
+    border:none !important;
 }
 /* ---------- Relative layout  ---------- */
 
