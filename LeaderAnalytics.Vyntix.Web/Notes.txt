@@ -16,5 +16,6 @@ At build time,  ClientApp/src/Config/msalconfig.???.tsx is copied to ClientApp/s
 https://preview.themeforest.net/item/wave-finance-and-investment-html-template/full_screen_preview/27458147
 
 
+SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
 
