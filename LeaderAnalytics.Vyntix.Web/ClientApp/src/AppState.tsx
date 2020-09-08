@@ -12,6 +12,8 @@ export class AppState {
     public Token: IdToken | null = null;
     public SignInCallback: (isSignedIn: boolean) => void = (isSignedIn) => { };
     public RenderTopNav: () => void = () => { };
+    public SubscriptionPlans: SubscriptionPlan[] = new Array<SubscriptionPlan>();
+
     // Order
     public PromoCodes: string = "";
     public SubscriptionPlan: SubscriptionPlan | null = null;

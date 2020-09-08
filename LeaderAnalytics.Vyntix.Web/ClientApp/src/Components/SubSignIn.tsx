@@ -37,11 +37,11 @@ function SubSignIn() {
     }
   
     return (
-        <div className="container-fluid content-root">
+        <div className="container-fluid content-root dark-bg">
             <div>{appState.SubscriptionPlan?.PlanDescription}</div>
 
             <div>
-                You must log in using your existing acccount or create a new account before you can proceed with your subscription purchase.
+                You must log in using your existing acccount or create a new account before you can create your subscription.
             </div>
 
             <div>
