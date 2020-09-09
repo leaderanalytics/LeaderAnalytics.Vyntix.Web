@@ -113,7 +113,7 @@ function SubPlans() {
 
                 <div id="subPlansRight">
 
-                    <div className="disclosureCard rp1 rmb1 rm1">
+                    <div className="disclosureCard colorSet1 rp1 rmb1 rm1">
                         <div className="disclosureCardHeader">
                             <FontAwesomeIcon className="rh4" icon={faStar} />
                             <p className="rh5">
@@ -138,7 +138,7 @@ function SubPlans() {
                     Vyntix is still under development.  All business use subscriptons are FREE until the service is officially released.
                     Please choose the subscription plan that applies to you from the list below and click Continue.  You will be prompted to create an account however you will not be asked for a 
                     credit card.  You can you renew your subscription at no cost as often as you wish while Vyntix is under develpment.  Free business use subscriptions will expire
-                    approximately thirty days after Vyntix is released. See the <Link className="rh6"  to="/Documentation" >Documentation</Link> page for estimated pricing.
+                    approximately thirty days after Vyntix is released. See the <Link className="rh6" to="/Documentation" >Documentation</Link> page for estimated pricing.
                 </p>
                 <FontAwesomeIcon icon={faTools} className="rh5 rm1" />
             </div>
@@ -161,7 +161,7 @@ function SubPlans() {
                     </div>
                     {renderPlans(appState.SubscriptionPlans)}
                 </div>
-                <Button type="submit" value={0} className="continueButton rmt1 rmb1" >
+                <Button type="submit" value={0} className="iconButton rmt1 rmb1" >
                     <div className="rh6">
                         <div>Continue</div>
                         <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />

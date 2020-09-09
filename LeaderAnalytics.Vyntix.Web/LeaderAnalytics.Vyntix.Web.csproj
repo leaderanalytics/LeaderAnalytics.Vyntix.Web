@@ -62,6 +62,7 @@
     <None Remove="ClientApp\src\Components\Downloads.tsx" />
     <None Remove="ClientApp\src\Components\Footer.tsx" />
     <None Remove="ClientApp\src\Components\Home.tsx" />
+    <None Remove="ClientApp\src\Components\SelectedPlan.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationFailure.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationSuccess.tsx" />
     <None Remove="ClientApp\src\Components\SubConfirmation.tsx" />
@@ -91,6 +92,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\Components\SelectedPlan.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\Dialog.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>

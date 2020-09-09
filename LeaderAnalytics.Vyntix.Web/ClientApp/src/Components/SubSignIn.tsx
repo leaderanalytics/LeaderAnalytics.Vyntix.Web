@@ -1,8 +1,12 @@
 ﻿import React, { useState } from 'react';
 import { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom'
+import { Button } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
 import { SignIn } from '../Services/Services';
+import SelectedPlan  from './SelectedPlan';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faKey, faSignInAlt, faArrowCircleLeft } from '@fortawesome/free-solid-svg-icons';
 
 function SubSignIn() {
     const appState: AppState = useContext(GlobalContext);
@@ -32,28 +36,41 @@ function SubSignIn() {
 
         if(isSignedIn)
             history.push("/SubConfirmation");
-        else
-            history.push("/Subscriptions");
     }
   
     return (
         <div className="container-fluid content-root dark-bg">
-            <div>{appState.SubscriptionPlan?.PlanDescription}</div>
-
-            <div>
-                You must log in using your existing acccount or create a new account before you can create your subscription.
+            <div id="banner">
+                <div className="pageBanner rp1">
+                    <span className="rh5">Sign in before creating a subscription</span>
+                </div>
+            </div>
+            <div className="rmt1 rml2 rmr2 rmb1">
+                <SelectedPlan />
             </div>
 
             <div>
-                Click the login button below to log in.  If you do not have an account you can create one.
+                You must sign in using your existing acccount or create a new account before you can create your subscription.
             </div>
 
             <div>
-                <button onClick={LocalSignIn}>Login</button>
+                Click the button below to sign in.  If you do not have an account you can create one.
             </div>
 
             <div>
-                <button onClick={() => history.push("/Subscriptions")} >Return to Order</button>
+                <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
+                    <div className="rh6">
+                        <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
+                        <div>Back to Subscriptions</div>
+                    </div>
+                </Button>
+
+                <Button onClick={LocalSignIn} className="iconButton rmt1 rmb1" >
+                    <div className="rh6">
+                        <div>Sign in</div>
+                        <FontAwesomeIcon className="rh4" icon={faSignInAlt} />
+                    </div>
+                </Button>
             </div>
         </div>
     )

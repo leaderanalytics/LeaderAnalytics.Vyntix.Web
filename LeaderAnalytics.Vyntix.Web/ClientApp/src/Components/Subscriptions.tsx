@@ -97,7 +97,7 @@ function Subscriptions() {
                             </p>
                       
                         </div>
-                        <Button type="submit" value={0} className="continueButton">
+                        <Button type="submit" value={0} className="iconButton">
                             <div className="rh6">
                                 <div>Choose a business use subscription</div>
                                 <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />
@@ -151,7 +151,7 @@ function Subscriptions() {
                             </div>
                       
                         </div>
-                        <Button type="submit" value={1} className="continueButton">
+                        <Button type="submit" value={1} className="iconButton">
                             <div className="rh6">
                                 <div>Choose a non-business use subscription</div>
                                 <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />

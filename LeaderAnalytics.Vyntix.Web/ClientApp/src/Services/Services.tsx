@@ -94,7 +94,7 @@ export const SignOut = (appState: AppState) => {
     appState.PromoCodes = "";
     appState.SubscriptionPlan = null;
     appState.SubscriptionPlans = new Array<SubscriptionPlan>();
-    SaveAppState(appState);
+    localStorage.removeItem('appState');
 }
 
 export const SaveAppState = (appState: AppState) => {
@@ -105,10 +105,11 @@ export const SaveAppState = (appState: AppState) => {
 export const GetAppState = (): AppState => {
 
     var s = localStorage.getItem('appState');
-    var appState: AppState = s === null ? new AppState() : JSON.parse(s);
+    var appState: AppState = (s === null || s.length === 0) ? new AppState() : JSON.parse(s);
 
     if (Date.now() - appState.TimeStamp > 3600000 && appState.Token !== null) {
         SignOut(appState);
+        return GetAppState();
     }
     return appState;
 }

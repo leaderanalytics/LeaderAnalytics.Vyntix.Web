@@ -1,10 +1,15 @@
-﻿import React,  { useContext } from 'react';
+﻿import React, { useContext } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import { GlobalContext, AppState } from '../AppState';
+import { Button } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom'
 import AppConfig  from '../appconfig';
 import { loadStripe } from '@stripe/stripe-js';
 import { GetAppState } from '../Services/Services';
+import SelectedPlan from './SelectedPlan';
 import OrderApprovalResponse from '../Model/OrderApprovalResponse';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShoppingCart, faArrowCircleLeft } from '@fortawesome/free-solid-svg-icons';
 
 function SubConfirmation() {
     const history = useHistory();
@@ -21,7 +26,7 @@ function SubConfirmation() {
 
         const order = {
             UserID: appState.UserID,
-            UserEmail: appState.UserEmail,                    // only until we can get it from Azure
+            UserEmail: appState.UserEmail,                    
             CustomerID: appState.CustomerID,
             SubscriptionID: appState.SubscriptionID,
             PaymentProviderPlanID: appState.SubscriptionPlan?.PaymentProviderPlanID,
@@ -52,25 +57,39 @@ function SubConfirmation() {
     }
 
     return (
-        <div className="container-fluid content-root">
-            <div>
-                This is SubConfirmation
+        <div className="container-fluid content-root dark-bg">
+            <div id="banner">
+                <div className="pageBanner rp1">
+                    <span className="rh5">Confirm your subscription</span>
+                </div>
+            </div>
+            <div className="rmt1 rml2 rmr2 rmb1">
+                <SelectedPlan />
             </div>
 
             <div>
-                {appState.SubscriptionPlan?.PlanDescription}
+                Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank" >Documentation</Link> page for a complete description of the Vyntix service.
             </div>
 
-            <div>
-                {appState.PromoCodes}
-            </div>
+            
 
             <div>
-                <button onClick={Checkout} >Procced to checkout</button>
-            </div>
 
-            <div>
-                <button onClick={() => history.push("/Subscriptions")} >Return to Order</button>
+                <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
+                    <div className="rh6">
+                        <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
+                        <div>Back to Subscriptions</div>
+
+                    </div>
+                </Button>
+
+                <Button onClick={Checkout} className="iconButton rmt1 rmb1" >
+                    <div className="rh6">
+                        <div>Check out</div>
+                        <FontAwesomeIcon className="rh4" icon={faShoppingCart} />
+                    </div>
+                </Button>
+
             </div>
         </div>
     )
