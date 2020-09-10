@@ -21,7 +21,8 @@ const TopNav = () => {
 
     
 
-    const LocalSignIn = async () => {
+    const LocalSignIn = async (event: any) => {
+        event.preventDefault();
         const x = await SignIn(appState);
 
         setisSignedIn(x);

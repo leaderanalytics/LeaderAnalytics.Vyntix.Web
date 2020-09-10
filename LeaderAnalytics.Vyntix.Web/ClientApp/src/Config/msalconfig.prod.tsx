@@ -1,5 +1,8 @@
 import * as MSAL from 'msal';
 export default class MSALConfig {
+    //----------------------------------------------------------------------
+    // This file is copied from src/Config at build time.   See .csproj file
+    //----------------------------------------------------------------------
     /**
      * Config object to be passed to MSAL on creation.
      * For a full list of msal.js configuration parameters, 
@@ -9,7 +12,9 @@ export default class MSALConfig {
     public auth = {
         clientId: "f16f44ba-20c7-4fc0-a940-f70def6146eb",
         authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/B2C_1_susi",
-        validateAuthority: false
+        validateAuthority: false,
+        navigateToLoginRequestUrl: true,
+        redirectUri: "https://localhost:5031/"
     };
     public cache = {
         CacheLocation: "localStorage", // LocalStorage allows single signon accross tabs.

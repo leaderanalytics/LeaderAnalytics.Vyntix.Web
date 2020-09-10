@@ -55,7 +55,7 @@ export const SignIn = async (appState: AppState): Promise<boolean> => {
     const auth: MSAL.Configuration = new MSALConfig();
     const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
     var success: boolean = false;
-
+    
     try {
         const response = await userAgentApplication.loginPopup(AppConfig.loginScopes);
 

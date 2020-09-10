@@ -25,7 +25,8 @@ function SubSignIn() {
     }, []);
 
     
-    const LocalSignIn = async () => {
+    const LocalSignIn = async (event: any) => {
+        event.preventDefault();
         isSignedIn = await SignIn(appState);
         setisSignedIn(isSignedIn);
         SignInCallback(isSignedIn);
