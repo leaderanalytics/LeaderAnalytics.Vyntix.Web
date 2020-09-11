@@ -13,7 +13,7 @@ function Home() {
     const appState: AppState = useContext(GlobalContext);
     const userName = appState.UserName;
     return (
-        <div>
+        <div className="content-root">
             <div className="center-content">  
                 <Image src={models_that_lead} fluid id="banner-image" />
             </div>

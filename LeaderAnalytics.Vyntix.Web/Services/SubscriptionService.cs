@@ -44,7 +44,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             // To do: In Renewals, check for an existing subscription and customerID.
             // If found, update the existing subscription
-            // User cannot have two subscriptions for same product
+            // User cannot have two subscriptions for same product (todo: why not)
             // User must be admin to modify subscription
             // Check CanSubscribe and CanRenew flag on subscription
 

@@ -14,12 +14,14 @@ import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import { AppState, GlobalContext } from './AppState';
 import Documentation from './Components/Documentation';
 import Downloads from './Components/Downloads';
+import ScrollToTop from './Components/ScrollToTop';
 
 function App() {
     const appState: AppState = GetAppState();
     return (
         <GlobalContext.Provider value={appState}>
             <Router>
+                <ScrollToTop />
                 <TopNav />
                 <Switch>
                     <Route exact path="/" component={Home} />

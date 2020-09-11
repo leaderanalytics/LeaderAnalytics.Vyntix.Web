@@ -9,12 +9,12 @@ import { GetAppState } from '../Services/Services';
 import SelectedPlan from './SelectedPlan';
 import OrderApprovalResponse from '../Model/OrderApprovalResponse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faArrowCircleLeft } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faArrowCircleLeft, faKey } from '@fortawesome/free-solid-svg-icons';
 
 function SubConfirmation() {
     const history = useHistory();
     const appState: AppState = GetAppState();
-
+    const orderTotal = appState.SubscriptionPlan?.Cost;
 
     const Checkout = async () => {
 
@@ -23,7 +23,7 @@ function SubConfirmation() {
 
         // At this point the user is logged in and has made a subscription selection. 
         // Post user identity and subscription selection back to the server for validation.
-
+        
         const order = {
             UserID: appState.UserID,
             UserEmail: appState.UserEmail,                    
@@ -43,21 +43,42 @@ function SubConfirmation() {
 
         const approval = await response.json(); // see Model/OrderApprovalResponse
 
+        // test
+        approval.errorMessage = "this is a test";
+        (response as any).status = 301;
+        // test
+
         if (response.status < 300) {
-            // Order is OK, redirect to payment processor
-            const stripe = await loadStripe(AppConfig.StripeApiKey);
-            stripe?.redirectToCheckout({ sessionId: approval.sessionID });
+
+            // Order approval is OK
+
+            if (orderTotal > 0) {
+                // Redirect to payment processor
+                const stripe = await loadStripe(AppConfig.StripeApiKey);
+                stripe?.redirectToCheckout({ sessionId: approval.sessionID });
+            }
+            else {
+                // Create a no cost subscription
+                let createResponse = await fetch('/subscription/CreateNoCostSubscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(order)
+                });
+                history.push("/SubActivationSuccess");
+            }
         }
         else {
 
-            // Error, redirect to Subscriptions page
-            alert(approval.errorMessage);
-            history.push("/Subscriptions");
+            // Approval error
+            appState.Message = approval.errorMessage;
+            history.push("/SubActivationSuccess");
         }
     }
 
     return (
-        <div className="container-fluid content-root dark-bg">
+        <div className="content-root container-fluid dark-bg" >
             <div id="banner">
                 <div className="pageBanner rp1">
                     <span className="rh5">Confirm your subscription</span>
@@ -71,8 +92,6 @@ function SubConfirmation() {
                 Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank" >Documentation</Link> page for a complete description of the Vyntix service.
             </div>
 
-            
-
             <div>
 
                 <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
@@ -83,12 +102,23 @@ function SubConfirmation() {
                     </div>
                 </Button>
 
-                <Button onClick={Checkout} className="iconButton rmt1 rmb1" >
-                    <div className="rh6">
-                        <div>Check out</div>
-                        <FontAwesomeIcon className="rh4" icon={faShoppingCart} />
-                    </div>
-                </Button>
+                {
+                    orderTotal > 0 ?
+
+                        <Button onClick={Checkout} className="iconButton rmt1 rmb1" >
+                            <div className="rh6">
+                                <div>Check out</div>
+                                <FontAwesomeIcon className="rh4" icon={faShoppingCart} />
+                            </div>
+                        </Button>
+                    :
+                        <Button onClick={Checkout} className="iconButton rmt1 rmb1" >
+                            <div className="rh6">
+                                <div>Create Subscription</div>
+                                <FontAwesomeIcon className="rh4" icon={faKey} />
+                            </div>
+                        </Button>
+                }
 
             </div>
         </div>

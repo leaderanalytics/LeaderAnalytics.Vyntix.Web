@@ -62,6 +62,7 @@
     <None Remove="ClientApp\src\Components\Downloads.tsx" />
     <None Remove="ClientApp\src\Components\Footer.tsx" />
     <None Remove="ClientApp\src\Components\Home.tsx" />
+    <None Remove="ClientApp\src\Components\ScrollToTop.tsx" />
     <None Remove="ClientApp\src\Components\SelectedPlan.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationFailure.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationSuccess.tsx" />
@@ -92,6 +93,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\Components\ScrollToTop.tsx" />
     <TypeScriptCompile Include="ClientApp\src\Components\SelectedPlan.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
