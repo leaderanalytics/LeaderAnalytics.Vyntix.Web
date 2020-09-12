@@ -47,6 +47,7 @@ function Subscriptions() {
         else if (planChoice === "1") {
             // Non-business subscription
             appState.SubscriptionPlan = appState.SubscriptionPlans.filter(x => x.PaymentProviderPlanID === "NONBUSINESS")[0];
+            SaveAppState(appState);
 
             // if the user is not logged in, prompt them to log in.
             if (appState.UserID === null || appState.UserID.length < 2) {

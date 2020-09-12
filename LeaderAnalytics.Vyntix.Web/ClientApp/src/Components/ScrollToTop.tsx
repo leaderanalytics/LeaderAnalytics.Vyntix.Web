@@ -3,10 +3,10 @@ import { withRouter } from 'react-router-dom';
 import { useHistory } from 'react-router-dom'
 
 function ScrollToTop(props: any) {
-    
+    const history = useHistory();
 
     useEffect(() => {
-        const unlisten = props.history.listen(() => {
+        const unlisten = history.listen(() => {
             window.scrollTo(0, 0);
         });
         return () => {

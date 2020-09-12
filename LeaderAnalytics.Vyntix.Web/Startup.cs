@@ -22,7 +22,7 @@ namespace LeaderAnalytics.Vyntix.Web
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        private List<SubscriptionPlan> subscriptionPlans;
+        private string subscriptionFilePath;
 
         public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
@@ -35,17 +35,8 @@ namespace LeaderAnalytics.Vyntix.Web
                 .AddConfiguration(configuration)
                 .AddJsonFile(Path.Combine(configFilePath, $"appsettings.{env.EnvironmentName}.json"), false)
                 .Build();
-
-            // Read subscription plan data
-            string subscriptionFile = Path.Combine(configFilePath, $"subscriptions.{env.EnvironmentName}.json");
             
-            if (! System.IO.File.Exists(subscriptionFile))
-                throw new Exception($"Subscription File {subscriptionFile} was not found.");
-            
-            subscriptionPlans = JsonSerializer.Deserialize<List<SubscriptionPlan>>(System.IO.File.ReadAllBytes(subscriptionFile));
-            
-            if(subscriptionPlans == null || ! subscriptionPlans.Any())
-                throw new Exception($"Subscription File {subscriptionFile} was not parsed correctly.  No subscription plans were found.");
+            subscriptionFilePath = Path.Combine(configFilePath, $"subscriptions.{env.EnvironmentName}.json");
         }
 
         
@@ -76,9 +67,6 @@ namespace LeaderAnalytics.Vyntix.Web
             Stripe.StripeClient stripeClient = new Stripe.StripeClient(Stripe.StripeConfiguration.ApiKey);
             services.AddSingleton(stripeClient);
 
-            // Subscription Plans
-            services.AddSingleton(subscriptionPlans);
-
             // Graph Credentials
             IConfigurationSection graphSection = Configuration.GetSection("AzureGraph");
             GraphClientCredentials graphCredentials = new GraphClientCredentials
@@ -89,7 +77,7 @@ namespace LeaderAnalytics.Vyntix.Web
             };
             GraphService graphService = new GraphService(graphCredentials);
             SessionCache sessionCache = new SessionCache();
-            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService, stripeClient, sessionCache);
+            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService, stripeClient, sessionCache, subscriptionFilePath);
 
             services.AddSingleton(graphCredentials);
             services.AddSingleton(graphService);

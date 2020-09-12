@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { SaveAppState } from '../Services/Services';
 
 
 
@@ -13,6 +14,7 @@ function SubActivationFailure() {
 
     const clickHandler = () => {
         appState.Message = '';
+        SaveAppState(appState);
         history.push("/Subscriptions");
 
     }
@@ -42,11 +44,10 @@ function SubActivationFailure() {
                             {appState.Message}
                         </div>
                 }
-                
 
             </div>
-            
-            <Button  className="iconButton rmt1 rmb1" >
+
+            <Button onClick={clickHandler} className="iconButton rmt1 rmb1" >
                 <div className="rh6">
                     <div>Continue</div>
                     <FontAwesomeIcon className="rh4" icon={faArrowCircleRight} />

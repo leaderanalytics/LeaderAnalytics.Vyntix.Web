@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom'
 import AppConfig  from '../appconfig';
 import { loadStripe } from '@stripe/stripe-js';
-import { GetAppState } from '../Services/Services';
+import { GetAppState, SaveAppState } from '../Services/Services';
 import SelectedPlan from './SelectedPlan';
 import OrderApprovalResponse from '../Model/OrderApprovalResponse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,7 +14,7 @@ import { faShoppingCart, faArrowCircleLeft, faKey } from '@fortawesome/free-soli
 function SubConfirmation() {
     const history = useHistory();
     const appState: AppState = GetAppState();
-    const orderTotal = appState.SubscriptionPlan?.Cost;
+    const orderTotal = appState.SubscriptionPlan?.Cost ?? 0;
 
     const Checkout = async () => {
 
@@ -43,13 +43,7 @@ function SubConfirmation() {
 
         const approval = await response.json(); // see Model/OrderApprovalResponse
 
-        // test
-        approval.errorMessage = "this is a test";
-        (response as any).status = 301;
-        // test
-
         if (response.status < 300) {
-
             // Order approval is OK
 
             if (orderTotal > 0) {
@@ -73,7 +67,8 @@ function SubConfirmation() {
 
             // Approval error
             appState.Message = approval.errorMessage;
-            history.push("/SubActivationSuccess");
+            SaveAppState(appState);
+            history.push("/SubActivationFailure");
         }
     }
 
@@ -89,7 +84,7 @@ function SubConfirmation() {
             </div>
 
             <div>
-                Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank" >Documentation</Link> page for a complete description of the Vyntix service.
+                Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank" >documentation</Link> page for a complete description of the Vyntix service.
             </div>
 
             <div>

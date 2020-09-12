@@ -27,8 +27,8 @@ const TopNav = () => {
 
         setisSignedIn(x);
 
-        if (isSignedIn) {
-            appState.SignInCallback?.call(null, isSignedIn);
+        if (x) {
+            appState.SignInCallback?.call(null, x);
         }
     }
 

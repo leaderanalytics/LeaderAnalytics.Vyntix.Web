@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
+using System.Text.Json;
+using LeaderAnalytics.Core;
+using System.Security.Cryptography.X509Certificates;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
@@ -15,13 +18,38 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private GraphService graphService;
         private StripeClient stripeClient;
         private SessionCache sessionCache;
+        private string subscriptionFile;
+        private List<SubscriptionPlan> subscriptionPlans;
 
-        public SubscriptionService(GraphService graphService, StripeClient stripeClient, SessionCache sessionCache)
+        public SubscriptionService(GraphService graphService, StripeClient stripeClient, SessionCache sessionCache, string subscriptionFilePath)
         {
             this.graphService = graphService;
             this.stripeClient = stripeClient;
             this.sessionCache = sessionCache;
+            this.subscriptionFile = subscriptionFilePath ?? throw new ArgumentNullException("subscriptionFilePath");
+            subscriptionPlans = new List<SubscriptionPlan>();
         }
+
+
+        public List<SubscriptionPlan> GetActiveSubscriptionPlans() => GetSubscriptionPlans().Where(x => x.IsCurrent()).ToList();
+
+        public List<SubscriptionPlan> GetSubscriptionPlans()
+        {
+            if (subscriptionPlans.Any())
+                return subscriptionPlans;
+
+
+            if (!System.IO.File.Exists(subscriptionFile))
+                throw new Exception($"Subscription File {subscriptionFile} was not found.");
+
+            subscriptionPlans = JsonSerializer.Deserialize<List<SubscriptionPlan>>(System.IO.File.ReadAllBytes(subscriptionFile));
+
+            if (subscriptionPlans == null || !subscriptionPlans.Any())
+                throw new Exception($"Subscription File {subscriptionFile} was not parsed correctly.  No subscription plans were found.");
+
+            return subscriptionPlans;
+        }
+
 
         public async Task<CreateSessionResponse> ApproveSubscriptionOrder(SubscriptionOrder order, string hostURL) 
         {
@@ -47,8 +75,17 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             // User cannot have two subscriptions for same product (todo: why not)
             // User must be admin to modify subscription
             // Check CanSubscribe and CanRenew flag on subscription
+            SubscriptionPlan plan = GetActiveSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID);
 
-            response = await CreateSession(order, hostURL);
+            if (plan == null)
+            {
+                response.ErrorMessage = $"Subscription plan {order.PaymentProviderPlanID} was not found in the active subscription plan table.";
+                return response;
+            }
+
+            if(plan.Cost > 0)
+                response = await CreateSession(order, hostURL);
+
             return response;
         }
 

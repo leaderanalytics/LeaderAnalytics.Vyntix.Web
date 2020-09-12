@@ -15,13 +15,10 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     [Route("[controller]/[action]")]
     public class SubscriptionController : Controller
     {
-        private List<SubscriptionPlan> subscriptonPlans;
         private SubscriptionService subscriptionService;
-        
 
-        public SubscriptionController(List<SubscriptionPlan> subscriptonPlans, SubscriptionService subscriptionService)
+        public SubscriptionController(SubscriptionService subscriptionService)
         {
-            this.subscriptonPlans = subscriptonPlans ?? throw new ArgumentNullException("subscriptionPlans");
             this.subscriptionService = subscriptionService ?? throw new ArgumentNullException("subscriptionService");
         }
 
@@ -32,9 +29,9 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetActiveSubscriptionPlans()
+        public JsonResult GetActiveSubscriptionPlans()
         {
-            return Json(subscriptonPlans.Where(x => x.IsCurrent()));
+            return Json(subscriptionService.GetActiveSubscriptionPlans());
         }
 
 
