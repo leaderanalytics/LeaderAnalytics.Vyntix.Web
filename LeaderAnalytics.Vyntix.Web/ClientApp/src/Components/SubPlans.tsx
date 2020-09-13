@@ -21,7 +21,22 @@ function SubPlans() {
     const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan?.PaymentProviderPlanID ?? '');
     const [message, setMessage] = useState('');
     const history = useHistory();
+    const [plans, setPlans] = useState(new Array<SubscriptionPlan>());
 
+    const useFetch = () => {
+        const [loading, setLoading] = useState(true);
+
+        useAsyncEffect(async (isMounted) => {
+
+            if (isMounted() && plans.length === 0)
+                setPlans(await GetSubscriptionPlans());
+
+            setLoading(false);
+
+        }, []);
+
+        return { loading };
+    }
     
 
     const handleSelectionChange = (event: any) => setSelectedPlan(event.target.checked ? event.target.dataset.providerid : '');
@@ -51,7 +66,7 @@ function SubPlans() {
         }
 
         // get the selected subscription
-        appState.SubscriptionPlan = appState.SubscriptionPlans.filter(x => x.PaymentProviderPlanID === selectedPlan)[0];
+        appState.SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === selectedPlan)[0];
         appState.PromoCodes = promoCodes;
         SaveAppState(appState);
 
@@ -97,6 +112,10 @@ function SubPlans() {
     // -------------------------------------
     
 
+    const { loading } = (useFetch())
+
+    if (loading || plans === null || plans.length == 0)
+        return (<div>loading...</div>);
 
 
     return (
@@ -159,7 +178,7 @@ function SubPlans() {
                         <div className="cell-dur">Duration</div>
                         <div className="cell-total">Total cost</div>
                     </div>
-                    {renderPlans(appState.SubscriptionPlans)}
+                    {renderPlans(plans)}
                 </div>
                 <Button type="submit" value={0} className="iconButton rmt1 rmb1" >
                     <div className="rh6">

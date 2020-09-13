@@ -18,25 +18,8 @@ import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 function Subscriptions() {
     const appState: AppState = useContext(GlobalContext);
-
-    const useFetch = () => {
-        const [loading, setLoading] = useState(true);
-
-
-        useAsyncEffect(async (isMounted) => {
-
-            if (isMounted() && appState.SubscriptionPlans.length === 0)
-                appState.SubscriptionPlans = await GetSubscriptionPlans();
-
-            setLoading(false);
-
-        }, []);
-
-        return { loading };
-    }
-
-
     const history = useHistory();
+
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         const elem = document.activeElement as any;
@@ -46,7 +29,7 @@ function Subscriptions() {
             history.push("/SubPlans"); // Business subscription
         else if (planChoice === "1") {
             // Non-business subscription
-            appState.SubscriptionPlan = appState.SubscriptionPlans.filter(x => x.PaymentProviderPlanID === "NONBUSINESS")[0];
+            appState.SubscriptionPlan = (await GetSubscriptionPlans()).filter(x => x.PaymentProviderPlanID === "NONBUSINESS")[0];
             SaveAppState(appState);
 
             // if the user is not logged in, prompt them to log in.
@@ -59,10 +42,7 @@ function Subscriptions() {
         }
     }
 
-    const { loading } = (useFetch())
-
-    if (loading || appState.SubscriptionPlans === null || appState.SubscriptionPlans.length == 0)
-        return (<div>loading...</div>);
+    
 
     return (
         <div className="container-fluid content-root dark-bg rpt2">

@@ -10,6 +10,7 @@ using Serilog;
 using System.Text.Json;
 using LeaderAnalytics.Core;
 using System.Security.Cryptography.X509Certificates;
+using System.Runtime.CompilerServices;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
@@ -50,6 +51,37 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return subscriptionPlans;
         }
 
+        public async Task<SubscriptionOrder> GetPriorSubscriptions(SubscriptionOrder order)
+        {
+            LeaderAnalytics.Vyntix.Web.Models.Subscription sub = null;
+
+            CustomerService customerService = new CustomerService();
+            Customer customer = (await customerService.ListAsync(new CustomerListOptions { Email = order.UserEmail })).FirstOrDefault();
+            
+            if (customer == null)
+                return order;
+
+            order.CustomerID = customer.Id;
+
+            if (customer.Subscriptions?.Any() ?? false)
+            {
+                // Find prior subscription, if any
+                var stripeSub = customer.Subscriptions.FirstOrDefault(x => x.Plan.Id == order.PaymentProviderPlanID);
+                
+                if (stripeSub != null)
+                {
+                    sub = new Models.Subscription();
+                    sub.SubscriptionID = stripeSub.Id;
+                    sub.PaymentProviderPlanID = stripeSub.Plan.Id;
+                    sub.PlanDescription = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID)?.PlanDescription;
+                    sub.StartDate = stripeSub.CurrentPeriodStart;
+                    sub.EndDate = stripeSub.CurrentPeriodEnd;
+                    order.PriorSubscription = sub;
+                }
+            }
+            return order;
+        }
+
 
         public async Task<CreateSessionResponse> ApproveSubscriptionOrder(SubscriptionOrder order, string hostURL) 
         {
@@ -61,8 +93,9 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             CreateSessionResponse response = new CreateSessionResponse();
 
             // Check the user
-
-            if (string.IsNullOrEmpty(order.UserID))
+            if (string.IsNullOrEmpty(order.UserEmail))
+                response.ErrorMessage = "User Email cannot be null.  Please log in before purchasing a subscription.";
+            else if (string.IsNullOrEmpty(order.UserID))
                 response.ErrorMessage = "User ID cannot be null.  Please log in before purchasing a subscription.";
             else if (!await graphService.VerifyUser(order.UserID))
                 response.ErrorMessage = "Invalid User ID.";
@@ -83,9 +116,11 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 return response;
             }
 
-            if(plan.Cost > 0)
+            if (plan.Cost > 0)
+            {
+                order = await GetPriorSubscriptions(order);
                 response = await CreateSession(order, hostURL);
-
+            }
             return response;
         }
 
@@ -101,12 +136,22 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 {
                     new SessionLineItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 }
                 },
-                CustomerEmail = order.UserEmail,
+                Customer = order.CustomerID,
+                CustomerEmail = string.IsNullOrEmpty(order.CustomerID)? order.UserEmail : null,
                 Mode = "subscription",
                 SuccessUrl = hostURL + "/Subscription/CreateSubscription?session_id={CHECKOUT_SESSION_ID}",    // Called AFTER user submits payment
                 CancelUrl = hostURL + "/SubActivationFailure",                                                  // Called only if user cancels
             };
-
+            
+            // causes stripe to throw
+            //if (order.PriorSubscription != null)
+            //{
+            //    options.SubscriptionData = new SessionSubscriptionDataOptions
+            //    {
+            //        Items = new List<SessionSubscriptionDataItemOptions> { new SessionSubscriptionDataItemOptions { Plan = order.PaymentProviderPlanID, Quantity = 1 } }
+            //    };
+            
+            //}
             // Call Stripe and create the session
             Session session = null;
             Log.Information("CreateSession: Creating session for order options: {$options}", options);
@@ -170,7 +215,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             // Get the subscription from Stripe  --------------------------------
             string customerID = stripeSession.CustomerId;
             string subscriptionID = stripeSession.SubscriptionId;
-            Subscription subscription = null;
+            Stripe.Subscription subscription = null;
             
             try
             {

@@ -93,7 +93,6 @@ export const SignOut = (appState: AppState) => {
     appState.Token = null;
     appState.PromoCodes = "";
     appState.SubscriptionPlan = null;
-    appState.SubscriptionPlans = new Array<SubscriptionPlan>();
     localStorage.removeItem('appState');
 }
 
