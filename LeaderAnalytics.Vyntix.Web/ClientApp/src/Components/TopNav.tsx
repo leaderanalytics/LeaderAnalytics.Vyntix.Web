@@ -7,33 +7,37 @@ import { Button, Navbar, NavDropdown, Nav, Form, FormControl, Container, Image }
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faHome, faBahai, faKey, faBook, faDownload, faEnvelope, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 import logo from '../Assets/VyntixLogo.png';
+import Dialog from './Dialog';
+import DialogType from '../Model/DialogType';
+import DialogProps from '../Model/DialogProps';
 
 
 const TopNav = () => {
     const appState: AppState = useContext(GlobalContext);
     const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);
+    const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
+
     appState.RenderTopNav = () => {
-
         setisSignedIn(appState.UserID !== null && appState.UserID.length > 1)
-
-
     };
-
-    
 
     const LocalSignIn = async (event: any) => {
         event.preventDefault();
-        const x = await SignIn(appState);
+        const errorMsg = await SignIn(appState);
+        const tmpIsSignedIn: boolean = errorMsg.length === 0;
 
-        setisSignedIn(x);
+        setisSignedIn(tmpIsSignedIn);
 
-        if (x) {
-            appState.SignInCallback?.call(null, x);
+        if (tmpIsSignedIn) {
+            appState.SignInCallback?.call(null, tmpIsSignedIn);
         }
+        else
+            setDialogProps(new DialogProps(errorMsg, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
     }
 
     return (
         <Navbar variant="dark" expand="lg" collapseOnSelect fixed="top" className="nav-container dark-bg">
+            <Dialog dialogProps={dialogProps} />
             <Navbar.Brand href="/">
                 <Image src={logo} className="logo-large" />
             </Navbar.Brand>

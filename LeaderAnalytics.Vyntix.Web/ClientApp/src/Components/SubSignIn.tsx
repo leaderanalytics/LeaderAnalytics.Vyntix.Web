@@ -7,10 +7,16 @@ import { SignIn } from '../Services/Services';
 import SelectedPlan  from './SelectedPlan';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey, faSignInAlt, faArrowCircleLeft } from '@fortawesome/free-solid-svg-icons';
+import Dialog from './Dialog';
+import DialogProps from '../Model/DialogProps';
+import DialogType from '../Model/DialogType';
+import { string } from 'prop-types';
 
 function SubSignIn() {
     const appState: AppState = useContext(GlobalContext);
     var [isSignedIn, setisSignedIn] = useState(appState.UserID != null && appState.UserID.length > 1);
+    const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
+    const [errorMsg, setErrorMsg] = useState('');
     const history = useHistory();
 
     // The SignIn method in the Nav component calls the method that is assigned to appState.SignInCallback.
@@ -27,10 +33,15 @@ function SubSignIn() {
     
     const LocalSignIn = async (event: any) => {
         event.preventDefault();
-        isSignedIn = await SignIn(appState);
+        var tmp: string = await SignIn(appState);
+        isSignedIn = tmp.length === 0;
+        setErrorMsg(tmp);
         setisSignedIn(isSignedIn);
         SignInCallback(isSignedIn);
         appState.RenderTopNav();
+
+        if (tmp.length > 0)
+            setDialogProps(new DialogProps(tmp, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
     }
 
     const SignInCallback = (isSignedIn: boolean) => {
@@ -41,6 +52,7 @@ function SubSignIn() {
   
     return (
         <div className="container-fluid content-root dark-bg">
+            <Dialog dialogProps={dialogProps} />
             <div id="banner">
                 <div className="pageBanner rp1">
                     <span className="rh5">Sign in before creating a subscription</span>

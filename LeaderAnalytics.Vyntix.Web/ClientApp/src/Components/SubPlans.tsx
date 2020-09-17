@@ -14,6 +14,7 @@ import fourGuys from '../Assets/fourguys1.jpg';
 import blueNeural from '../Assets/blue-neural1.png';
 import Dialog from './Dialog';
 import DialogType from '../Model/DialogType';
+import DialogProps from '../Model/DialogProps';
 
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
@@ -22,6 +23,7 @@ function SubPlans() {
     const [message, setMessage] = useState('');
     const history = useHistory();
     const [plans, setPlans] = useState(new Array<SubscriptionPlan>());
+    const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
 
     const useFetch = () => {
         const [loading, setLoading] = useState(true);
@@ -61,7 +63,7 @@ function SubPlans() {
         event.preventDefault();
 
         if (selectedPlan?.length < 1 ?? true) {
-            setMessage("Please choose a subscription plan.");
+            setDialogProps(new DialogProps("Please choose a subscription plan.", DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
             return;
         }
 
@@ -120,7 +122,7 @@ function SubPlans() {
 
     return (
         <div className="container-fluid content-root dark-bg">
-            <Dialog dialogType={DialogType.Info } message={message} callback={() => setMessage('')} />
+            <Dialog dialogProps={dialogProps} />
             <div className="pageBanner rp1">
                 <span className="rh5">Subscription plans</span>
             </div>

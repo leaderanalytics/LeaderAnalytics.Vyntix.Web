@@ -29,17 +29,16 @@ export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
     return result;
 }
 
-export const SignIn = async (appState: AppState): Promise<boolean> => {
+export const SignIn = async (appState: AppState): Promise<string> => {
 
     if (appState.UserID != null && appState.UserID.length > 1) {
-        alert('You are already signed in.  Sign out before signing in again.')
-        return true;
+        return 'You are already signed in.  Sign out before signing in again.';
     }
 
     const auth: MSAL.Configuration = new MSALConfig();
     const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
-    var success: boolean = false;
-    
+    var msg: string = '';
+
     try {
         const response = await userAgentApplication.loginPopup(AppConfig.loginScopes);
 
@@ -49,18 +48,13 @@ export const SignIn = async (appState: AppState): Promise<boolean> => {
             appState.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
             appState.Token = response.idToken;
             SaveAppState(appState);
-            success = true;
         }
     }
     catch (err) {
-
         // login dialog throws if user cancels
+        msg = 'The login attempt was not successful.';
     }
-
-    if (!success) {
-        alert('The login attempt was not successful.');
-    }
-    return success;
+    return msg;
 }
 
 export const SignOut = (appState: AppState) => {

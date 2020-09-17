@@ -7,9 +7,9 @@ import { faMailBulk, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { SendContactRequest } from '../Services/Services';
 import ContactRequest from '../Model/ContactRequest';
 import AsyncResult from '../Model/AsyncResult';
+import AppConfig from '../appconfig';
 import Dialog from './Dialog';
 import DialogType from '../Model/DialogType';
-import AppConfig from '../appconfig';
 import DialogProps from '../Model/DialogProps';
 
 function Contact() {
