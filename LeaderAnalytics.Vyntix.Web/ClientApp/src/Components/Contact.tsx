@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState, useRef } from 'react';
 import { Image, Button } from 'react-bootstrap';
 import { useLocation } from 'react-router';
 import { useAsyncEffect } from 'use-async-effect';
@@ -13,6 +13,9 @@ import AppConfig from '../appconfig';
 import DialogProps from '../Model/DialogProps';
 
 function Contact() {
+    // https://stackoverflow.com/questions/54895883/reset-to-initial-state-with-react-hooks
+    const myForm = useRef(null);
+    const inputRef = useRef(null);
     const CAPTCHA_URL = AppConfig.host + "email/captchaImage";
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
     const [name, setName] = useState("");
@@ -21,16 +24,11 @@ function Contact() {
     const [requirement, setRequirement] = useState("Company Information");
     const [comment, setComment] = useState("");
     const [captcha, setCaptcha] = useState("");
-    const [captchaImgUrl, setCaptchaUrl] = useState(CAPTCHA_URL);
-    //const [toggleReset, setToggleRest] = useState(0);
-    var toggleReset = 0;
+    const [captchaImgUrl, setCaptchaUrl] = useState(CAPTCHA_URL + '?d=' + new Date().getTime().toString());
+    const [reloadCount, setReloadCount] = useState(0);
 
-    useEffect(() => {
-        resetForm();
-    }, [toggleReset]);
-
-
-    const resetForm = () => {
+    const clearForm = () => {
+        (myForm?.current as any).reset();
         setDialogProps(new DialogProps("", DialogType.None, () => { }));
         setName("");
         setEmail("");
@@ -38,8 +36,8 @@ function Contact() {
         setRequirement("");
         setComment("");
         setCaptcha("");
-        setCaptchaUrl("");
-        setCaptchaUrl(CAPTCHA_URL);
+        setCaptchaUrl(CAPTCHA_URL + '?d=' + new Date().getTime().toString());
+        setReloadCount(reloadCount + 1);
     }
 
     const handleSubmit = async (event: any) => {
@@ -67,13 +65,17 @@ function Contact() {
         
 
         if (result.Success) {
-            setDialogProps(new DialogProps("Your message was sent successfully.", DialogType.Info, () => { resetForm(); setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+            setDialogProps(new DialogProps("Your message was sent successfully.", DialogType.Info, () => { clearForm(); setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
         }
         else {
             const errorMsg = await result.ErrorMessage;
-            setDialogProps(new DialogProps(errorMsg, DialogType.Error, () => { resetForm(); setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+            setDialogProps(new DialogProps(errorMsg, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
         }
     }
+
+    useEffect(() => {
+        (inputRef?.current as any).focus();
+    },[reloadCount])
 
     return (
         <div className="container-fluid content-root dark-bg ">
@@ -87,16 +89,16 @@ function Contact() {
             <div className="flex-row center-content">
 
                 <div className="d-flex">
-                    <form onSubmit={handleSubmit} >
+                    <form onSubmit={handleSubmit} ref={myForm} >
                         <div className="form-row">
-                            <div id="form-intro" className="rp2">
+                            <div id="form-intro" className="rp2 col-md-12 center-content">
                                 <p className="rh6">Please use this form for company or subscription inquiries only.  Use the <a href="https://github.com/leaderanalytics" target="_blank">GitHub issue pages</a> for product related or technical questions.</p>
                             </div>
                         </div>
                         <div className="form-row rmt2">
                             <div className="form-group col-md-6">
                                 <label >Your name</label>
-                                <input type="text" className="form-control" name="name" onChange={e => setName(e.target.value)} />
+                                <input type="text" className="form-control" name="name" onChange={e => setName(e.target.value)} ref={inputRef} />
                             </div>
                             <div className="form-group col-md-6">
                                 <label>Email address</label>
@@ -111,9 +113,9 @@ function Contact() {
                             <div className="form-group col-md-6">
                                 <label>Requirement</label>
                                 <select name="requirement" className="form-control" onChange={e => setRequirement(e.target.value)} >
-                                    <option value="custom">Company Information</option>
-                                    <option value="web">Subscription Issue</option>
-                                    <option value="other">Other</option>
+                                    <option value="CompanyInfo">Company Information</option>
+                                    <option value="SubscriptionIssue">Subscription Issue</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
 

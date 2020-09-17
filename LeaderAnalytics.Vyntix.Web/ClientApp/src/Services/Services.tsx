@@ -108,7 +108,7 @@ export const FormatMoney = (num: number) => {
 
 export const SendContactRequest = async (request: ContactRequest): Promise<AsyncResult> => {
     const url = AppConfig.host + 'email/sendemail';
-    const msg = 'Name: ' + request.Name + '\r\nPhone: ' + request.Phone + '\r\nEmail: ' + request.EMail + '\r\nRequirement: ' + request.Requirement + '\r\nComment: ' + request.Message;
+    const msg = 'From Site:LeaderAnalytics.Vyntix.Web' + '\r\nName: ' + request.Name + '\r\nPhone: ' + request.Phone + '\r\nEmail: ' + request.EMail + '\r\nRequirement: ' + request.Requirement + '\r\nComment: ' + request.Message;
     
     let response = await fetch(url, {
         method: 'POST',
