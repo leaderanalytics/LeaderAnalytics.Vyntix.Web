@@ -6,4 +6,5 @@
     public static loginScopes: any = { scopes: ['openid','profile'] };
     public static StripeApiKey: string = "pk_test_51H4XDXLYasEZvdvrSiGSpqqv7qQWsyjomYNsFXjxRWMxWR9lqejkWJmjO3TMlOIi7BmeGzDVz4sooYgHhkZMJCnF00n39Spo0F";
     public static StripeClientId: string = "";
+    public static api_url: string = "https://localhost:5031"; 
 }

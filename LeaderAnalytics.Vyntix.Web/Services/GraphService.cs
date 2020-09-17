@@ -1,4 +1,4 @@
-﻿using LeaderAnalytics.Vyntix.Web.Models;
+﻿using LeaderAnalytics.Vyntix.Web.Model;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;

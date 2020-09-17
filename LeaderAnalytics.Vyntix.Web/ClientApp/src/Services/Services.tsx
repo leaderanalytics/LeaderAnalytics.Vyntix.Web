@@ -4,24 +4,8 @@ import { GlobalContext, AppState } from '../AppState';
 import AppConfig from '../appconfig';
 import * as MSAL from 'msal';
 import MSALConfig from '../msalconfig';
-
-
-// Dummmy / test
-export const GetPerson = async (): Promise<any> => {
-    const url = 'https://api.randomuser.me/';
-    const response = await fetch(url);
-    const json = await response.json();
-    const result = json.results[0];
-    return result;
-}
-
-// Dummmy / test
-export const GetIdentity = async () : Promise<string> => {
-    const url = window.location.origin + '/Subscription/Identity';
-    const response = await fetch(url);
-    const result = await response.text();
-    return result;
-}
+import ContactRequest from '../Model/ContactRequest';
+import AsyncResult from '../Model/AsyncResult';
 
 // Get active subscription plans
 export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
@@ -113,7 +97,6 @@ export const GetAppState = (): AppState => {
     return appState;
 }
 
-
 export const FormatMoney = (num: number) => {
     var formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -123,6 +106,26 @@ export const FormatMoney = (num: number) => {
     return formatter.format(num); 
 }
 
-
-
+export const SendContactRequest = async (request: ContactRequest): Promise<AsyncResult> => {
+    const url = AppConfig.host + 'email/sendemail';
+    const msg = 'Name: ' + request.Name + '\r\nPhone: ' + request.Phone + '\r\nEmail: ' + request.EMail + '\r\nRequirement: ' + request.Requirement + '\r\nComment: ' + request.Message;
     
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({ "To": "leaderanalytics@outlook.com", "Msg": msg, "CaptchaCode": request.Captcha })
+    });
+
+    const result: AsyncResult = new AsyncResult();
+    result.Success = response.status < 300;
+
+    if (!result.Success)
+        result.ErrorMessage = await response.json();
+    return result;
+}
+
+
+
+

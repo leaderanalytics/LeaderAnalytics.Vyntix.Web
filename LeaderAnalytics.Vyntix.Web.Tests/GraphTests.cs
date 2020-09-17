@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using Microsoft.Extensions.Configuration;
 using System.IO;
-using LeaderAnalytics.Vyntix.Web.Models;
+using LeaderAnalytics.Vyntix.Web.Model;
 using LeaderAnalytics.Vyntix.Web.Services;
 using System.Threading.Tasks;
 using Microsoft.Graph;

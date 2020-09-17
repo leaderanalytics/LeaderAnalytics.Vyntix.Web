@@ -13,7 +13,7 @@ import { faArrowCircleRight, faStar, faCheck, faTools } from '@fortawesome/free-
 import fourGuys from '../Assets/fourguys1.jpg';
 import blueNeural from '../Assets/blue-neural1.png';
 import Dialog from './Dialog';
-
+import DialogType from '../Model/DialogType';
 
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
@@ -120,7 +120,7 @@ function SubPlans() {
 
     return (
         <div className="container-fluid content-root dark-bg">
-            <Dialog message={message} callback={() => setMessage('')} />
+            <Dialog dialogType={DialogType.Info } message={message} callback={() => setMessage('')} />
             <div className="pageBanner rp1">
                 <span className="rh5">Subscription plans</span>
             </div>

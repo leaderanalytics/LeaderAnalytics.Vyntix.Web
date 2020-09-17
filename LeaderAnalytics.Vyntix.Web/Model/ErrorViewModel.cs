@@ -1,6 +1,6 @@
 using System;
 
-namespace LeaderAnalytics.Vyntix.Web.Models
+namespace LeaderAnalytics.Vyntix.Web.Model
 {
     public class ErrorViewModel
     {

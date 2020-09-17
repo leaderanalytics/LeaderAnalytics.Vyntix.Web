@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LeaderAnalytics.Core;
 
-namespace LeaderAnalytics.Vyntix.Web.Models
+namespace LeaderAnalytics.Vyntix.Web.Model
 {
     public class SubscriptionPlan : ITemporal
     {

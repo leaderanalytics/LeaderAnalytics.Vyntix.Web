@@ -1,7 +1,5 @@
 ﻿import React, { useContext } from 'react';
 import { Button } from 'react-bootstrap';
-import { useParams } from 'react-router';
-import { useLocation } from 'react-router';
 import { useHistory } from 'react-router-dom'
 import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

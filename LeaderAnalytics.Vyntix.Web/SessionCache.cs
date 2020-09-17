@@ -1,4 +1,4 @@
-﻿using LeaderAnalytics.Vyntix.Web.Models;
+﻿using LeaderAnalytics.Vyntix.Web.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

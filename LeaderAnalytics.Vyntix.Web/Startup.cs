@@ -13,9 +13,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using LeaderAnalytics.Vyntix.Web.Models;
+using LeaderAnalytics.Vyntix.Web.Model;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using LeaderAnalytics.Vyntix.Web.Services;
+using LeaderAnalytics.Core.Azure;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace LeaderAnalytics.Vyntix.Web
 {
@@ -44,8 +46,12 @@ namespace LeaderAnalytics.Vyntix.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            AzureADConfig config = AzureADConfig.ReadFromConfig(Configuration);
+            services.AddSingleton(config);
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
             // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
-            
+
             services.AddMicrosoftWebAppAuthentication(Configuration, "AzureADB2C");
 
             services.AddControllersWithViews()

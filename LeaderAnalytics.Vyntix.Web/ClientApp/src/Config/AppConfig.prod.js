@@ -10,6 +10,7 @@ var AppConfig = /** @class */ (function () {
     AppConfig.loginScopes = { scopes: ['openid', 'profile'] };
     AppConfig.StripeApiKey = "pk_live_51H4XDXLYasEZvdvrGjxforOOCxAWCrOxLPoJOjeFvFI0DBxCjEEWVrpecKtDtEbxkFTf3ZQSK2AcuGAxP5xPER3c00VFCBO4Sw";
     AppConfig.StripeClientId = "";
+    AppConfig.api_url = 'https://leaderanalytics.com';
     return AppConfig;
 }());
 exports.default = AppConfig;

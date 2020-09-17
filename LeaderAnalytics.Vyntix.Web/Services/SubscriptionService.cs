@@ -1,4 +1,4 @@
-﻿using LeaderAnalytics.Vyntix.Web.Models;
+﻿using LeaderAnalytics.Vyntix.Web.Model;
 using Microsoft.AspNetCore.Http;
 using Stripe;
 using Stripe.Checkout;
@@ -53,7 +53,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public async Task<SubscriptionOrder> GetPriorSubscriptions(SubscriptionOrder order)
         {
-            LeaderAnalytics.Vyntix.Web.Models.Subscription sub = null;
+            LeaderAnalytics.Vyntix.Web.Model.Subscription sub = null;
 
             CustomerService customerService = new CustomerService();
             Customer customer = (await customerService.ListAsync(new CustomerListOptions { Email = order.UserEmail })).FirstOrDefault();
@@ -70,7 +70,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 
                 if (stripeSub != null)
                 {
-                    sub = new Models.Subscription();
+                    sub = new Model.Subscription();
                     sub.SubscriptionID = stripeSub.Id;
                     sub.PaymentProviderPlanID = stripeSub.Plan.Id;
                     sub.PlanDescription = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID)?.PlanDescription;
@@ -152,6 +152,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             //    };
             
             //}
+
             // Call Stripe and create the session
             Session session = null;
             Log.Information("CreateSession: Creating session for order options: {$options}", options);

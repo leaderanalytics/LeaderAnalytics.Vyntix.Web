@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LeaderAnalytics.Vyntix.Web.Models;
+using LeaderAnalytics.Vyntix.Web.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LeaderAnalytics.Core;

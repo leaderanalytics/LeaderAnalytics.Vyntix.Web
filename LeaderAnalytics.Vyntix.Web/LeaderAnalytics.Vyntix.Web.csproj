@@ -73,6 +73,10 @@
     <None Remove="ClientApp\src\Components\TopNav.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.dev.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.prod.tsx" />
+    <None Remove="ClientApp\src\Model\AsyncResult.tsx" />
+    <None Remove="ClientApp\src\Model\ContactRequest.tsx" />
+    <None Remove="ClientApp\src\Model\DialogProps.tsx" />
+    <None Remove="ClientApp\src\Model\DialogType.tsx" />
     <None Remove="ClientApp\src\Model\OrderApprovalResponse.tsx" />
     <None Remove="ClientApp\src\Model\SubscriptionPlan.tsx" />
     <None Remove="ClientApp\src\Services\Services.tsx" />
@@ -137,6 +141,18 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\TopNav.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\Model\DialogProps.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\Model\DialogType.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\Model\AsyncResult.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\Model\ContactRequest.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Model\OrderApprovalResponse.tsx">
       <SubType>Code</SubType>
     </TypeScriptCompile>
