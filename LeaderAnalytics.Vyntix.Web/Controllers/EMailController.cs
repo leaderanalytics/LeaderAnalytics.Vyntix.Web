@@ -69,8 +69,17 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         public async Task<IActionResult> CaptchaImage()
         {
             string ipaddress = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
-            var apiResult = await apiClient.GetStreamAsync(QueryHelpers.AddQueryString("api/Message/CaptchaImage","ipaddress", ipaddress));
-            return new FileStreamResult(apiResult, "image/jpeg");
+            try
+            {
+                
+                var apiResult = await apiClient.GetStreamAsync(QueryHelpers.AddQueryString("api/Message/CaptchaImage", "ipaddress", ipaddress));
+                return new FileStreamResult(apiResult, "image/jpeg");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("CaptchaImage: {e}", ex.ToString());
+                return BadRequest("Failed to generate Captcha Image.");
+            }
         }
     }
 }

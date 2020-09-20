@@ -31,7 +31,6 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             subscriptionPlans = new List<SubscriptionPlan>();
         }
 
-
         public List<SubscriptionPlan> GetActiveSubscriptionPlans() => GetSubscriptionPlans().Where(x => x.IsCurrent()).ToList();
 
         public List<SubscriptionPlan> GetSubscriptionPlans()
@@ -51,44 +50,44 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return subscriptionPlans;
         }
 
-        public async Task<SubscriptionOrder> GetPriorSubscriptions(SubscriptionOrder order)
+        public async Task<Customer> GetCustomerByEmailAddress(string customerEmail)
         {
-            LeaderAnalytics.Vyntix.Web.Model.Subscription sub = null;
+            CustomerService customerService = new CustomerService(stripeClient);
+            Customer customer = (await customerService.ListAsync(new CustomerListOptions { Email = customerEmail })).FirstOrDefault();
+            return customer;
+        }
 
-            CustomerService customerService = new CustomerService();
-            Customer customer = (await customerService.ListAsync(new CustomerListOptions { Email = order.UserEmail })).FirstOrDefault();
+        public async Task<List<Model.Subscription>> GetSubscriptionsForCustomer(Customer customer)
+        {
+            List<Model.Subscription> subs = new List<Model.Subscription>(10);
             
             if (customer == null)
-                return order;
-
-            order.CustomerID = customer.Id;
+                return subs;
 
             if (customer.Subscriptions?.Any() ?? false)
             {
                 // Find prior subscription, if any
-                var stripeSub = customer.Subscriptions.FirstOrDefault(x => x.Plan.Id == order.PaymentProviderPlanID);
-                
-                if (stripeSub != null)
+                foreach (var stripeSub in customer.Subscriptions)
                 {
-                    sub = new Model.Subscription();
-                    sub.SubscriptionID = stripeSub.Id;
-                    sub.PaymentProviderPlanID = stripeSub.Plan.Id;
-                    sub.PlanDescription = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID)?.PlanDescription;
-                    sub.StartDate = stripeSub.CurrentPeriodStart;
-                    sub.EndDate = stripeSub.CurrentPeriodEnd;
-                    order.PriorSubscription = sub;
+                    if (stripeSub != null)
+                    {
+                        Model.Subscription sub = new Model.Subscription();
+                        sub.SubscriptionID = stripeSub.Id;
+                        sub.PaymentProviderPlanID = stripeSub.Plan.Id;
+                        sub.PlanDescription = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == stripeSub.Plan.Id)?.PlanDescription;
+                        sub.StartDate = stripeSub.CurrentPeriodStart;
+                        sub.EndDate = stripeSub.CurrentPeriodEnd;
+                        subs.Add(sub);
+                    }
                 }
             }
-            return order;
+            return subs;
         }
 
-
-        public async Task<CreateSessionResponse> ApproveSubscriptionOrder(SubscriptionOrder order, string hostURL) 
+        public async Task<CreateSessionResponse> ApproveSubscriptionOrder(SubscriptionOrder order) 
         {
             if (order == null)
                 throw new ArgumentNullException("order");
-            if (string.IsNullOrEmpty(hostURL))
-                throw new ArgumentNullException("hostURL");
 
             CreateSessionResponse response = new CreateSessionResponse();
 
@@ -105,9 +104,10 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             // To do: In Renewals, check for an existing subscription and customerID.
             // If found, update the existing subscription
-            // User cannot have two subscriptions for same product (todo: why not)
             // User must be admin to modify subscription
             // Check CanSubscribe and CanRenew flag on subscription
+            
+            
             SubscriptionPlan plan = GetActiveSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID);
 
             if (plan == null)
@@ -115,17 +115,24 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 response.ErrorMessage = $"Subscription plan {order.PaymentProviderPlanID} was not found in the active subscription plan table.";
                 return response;
             }
-
-            if (plan.Cost > 0)
+            Customer customer = await GetCustomerByEmailAddress(order.UserEmail);
+            
+            if (customer != null)
             {
-                order = await GetPriorSubscriptions(order);
-                response = await CreateSession(order, hostURL);
+                order.CustomerID = customer.Id;
+                order.PriorSubscriptions = await GetSubscriptionsForCustomer(customer);
             }
+
+            // order is a trial if customer has no prior subs and the sub they are ordering is not free.
+            order.IsTrial = ((!order.PriorSubscriptions?.Any()) ?? true) && plan.Cost > 0;
             return response;
         }
 
-        private async Task<CreateSessionResponse> CreateSession(SubscriptionOrder order, string hostURL)
+        public async Task<CreateSessionResponse> CreateSession(SubscriptionOrder order, string hostURL)
         {
+            if (string.IsNullOrEmpty(hostURL))
+                throw new ArgumentNullException("hostURL");
+
             CreateSessionResponse response = new CreateSessionResponse();
 
             // Create stripe session options
@@ -142,16 +149,6 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 SuccessUrl = hostURL + "/Subscription/CreateSubscription?session_id={CHECKOUT_SESSION_ID}",    // Called AFTER user submits payment
                 CancelUrl = hostURL + "/SubActivationFailure",                                                  // Called only if user cancels
             };
-            
-            // causes stripe to throw
-            //if (order.PriorSubscription != null)
-            //{
-            //    options.SubscriptionData = new SessionSubscriptionDataOptions
-            //    {
-            //        Items = new List<SessionSubscriptionDataItemOptions> { new SessionSubscriptionDataItemOptions { Plan = order.PaymentProviderPlanID, Quantity = 1 } }
-            //    };
-            
-            //}
 
             // Call Stripe and create the session
             Session session = null;
@@ -182,7 +179,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return response;
         }
 
-        public async Task<string> CreateSubscription(string sessionID)
+        public async Task<string> ConfirmOrderCreationFromSession(string sessionID)
         {
             if (string.IsNullOrEmpty(sessionID))
                 return "sessionID cannot be null.";
@@ -236,13 +233,64 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 Log.Fatal(errorMsg);
                 return errorMsg;
             }
-         
-
             
             // Write it to renewals here.
 
 
             return errorMsg;
+        }
+
+        public async Task<AsyncResult<Stripe.Subscription>> CreateSubscription(SubscriptionOrder order) 
+        {
+            if (order == null)
+                throw new ArgumentNullException(nameof(order));
+
+            AsyncResult<Stripe.Subscription> result = new AsyncResult<Stripe.Subscription>();
+            CreateSessionResponse response = await ApproveSubscriptionOrder(order);
+
+            if (!string.IsNullOrEmpty(response.ErrorMessage))
+            {
+                result.ErrorMessage = response.ErrorMessage;
+                return result;
+            }
+            Stripe.SubscriptionCreateOptions options = new Stripe.SubscriptionCreateOptions();
+            Stripe.SubscriptionService stripeSubService = new Stripe.SubscriptionService(stripeClient);
+
+            options.Customer = order.CustomerID;
+            options.CollectionMethod = "send_invoice"; // Do not auto-charge customers account
+            options.TrialPeriodDays = order.IsTrial ? 30 : 0;
+            options.Items.Add(new SubscriptionItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 });
+            Stripe.Subscription sub = await stripeSubService.CreateAsync(options);
+            result.Result = sub;
+            return result;
+        }
+
+        public async Task<Customer> CreateCustomer(string email)
+        {
+            Customer customer = await GetCustomerByEmailAddress(email);
+            
+            if (customer != null)
+                return customer;
+
+            CustomerService customerService = new CustomerService(stripeClient);
+            await customerService.CreateAsync(new CustomerCreateOptions { Email = email });
+            return await GetCustomerByEmailAddress(email);
+        }
+
+        public async Task<bool> DeleteCustomer(string customerID)
+        {
+
+            if (string.IsNullOrEmpty(customerID))
+                throw new ArgumentNullException(nameof(customerID));
+
+            CustomerService customerService = new CustomerService();
+            await customerService.DeleteAsync(customerID);
+            return true;
+        }
+
+        public async Task ExtendSubscription(List<string> customerIDs, int daysToExtend) 
+        { 
+            // ToDo: Extend the subscription of each passed customerID by daysToExtend
         }
     }
 }

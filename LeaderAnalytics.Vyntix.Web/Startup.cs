@@ -41,8 +41,6 @@ namespace LeaderAnalytics.Vyntix.Web
             subscriptionFilePath = Path.Combine(configFilePath, $"subscriptions.{env.EnvironmentName}.json");
         }
 
-        
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {

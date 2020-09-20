@@ -1,10 +1,72 @@
-﻿import React,  { useContext } from 'react';
-
+﻿import React, { useContext } from 'react';
+import { Accordion, Card } from 'react-bootstrap';
 
 function Documentation() {
 
     return (
-        <div className="container-fluid content-root">
+        <div className="container-fluid content-root dark-bg">
+            <div id="banner">
+                <div className="pageBanner rp1">
+                    <span className="rh5">Documentation</span>
+                </div>
+            </div>
+
+
+            <div>
+                <div className="pageBanner rp1">
+                    <span className="rh3">Frequently Asked Questions</span>
+                </div>
+            </div>
+
+
+            <Accordion>
+                <Card>
+                    <Accordion.Toggle as={Card.Header} eventKey="0">
+                        Click me!
+                    </Accordion.Toggle>
+                    <Accordion.Collapse eventKey="0">
+                        <Card.Body>Hello! I'm the body</Card.Body>
+                    </Accordion.Collapse>
+                </Card>
+                <Card>
+                    <Accordion.Toggle as={Card.Header} eventKey="1">
+                        Click me!
+                    </Accordion.Toggle>
+                    <Accordion.Collapse eventKey="1">
+                        <Card.Body>Hello! I'm another body</Card.Body>
+                    </Accordion.Collapse>
+                </Card>
+            </Accordion>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
             <div className="rh5">
                 <div>
                     What's included in a Vyntix subscription

@@ -22,15 +22,3 @@ https://preview.themeforest.net/item/wave-finance-and-investment-html-template/f
 
 SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
-2020/9/10 To do
-
-Finish SubActivationFailure and SubActivationSuccess
-
-Make SubscriptionController protected using client credentials.
-
-Need to authenticate stripe when they call back to CreateSubscription.
-
-Check for existing subscription and display it when a new subscription is purchased.  Start new subscription on day after existing subscription expires.
-
-
-

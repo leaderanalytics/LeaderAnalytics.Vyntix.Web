@@ -40,8 +40,11 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         public async Task<ActionResult<CreateSessionResponse>> ApproveSubscriptionOrder(SubscriptionOrder order) 
         {
             string uri = this.Request.Scheme + "://" + this.Request.Host;
-            CreateSessionResponse response = await subscriptionService.ApproveSubscriptionOrder(order, uri);
+            CreateSessionResponse response = await subscriptionService.ApproveSubscriptionOrder(order);
 
+            if (string.IsNullOrEmpty(response.ErrorMessage))
+                response = await subscriptionService.CreateSession(order, uri);
+            
             if (string.IsNullOrEmpty(response.ErrorMessage))
                 return Ok(response);
             else
@@ -54,7 +57,7 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         {
             string sessionID = Request.Query["session_id"];
             string redirect = $"{this.Request.Scheme}://{this.Request.Host}";
-            string errorMsg = await subscriptionService.CreateSubscription(sessionID);
+            string errorMsg = await subscriptionService.ConfirmOrderCreationFromSession(sessionID);
 
             if (string.IsNullOrEmpty(errorMsg))
                 redirect += ($"/SubActivationSuccess");  
