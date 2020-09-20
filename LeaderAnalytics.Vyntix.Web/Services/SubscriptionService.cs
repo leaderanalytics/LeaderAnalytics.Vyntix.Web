@@ -259,9 +259,21 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             options.Customer = order.CustomerID;
             options.CollectionMethod = "send_invoice"; // Do not auto-charge customers account
             options.TrialPeriodDays = order.IsTrial ? 30 : 0;
+            options.Items = new List<SubscriptionItemOptions>(2);
             options.Items.Add(new SubscriptionItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 });
-            Stripe.Subscription sub = await stripeSubService.CreateAsync(options);
-            result.Result = sub;
+            options.DaysUntilDue = 15;
+
+            try
+            {
+                Stripe.Subscription sub = await stripeSubService.CreateAsync(options);
+                result.Result = sub;
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessage = "Subscription creation failed.  Please try again later.";
+                Log.Error("Error creating subscription. UserID: {u}, Ex: {e} ", order.UserID, ex.ToString());
+            }
             return result;
         }
 

@@ -14,3 +14,5 @@
 [How to test Stripe](https://stripe.com/docs/billing/testing)
 
 [Stripe free trial subscriptions](https://stripe.com/docs/billing/subscriptions/trials)
+
+[Integrating Customer Portal](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#redirect)

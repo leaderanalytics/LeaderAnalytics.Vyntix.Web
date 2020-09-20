@@ -15,7 +15,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
     {
         private const string CUSTOMER_EMAIL = "samspam92842@gmail.com";
         private const string PLAN_DESC = "Daily Subscription Plan";
-
+        private const string USER_ID = "0216a845-3d8e-45c9-a67f-fcc04accded2";
 
         [TestCase]
         public async Task CreateSubscriptionIfOneDoesNotAlreadyExist()
@@ -40,7 +40,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             LeaderAnalytics.Vyntix.Web.Services.SubscriptionService subService = Container.GetService<LeaderAnalytics.Vyntix.Web.Services.SubscriptionService>();
             SubscriptionPlan plan = subService.GetSubscriptionPlans().First(x => x.PlanDescription == PLAN_DESC);
             Customer customer = await subService.CreateCustomer(CUSTOMER_EMAIL);
-            SubscriptionOrder order = new SubscriptionOrder {CustomerID = customer.Id, UserEmail = CUSTOMER_EMAIL, PaymentProviderPlanID = plan.PaymentProviderPlanID };
+            SubscriptionOrder order = new SubscriptionOrder {CustomerID = customer.Id, UserEmail = CUSTOMER_EMAIL, UserID = USER_ID, PaymentProviderPlanID = plan.PaymentProviderPlanID };
             AsyncResult<Stripe.Subscription> sub = await subService.CreateSubscription(order);
 
         }
