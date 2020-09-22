@@ -303,6 +303,75 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task ExtendSubscription(List<string> customerIDs, int daysToExtend) 
         { 
             // ToDo: Extend the subscription of each passed customerID by daysToExtend
+            // May to use this if there is a site outage 
+        }
+
+        public async Task<AsyncResult<string>> CreateStripePortalSession(string customerID, string hostUrl)
+        {
+            AsyncResult<string> result = new AsyncResult<string>();
+            Customer customer = await new CustomerService(stripeClient).GetAsync(customerID);
+
+            if (customer == null)
+                throw new Exception($"Bad customerID: {customerID}");
+
+            List<Model.Subscription> subscriptions = await GetSubscriptionsForCustomer(customer);
+
+            if (!subscriptions.Any())
+            {
+                result.ErrorMessage = "No subscriptions.  Subscribe to a subscription plan first.";
+                return result;
+            }
+
+            var options = new SessionCreateOptions
+            {
+                Customer = customerID,
+                SuccessUrl = hostUrl,
+                CancelUrl = hostUrl,
+                PaymentMethodTypes = new List<string> { "card" },
+                Mode = "subscription"
+            };
+            options.LineItems = new List<SessionLineItemOptions>();
+
+            foreach (Model.Subscription s in subscriptions)
+                options.LineItems.Add(new SessionLineItemOptions { Price = s.PaymentProviderPlanID, Quantity = 1 });
+
+            var service = new SessionService(stripeClient);
+
+            try
+            {
+                var session = service.Create(options);
+                result.Result = session.SuccessUrl;
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error creating portal session: {d}", ex.ToString());
+                result.ErrorMessage = "An error occurred creating the portal session.";
+            }
+            return result;
+        }
+
+        public async Task<SubscriptionInfoResponse> GetSubscriptionInfo(string userEmail)
+        {
+            if (string.IsNullOrEmpty(userEmail))
+                throw new ArgumentNullException(nameof(userEmail));
+            
+            SubscriptionInfoResponse response = new SubscriptionInfoResponse();
+            Customer customer = await GetCustomerByEmailAddress(userEmail);
+
+            if (customer == null)
+                return response;
+
+            response.CustomerID = customer.Id;
+
+            if (customer.Subscriptions?.Any() ?? false)
+            {
+                var sub = customer.Subscriptions.FirstOrDefault(x => x.Status == "active");
+
+                if (sub != null)
+                    response.SubscriptionID = sub.Items?.FirstOrDefault()?.Plan.Id;
+            }
+            return response;
         }
     }
 }

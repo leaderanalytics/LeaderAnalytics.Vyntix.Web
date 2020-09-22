@@ -47,6 +47,7 @@ export const SignIn = async (appState: AppState): Promise<string> => {
             appState.UserID = response.account.accountIdentifier;
             appState.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
             appState.Token = response.idToken;
+            await GetSubscriptionInfo(appState);
             SaveAppState(appState);
         }
     }
@@ -120,6 +121,52 @@ export const SendContactRequest = async (request: ContactRequest): Promise<Async
     return result;
 }
 
+export const ManageSubscription = async (appState: AppState): Promise<AsyncResult> => {
 
+    const result: AsyncResult = new AsyncResult();
 
+    if (appState?.CustomerID?.length === 0 ?? true) {
+        result.ErrorMessage = "Invalid CustomerID";
+        return result;
+    }
 
+    const url = AppConfig.host + 'subscription/managesubscription';
+
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(appState.CustomerID)
+    });
+
+    
+    result.Success = response.status < 300;
+
+    if (!result.Success)
+        result.ErrorMessage = await response.json();
+
+    return result;
+
+    // Need to call GetSubscriptionInfo after returned by Stripe
+}
+
+const GetSubscriptionInfo = async (appState: AppState) => {
+
+    if (appState?.UserEmail?.length === 0 ?? true)
+        return;
+
+    const url = AppConfig.host + 'subscription/getsubscriptioninfo';
+
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(appState.UserEmail)
+    });
+    var json = (await response.json()) as any;
+    appState.CustomerID = json.customerID;
+    appState.SubscriptionID = json.subscriptionID;
+    SaveAppState(appState);
+}

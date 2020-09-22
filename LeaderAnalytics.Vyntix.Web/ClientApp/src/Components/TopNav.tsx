@@ -2,11 +2,12 @@
 import { BrowserRouter as Router, Route, Switch, Link, NavLink } from 'react-router-dom';
 import { useAsyncEffect } from 'use-async-effect';
 import { GlobalContext, AppState } from '../AppState';
-import { SignIn, SignOut } from '../Services/Services';
-import { Button, Navbar, NavDropdown, Nav, Form, FormControl, Container, Image } from 'react-bootstrap';
+import { SignIn, SignOut, ManageSubscription } from '../Services/Services';
+import { Button, Navbar, NavDropdown, Nav, Form, FormControl, Container, Image, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faHome, faBahai, faKey, faBook, faDownload, faEnvelope, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 import logo from '../Assets/VyntixLogo.png';
+import AsyncResult from '../Model/AsyncResult';
 import Dialog from './Dialog';
 import DialogType from '../Model/DialogType';
 import DialogProps from '../Model/DialogProps';
@@ -35,6 +36,14 @@ const TopNav = () => {
             setDialogProps(new DialogProps(errorMsg, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
     }
 
+    const LocalManageSubscription = async (event: any) => {
+        event.preventDefault();
+        const result: AsyncResult = await ManageSubscription(appState);
+
+        if (!result.Success) 
+            setDialogProps(new DialogProps(result.ErrorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+    }
+
     return (
         <Navbar variant="dark" expand="lg" collapseOnSelect fixed="top" className="nav-container dark-bg">
             <Dialog dialogProps={dialogProps} />
@@ -53,7 +62,12 @@ const TopNav = () => {
                     <Nav.Link className="rh6" as={NavLink} to="/Contact" href="/Contact" eventKey="5"><FontAwesomeIcon icon={faEnvelope} className="nav-toggle nav-icon" />Contact Us</Nav.Link>
 
                     {isSignedIn ?
-                        <Nav.Link className="rh6" to="/" as={NavLink} onClick={() => SignOut(appState)} eventKey="6" exact activeClassName="zzz"><FontAwesomeIcon icon={faSignOutAlt} className="nav-toggle nav-icon" />Sign out</Nav.Link>
+                        <ButtonGroup>
+                            <DropdownButton as={ButtonGroup} title="Profile" id="profileButton" alignRight>
+                                <Dropdown.Item eventKey="1" className="rh6" onClick={() => SignOut(appState)} >Sign Out</Dropdown.Item>
+                                <Dropdown.Item eventKey="2" className="rh6" onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
+                            </DropdownButton>
+                        </ButtonGroup>
                         :
                         <Nav.Link className="rh6" to="/" as={NavLink} onClick={LocalSignIn} eventKey="7" exact activeClassName="zzz"><FontAwesomeIcon icon={faSignInAlt} className="nav-toggle nav-icon" />Sign in</Nav.Link>
                     }

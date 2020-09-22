@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using LeaderAnalytics.Core;
 using LeaderAnalytics.Vyntix.Web.Services;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 
 namespace LeaderAnalytics.Vyntix.Web.Controllers
 {
@@ -19,7 +21,7 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
 
         public SubscriptionController(SubscriptionService subscriptionService)
         {
-            this.subscriptionService = subscriptionService ?? throw new ArgumentNullException("subscriptionService");
+            this.subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
         }
 
         [HttpGet]
@@ -65,6 +67,25 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
                 redirect += ($"/SubActivationFailure");
 
             return new RedirectResult(redirect, false);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> ManageSubscription([FromBody] string customerID) {
+            string host = $"{this.Request.Scheme}://{this.Request.Host}";
+            AsyncResult<string> result = await subscriptionService.CreateStripePortalSession(customerID, host);
+
+            if (!result.Success)
+                return BadRequest(JsonSerializer.Serialize(result.ErrorMessage));
+            else
+                return new RedirectResult(result.Result);
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult<SubscriptionInfoResponse>> GetSubscriptionInfo([FromBody] string userEmail)
+        {
+            SubscriptionInfoResponse response = await subscriptionService.GetSubscriptionInfo(userEmail);
+            return response;
         }
     }
 }
