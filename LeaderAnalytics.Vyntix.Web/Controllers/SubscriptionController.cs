@@ -77,7 +77,7 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             if (!result.Success)
                 return BadRequest(JsonSerializer.Serialize(result.ErrorMessage));
             else
-                return new RedirectResult(result.Result);
+                return new JsonResult(result.Result);
         }
 
 

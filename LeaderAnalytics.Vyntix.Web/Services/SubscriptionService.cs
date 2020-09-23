@@ -322,25 +322,19 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 return result;
             }
 
-            var options = new SessionCreateOptions
+            var options = new Stripe.BillingPortal.SessionCreateOptions
             {
                 Customer = customerID,
-                SuccessUrl = hostUrl,
-                CancelUrl = hostUrl,
-                PaymentMethodTypes = new List<string> { "card" },
-                Mode = "subscription"
+                ReturnUrl = hostUrl
             };
-            options.LineItems = new List<SessionLineItemOptions>();
+            
 
-            foreach (Model.Subscription s in subscriptions)
-                options.LineItems.Add(new SessionLineItemOptions { Price = s.PaymentProviderPlanID, Quantity = 1 });
-
-            var service = new SessionService(stripeClient);
+            var service = new Stripe.BillingPortal.SessionService(stripeClient);
 
             try
             {
                 var session = service.Create(options);
-                result.Result = session.SuccessUrl;
+                result.Result = session.Url;
                 result.Success = true;
             }
             catch (Exception ex)

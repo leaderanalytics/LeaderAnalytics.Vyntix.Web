@@ -126,7 +126,9 @@ namespace LeaderAnalytics.Vyntix.Web
                     "https://vyntix.azurewebsites.net",
                     "http://localhost:5032",
                     "https://localhost:5031",
-                    "https://vyntix-staging.azurewebsites.net"
+                    "https://vyntix-staging.azurewebsites.net",
+                    "https://billing.stripe.com",
+                    "http://billing.stripe.com"
                 }).AllowAnyMethod().AllowAnyHeader();
             });
 

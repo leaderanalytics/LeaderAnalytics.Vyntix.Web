@@ -139,13 +139,14 @@ export const ManageSubscription = async (appState: AppState): Promise<AsyncResul
         },
         body: JSON.stringify(appState.CustomerID)
     });
-
     
     result.Success = response.status < 300;
 
-    if (!result.Success)
+    if (!result.Success) {
         result.ErrorMessage = await response.json();
-
+    }
+    const redirectUrl = await response.json();
+    window.location = redirectUrl;
     return result;
 
     // Need to call GetSubscriptionInfo after returned by Stripe
