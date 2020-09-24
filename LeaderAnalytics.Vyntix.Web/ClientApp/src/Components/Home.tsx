@@ -1,7 +1,10 @@
 ﻿import React, {useContext} from 'react';
 import { useParams } from 'react-router';
+import { useHistory } from 'react-router-dom'
 import { Container, Image, Row, Col } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
+import { GetSubscriptionInfo } from '../Services/Services';
+import { useAsyncEffect } from 'use-async-effect';
 import models_that_lead from '../Assets/build_models_that_lead.png';
 import managing_the_future from '../Assets/the_platform_for_managing_the_future2.png';
 import number_jumble from '../Assets/number_jumble.jpg';
@@ -9,9 +12,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDatabase, faCheck, faBezierCurve, faMoneyCheckAlt, faChartLine, faSearchDollar } from '@fortawesome/free-solid-svg-icons';
 
 function Home() {
-
+    const history = useHistory();
     const appState: AppState = useContext(GlobalContext);
     const userName = appState.UserName;
+    const { id } = useParams() as any;
+
+    useAsyncEffect(async () => {
+        if (id !== undefined && id === "1") {
+            // After a user navigates to stripe portal, Stripe calls back using url "../lsi/1"
+            // This tells us to reload the users subscription info in the event they made some change.
+            await GetSubscriptionInfo(appState);
+            history.push("/"); // get rid of /lsi/1
+        }
+    })
+
+
     return (
         <div className="content-root">
             <div className="center-content">  

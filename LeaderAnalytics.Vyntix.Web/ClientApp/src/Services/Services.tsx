@@ -152,7 +152,7 @@ export const ManageSubscription = async (appState: AppState): Promise<AsyncResul
     // Need to call GetSubscriptionInfo after returned by Stripe
 }
 
-const GetSubscriptionInfo = async (appState: AppState) => {
+export const GetSubscriptionInfo = async (appState: AppState) => {
 
     if (appState?.UserEmail?.length === 0 ?? true)
         return;

@@ -36,7 +36,6 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             return Json(subscriptionService.GetActiveSubscriptionPlans());
         }
 
-
         // This method is called when user clicks "Proceed to checkout".  It calls the payment processor and requests a session be created.
         [HttpPost]
         public async Task<ActionResult<CreateSessionResponse>> ApproveSubscriptionOrder(SubscriptionOrder order) 
@@ -79,7 +78,6 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             else
                 return new JsonResult(result.Result);
         }
-
 
         [HttpPost]
         public async Task<ActionResult<SubscriptionInfoResponse>> GetSubscriptionInfo([FromBody] string userEmail)

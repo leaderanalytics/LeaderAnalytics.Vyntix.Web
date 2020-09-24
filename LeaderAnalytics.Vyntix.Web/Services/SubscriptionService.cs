@@ -325,7 +325,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             var options = new Stripe.BillingPortal.SessionCreateOptions
             {
                 Customer = customerID,
-                ReturnUrl = hostUrl
+                ReturnUrl = hostUrl + (hostUrl.EndsWith('/') ? "" : "/") + "lsi/1"
             };
             
 

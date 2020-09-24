@@ -25,6 +25,7 @@ function App() {
                 <TopNav />
                 <Switch>
                     <Route exact path="/" component={Home} />
+                    <Route exact path="/lsi/:id" component={Home} />
                     <Route exact path="/contact" component={Contact} />
                     <Route exact path="/documentation" component={Documentation} />
                     <Route exact path="/downloads" component={Downloads} />
@@ -33,7 +34,7 @@ function App() {
                     <Route exact path="/subconfirmation" component={SubConfirmation} />
                     <Route exact path="/subscriptions" component={Subscriptions} />
                     <Route exact path="/subsignin" component={SubSignIn} />
-                    <Route exact path="/subplans" component={SubPlans} />
+                    <Route exact path="/subplans" component={SubPlans}  />
                 </Switch>
                 <Footer/>
             </Router>
