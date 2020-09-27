@@ -13,6 +13,7 @@ export class AppState {
     public SignInCallback: (isSignedIn: boolean) => void = (isSignedIn) => { };
     public RenderTopNav: () => void = () => { };
     public Message: string = "";
+    public IsSubscriptionActive: boolean = false;
     // Order
     public PromoCodes: string = "";
     public SubscriptionPlan: SubscriptionPlan | null = null;

@@ -363,7 +363,10 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 var sub = customer.Subscriptions.FirstOrDefault(x => x.Status == "active");
 
                 if (sub != null)
+                {
                     response.SubscriptionID = sub.Items?.FirstOrDefault()?.Plan.Id;
+                    response.IsSuscriptionActive = true;
+                }
             }
             return response;
         }

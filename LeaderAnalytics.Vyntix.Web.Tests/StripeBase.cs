@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LeaderAnalytics.Vyntix.Web.Tests
 {
-    [TestFixture]
+    
     public abstract class StripeBase
     {
         protected IConfiguration Configuration { get; private set; }
@@ -38,7 +38,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
         [SetUp]
         public void Setup()
-        { 
+        {
         }
     }
 }

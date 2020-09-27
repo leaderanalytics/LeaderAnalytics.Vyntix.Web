@@ -9,5 +9,6 @@ namespace LeaderAnalytics.Vyntix.Web.Model
     {
         public string CustomerID { get; set; }
         public string SubscriptionID { get; set; }
+        public bool IsSuscriptionActive { get; set; }
     }
 }

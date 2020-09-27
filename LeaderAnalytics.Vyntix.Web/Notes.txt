@@ -22,3 +22,9 @@ https://preview.themeforest.net/item/wave-finance-and-investment-html-template/f
 
 SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
+To do:
+When creating non-business sub, check that no other sub has been created before.
+Add Terms and conditons for non-business subs
+Fix duration on SubPlans
+Create privacy page and terms page.
+https://github.blog/2016-08-22-publish-your-project-documentation-with-github-pages/

@@ -85,7 +85,7 @@ function SubPlans() {
     const renderPlans = (plans: SubscriptionPlan[]) => {
         return (
             plans.filter(x => x.DisplaySequence > 0).sort(x => x.DisplaySequence).map((val, i) => (
-                <div  className={(val).PaymentProviderPlanID === selectedPlan ? "gridrow selectedPlan" : "gridrow"} data-providerid={(val).PaymentProviderPlanID} onClick={handleRowSelectionChange}>
+                <div className={(val).PaymentProviderPlanID === selectedPlan ? "gridrow selectedPlan" : "gridrow"} data-providerid={(val).PaymentProviderPlanID} onClick={handleRowSelectionChange} key={i}>
                     <div className="cell-sub">
                         <input checked={(val).PaymentProviderPlanID === selectedPlan} onChange={handleSelectionChange} type="checkbox" data-providerid={(val).PaymentProviderPlanID} className="subscribeCheckbox"></input>
                     </div>

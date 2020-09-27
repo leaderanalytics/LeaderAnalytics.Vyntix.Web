@@ -16,3 +16,7 @@
 [Stripe free trial subscriptions](https://stripe.com/docs/billing/subscriptions/trials)
 
 [Integrating Customer Portal](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#redirect)
+
+[Security test](https://www.immuniweb.com/free/)
+
+https://github.community/t/commits-pushed-under-wrong-name-should-not-have-been-allowed/134361

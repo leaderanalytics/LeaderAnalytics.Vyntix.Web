@@ -542,7 +542,50 @@ a {
 
 }
 
+/* --------------------------------------- 
+# Documentation
+--------------------------------------- */
+.faq-header {
+    background-color: $accent2 !important;
+    color:$accent5;
+    cursor:pointer;
+}
+.card-body a {
+    color: $accent2 !important;
 
+}
+
+.section-grid {
+    display:flex;
+    flex-direction:row;
+}
+
+.section-header {
+    background-color: $accent1;
+    color: $accent2;
+}
+.section-body {
+    background-color: $accent4;
+    color:$accent5;
+
+    
+}
+.section-body > p > a {
+    color: $accent2 !important;
+}
+
+@include media-breakpoint-down(md) {
+
+    .section-grid {
+        flex-direction: column;
+    }
+
+    #fred-widget {
+        display:flex;
+        justify-content:center;
+        margin-bottom:2vw;
+    }
+}
 /* --------------------------------------- 
 # Footer 
     --------------------------------------- */
