@@ -15,6 +15,8 @@ import { AppState, GlobalContext } from './AppState';
 import Documentation from './Components/Documentation';
 import Downloads from './Components/Downloads';
 import ScrollToTop from './Components/ScrollToTop';
+import Privacy from './Components/Privacy';
+import Terms from './Components/Terms';
 
 function App() {
     const appState: AppState = GetAppState();
@@ -34,7 +36,9 @@ function App() {
                     <Route exact path="/subconfirmation" component={SubConfirmation} />
                     <Route exact path="/subscriptions" component={Subscriptions} />
                     <Route exact path="/subsignin" component={SubSignIn} />
-                    <Route exact path="/subplans" component={SubPlans}  />
+                    <Route exact path="/subplans" component={SubPlans} />
+                    <Route exact path="/privacy" component={Privacy} />
+                    <Route exact path="/terms" component={Terms} />
                 </Switch>
                 <Footer/>
             </Router>

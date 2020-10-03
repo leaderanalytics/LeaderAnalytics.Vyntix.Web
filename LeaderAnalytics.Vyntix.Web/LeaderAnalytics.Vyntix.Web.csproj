@@ -62,6 +62,7 @@
     <None Remove="ClientApp\src\Components\Downloads.tsx" />
     <None Remove="ClientApp\src\Components\Footer.tsx" />
     <None Remove="ClientApp\src\Components\Home.tsx" />
+    <None Remove="ClientApp\src\Components\Privacy.tsx" />
     <None Remove="ClientApp\src\Components\ScrollToTop.tsx" />
     <None Remove="ClientApp\src\Components\SelectedPlan.tsx" />
     <None Remove="ClientApp\src\Components\SubActivationFailure.tsx" />
@@ -70,6 +71,7 @@
     <None Remove="ClientApp\src\Components\SubPlans.tsx" />
     <None Remove="ClientApp\src\Components\Subscriptions.tsx" />
     <None Remove="ClientApp\src\Components\SubSignIn.tsx" />
+    <None Remove="ClientApp\src\Components\Terms.tsx" />
     <None Remove="ClientApp\src\Components\TopNav.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.dev.tsx" />
     <None Remove="ClientApp\src\Config\AppConfig.prod.tsx" />
@@ -97,6 +99,12 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\Components\Terms.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\Components\Privacy.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\Components\ScrollToTop.tsx" />
     <TypeScriptCompile Include="ClientApp\src\Components\SelectedPlan.tsx">
       <SubType>Code</SubType>

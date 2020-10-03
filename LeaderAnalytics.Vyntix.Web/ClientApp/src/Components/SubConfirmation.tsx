@@ -84,7 +84,7 @@ function SubConfirmation() {
             </div>
 
             <div>
-                Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank" >documentation</Link> page for a complete description of the Vyntix service.
+                Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank">documentation</Link> page for a complete description of the Vyntix service.
             </div>
 
             <div>
