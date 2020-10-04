@@ -95,8 +95,7 @@ function Subscriptions() {
                                 This subscription may only be used by individual researchers, individual investors, students, and instructors. 
                                 It may not be used for any business activity. 
                             
-                                A business activity is any activity that directly or indirectly results in payment or 
-                                benefit of any kind being received.
+                                A business activity is any activity that is performed with an expectation of payment or benefit of any kind being received.
                             </p>
 
                             <p id="nonBusinessFreeText" className="rp1">
@@ -112,10 +111,10 @@ function Subscriptions() {
                                     <li>
                                         Bloggers, authors, consultants, advisors, and wealth managers who work with the 
                                         expectation of payment or benefit of any kind.
-                                        Benefit incluces authorship fees, subscription fees, advertising revenue, royalties, profit sharing,
+                                        Benefit incluces authorship fees, subscription fees, advertising revenue, royalties, profit sharing, capital gains,
                                         or promotional exposure for a business in which there is an interest.
                                     </li>
-                                    <li>Software developers who incorporate the subscription into their product which is sold or licensed.</li>
+                                    
                                     <li>Any activity within any group or organization that works with the expectation of payment, benefit, or profit.</li>
                                 </ul>
                             </div>
@@ -126,8 +125,8 @@ function Subscriptions() {
                                 </p>
 
                                 <ul>
-                                    <li>Individual investors who manage funds for themselves and their immediate families only.</li>
-                                    <li>Students and instructors who use the subscription in an academic environment.</li>
+                                    <li>Individual investors who manage funds for themselves and their immediate family only.</li>
+                                    <li>Students and instructors who use the subscription to fulfill the requirements of their academic coursework.</li>
                                 </ul>
                             </div>
                       

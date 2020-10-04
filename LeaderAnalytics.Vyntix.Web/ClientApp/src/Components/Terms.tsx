@@ -35,7 +35,7 @@ function Terms() {
                     <li>When renewing your business subscription, you must renew at the pricing tier that reflects you or your company's current annual revenue.</li>
                     <li>You must be a professional online.  You can not be rude to other users or harass them.</li>
                     <li>You must not upload anything that does not belong to you.</li>
-                    <li>Anything you upload in a public forum or as a public data series becomes property of Leader Analytics.</li>
+                    <li>Anything you upload in a public forum or as a public data series can be modified, deleted, or re-published by Leader Analytics.</li>
                     <li>We collect informaton that identifies you personally, such as your name and your IP address.</li>
                     <li>Vyntix and all it's related components are provided without warranty of any kind. When you use them you are doing so at your own risk.</li>
                     <li>There are no refunds, prorated or otherwise.  Use the free trial period to your advantage.  If you need some extra free time please send us an email and we will make every effort to accomodate you.</li>
@@ -138,10 +138,47 @@ function Terms() {
                     We might email you important messages and information we think you’ll find useful. We will stop sending you promotional materials if you tell us you’re not interested.
                 </p>
                 <p>
-                    3. Service Rules
+                    3. Vyntix Subscriptions
                 </p>
                 <p>
-                    3.1 General
+                    3.1 Non-business Subscriptions
+                </p>
+                <p>
+                    A Non-Business Subscription may only be used by individual researchers, individual investors, students, and instructors. 
+                    It may not be used for any business activity. A business activity is any activity that is performed with an expectation of payment or benefit of any kind being received.
+                </p>
+                <p>
+                    Individual researchers are individuals who research for their own interest or who share their finding with others free of charge and without expectation of payment
+                    or benefit of any kind.
+                </p>
+                <p>
+                    Individual investors are individuals who manage funds for themselves and their immediate family only.    
+                </p>
+                <p>
+                    Students and instructors are individuals who use the subscription to fulfill the requirements of their academic coursework.
+                </p>
+
+                <p>
+                    3.2 Business Subscriptions
+                </p>
+                <p>
+                    A Business Subscription must be used by any individual or organization who uses it during the course of any activity that is performed 
+                    with an expectation of payment or benefit of any kind being received.
+                </p>
+                <p>
+                    Individuals and organizations who must use a business subscription include but are not limited to: Bloggers, authors, consultants, advisors, and wealth managers who work with 
+                    the expectation of payment or benefit of any kind.
+                </p>
+                <p>
+                    Payment or benefit includes, but is not limited to: authorship fees, subscription fees, advertising revenue, royalties, profit sharing, capital gains,
+                    or promotional exposure for a business in which there is an interest.
+                </p>
+
+                <p>
+                    4. Service Rules
+                </p>
+                <p>
+                    4.1 General
                 </p>
                 <p>
                     You agree not to engage in any of the following prohibited activities: 
@@ -187,7 +224,7 @@ function Terms() {
                     disputes between you and other Users. Leader Analytics shall have no liability for your interactions with other Users, or for any User’s action or inaction.
                 </p>
                 <p>
-                    3.2 Anti-discrimination
+                    4.2 Anti-discrimination
                 </p>
                 <p>
                     Leader Analytics does not support and will not tolerate its Service being used to discriminate against others, 
@@ -198,10 +235,10 @@ function Terms() {
                     ancestry or national origin, we may permanently or temporarily terminate or suspend your access to the Service without notice and liability for any reason.
                 </p>
                 <p>
-                    4. User Content
+                    5. User Content
                 </p>
                 <p>
-                    4.1 General
+                    5.1 General
                 </p>
                 <p>
                     Some areas of the Service allow Users to submit and publish content such as profile information, comments, questions, 
@@ -209,7 +246,7 @@ function Terms() {
                     the Service without compensation “User Content”). 
                 </p>
                 <p>
-                    4.2 Uploading and Publishing User Content to Vyntix.
+                    5.2 Uploading and Publishing User Content to Vyntix.
                 </p>
                 <p>
                     You agree not to submit or use User Content that: 
@@ -273,7 +310,7 @@ function Terms() {
                 </p>
 
                 <p>
-                    5. User Content License Grant
+                    6. User Content License Grant
                 </p>
                 <p>
                     By publishing any data containing User Content using the Service, you expressly grant, and you represent and warrant that you have 
@@ -282,12 +319,11 @@ function Terms() {
                     derivative works of all such User Content and your name, voice, and/or likeness as contained in your User Content, in whole or in part, and in any form, 
                     media or technology, whether now known or hereafter developed, for use in connection with the Service and Leader Analytics’s (and its successors’ and affiliates’) 
                     business, including without limitation for promoting and redistributing part or all of the Service (and derivative works thereof) in any media formats 
-                    and through any media channels. For the avoidance of doubt, User Content does not include Stock Media. Stock Media is licensed to Leader Analytics 
-                    in accordance with the terms of the Contributor Agreement.
+                    and through any media channels. 
                 </p>
           
                 <p>
-                    6. Our Proprietary Rights
+                    7. Our Proprietary Rights
                 </p>
                 <p>
                     Except for your User Content, the Service and all materials therein or transferred thereby, including, without limitation, 
@@ -300,7 +336,7 @@ function Terms() {
                     any purpose not expressly permitted by this Agreement is strictly prohibited.
                 </p>
                 <p>
-                    7. Feedback
+                    8. Feedback
                 </p>
                 <p>
                     You may choose to or we may invite you to submit comments or ideas about the Service, including without limitation about how to improve the 
@@ -311,10 +347,10 @@ function Terms() {
                     developed by its employees, or obtained from sources other than you.
                 </p>
                 <p>
-                    8. Paid Services
+                    9. Paid Services
                 </p>
                 <p>
-                    8.1 Billing Policies.
+                    9.1 Billing Policies.
                 </p>
                 <p>
                     Certain aspects of the Service may be provided for a fee or other charge. If you elect to use paid aspects of the Service, you agree to the 
@@ -322,7 +358,7 @@ function Terms() {
                     charges, or amend fees and charges for existing services, at any time in its sole discretion.
                 </p>
                 <p>
-                    8.2 No Refunds.
+                    9.2 No Refunds.
                 </p>
                 <p>
                     You may cancel your Leader Analytics account at any time; however, there are no refunds for cancellation. 
@@ -331,7 +367,7 @@ function Terms() {
                     any content or data associated with your account, or for anything else.
                 </p>
                 <p>
-                    8.3 Payment Information; Taxes.
+                    9.3 Payment Information; Taxes.
                 </p>
                 <p>
                     All information that you provide in connection with a purchase or transaction or other monetary transaction interaction with the Service must be accurate, 
@@ -341,7 +377,7 @@ function Terms() {
                 </p>
 
                 <p>
-                    9. Leader Analytics Property
+                    10. Leader Analytics Property
                 </p>
                 <p>
                     Leader Analytics Property represents a limited license right governed solely by the terms of this Agreement and available for distribution at Leader Analytics’s sole discretion. 
@@ -356,7 +392,7 @@ function Terms() {
                     Notwithstanding any value attributed to such data by you or any third party, you understand and agree that any data, account history and account content residing on Leader Analytics’s servers, may be deleted, altered, moved or transferred at any time for any reason in Leader Analytics’s sole discretion, with or without notice and with no liability of any kind. Leader Analytics does not provide or guarantee, and expressly disclaims, any value, cash or otherwise, attributed to any data residing on Leader Analytics’s servers.
                 </p>
                 <p>
-                    10. Privacy
+                    11. Privacy
                 </p>
                 <p>
                     We care about the privacy of our Users. You understand that by using the Services you consent to the collection, use and disclosure of your personally 
@@ -364,14 +400,14 @@ function Terms() {
                     Your privacy is important to us and we only process your personal information in accordance with our Privacy Policy.
                 </p>
                 <p>
-                    11. Security
+                    12. Security
                 </p>
                 <p>
                     Leader Analytics cares about the integrity and security of your personal information. However, we cannot guarantee that unauthorized third parties will never be able to defeat 
                     our security measures or use your personal information for improper purposes. You acknowledge that you provide your personal information at your own risk.
                 </p>
                 <p>
-                    12. Infringement policy
+                    13. Infringement policy
                 </p>
                 <p>
                     Since we respect content owner rights, it is Leader Analytics’s policy to respond to alleged infringement notices.
@@ -382,7 +418,7 @@ function Terms() {
                     whether or not there is any repeat infringement.
                 </p>
                 <p>
-                    13. Third-Party Links, Data Providers and Leader Analytics Apps
+                    14. Third-Party Links, Data Providers and Leader Analytics Apps
                 </p>
                 <p>
                     The Service may contain:
@@ -400,7 +436,7 @@ function Terms() {
                     You agree that Leader Analytics shall not be responsible for any loss or damage of any sort relating to your dealings with such advertisers.
                 </p>
                 <p>
-                    14. Indemnity
+                    15. Indemnity
                 </p>
                 <p>
                     You agree to defend, indemnify and hold harmless Leader Analytics and its subsidiaries, agents, licensors, managers, and other affiliated companies, 
@@ -416,7 +452,7 @@ function Terms() {
 
 
                 <p>
-                    15. No Warranty
+                    16. No Warranty
                 </p>
                 <p>
                     The service is provided on an “as is” and “as available” basis. Use of the service is at your own risk. 
@@ -452,7 +488,7 @@ function Terms() {
                 </p>
 
                 <p>
-                    16.2 No warranty that Data Providers are supported, will be supported, or will remain supported
+                    16.3 No warranty that Data Providers are supported, will be supported, or will remain supported
                 </p>
                 <p>
                     As part of the Service, Leader Analytics may provide client software that enables Users to acquire and use data provided by certain third parties ("Data Providers").  
@@ -469,7 +505,7 @@ function Terms() {
                     not endorse, approve, guarantee, or reccommend any Data Provider.
                 </p>
                 <p>
-                    16.3 No Warranty for third parties
+                    16.4 No Warranty for third parties
                 </p>
                 <p>
                     Leader Analytics does not warrant, endorse, guarantee, or assume responsibility for any product or service advertised or offered by a 

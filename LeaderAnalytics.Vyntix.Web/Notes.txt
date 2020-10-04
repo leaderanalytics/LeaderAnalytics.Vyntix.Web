@@ -24,10 +24,11 @@ SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
 To do:
 When creating non-business sub, check that no other sub has been created before.  Also, make sure non-business subs renew automatically
-Create privacy page and terms page.
+DONE Create privacy page and terms page.
 Investigate how stripe handles multiple email addresses for a single subscription
-Add Terms and conditions for non-business subs
-Fix duration on SubPlans
+DONE Add Terms and conditions for non-business subs
+Links in footer component are causing postbacks.
+Fix duration on SubPlans grid on subs page
 Add captcha to leaderanalytics.com, also add 404 handler.
-
+Add checkboxes to final sub page - user must agree to Terms and privacy.
 https://github.blog/2016-08-22-publish-your-project-documentation-with-github-pages/

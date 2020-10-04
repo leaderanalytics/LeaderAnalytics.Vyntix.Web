@@ -201,7 +201,7 @@ function Home() {
                         </p>
 
                         <p>
-                            You can use data from any data provider in Vyntix.  Vyntix includes a downloader for <a href="https://fred.stlouisfed.org/" target="_blank" >FRED</a> that 
+                            You can use data from any data provider in Vyntix.  Vyntix includes a downloader for <a href="https://fred.stlouisfed.org/" target="_blank" className="darkLink" >FRED</a> that 
                             allows you to download and use data vintages that are maintained by the Federal Reserve Bank of St. Louis.
                         </p>
                     </div>
