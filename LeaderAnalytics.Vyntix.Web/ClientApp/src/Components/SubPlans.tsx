@@ -124,7 +124,7 @@ function SubPlans() {
         <div className="container-fluid content-root dark-bg">
             <Dialog dialogProps={dialogProps} />
             <div className="pageBanner rp1">
-                <span className="rh5">Subscription plans</span>
+                <span className="rh5">Business-use subscription plans</span>
             </div>
 
             <div id="subPlansTopContainer">

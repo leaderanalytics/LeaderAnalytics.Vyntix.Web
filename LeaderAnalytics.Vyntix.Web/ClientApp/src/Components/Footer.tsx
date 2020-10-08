@@ -3,7 +3,7 @@ import { Image, Nav, NavLink } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {  faBook, faDownload, faEnvelope, faUsers, faUserShield, faFileContract } from '@fortawesome/free-solid-svg-icons'
 import nuget  from '../Assets/nuget.png';
-
+import { Link } from 'react-router-dom';
 function Documentation() {
 
     return (
@@ -26,18 +26,18 @@ function Documentation() {
 
                     <div className="footer-cell">
                         <Nav.Link href="https://github.com/leaderanalytics" target="_blank" ><FontAwesomeIcon icon={faUsers} /><span>Community</span></Nav.Link>
-                        <Nav.Link as={NavLink} to="/Documentation" href="/Documentation" ><FontAwesomeIcon icon={faBook} /><span>Documentation</span></Nav.Link>
+                        <Nav.Link as={Link} to="/Documentation" href="/Documentation"><FontAwesomeIcon icon={faBook} /><span>Documentation</span></Nav.Link>
                     </div>
 
                     <div className="footer-cell">
-                        <Nav.Link as={NavLink} to="/Downloads" href="/Downloads" ><FontAwesomeIcon icon={faDownload} /><span>Downloads</span></Nav.Link>
-                        <Nav.Link as={NavLink} to="/Contact" href="/Contact" ><FontAwesomeIcon icon={faEnvelope} /><span>Contact Us</span></Nav.Link>
+                        <Nav.Link as={Link} to="/Downloads" href="/Downloads" ><FontAwesomeIcon icon={faDownload} /><span>Downloads</span></Nav.Link>
+                        <Nav.Link as={Link} to="/Contact" href="/Contact" ><FontAwesomeIcon icon={faEnvelope} /><span>Contact Us</span></Nav.Link>
                     </div >
 
 
                     <div className="footer-cell">
-                        <Nav.Link as={NavLink} to="/Privacy" href="/Privacy" ><FontAwesomeIcon icon={faUserShield} /><span>Privacy</span></Nav.Link>
-                        <Nav.Link as={NavLink} to="/Terms" href="/Terms" ><FontAwesomeIcon icon={faFileContract} /><span>Terms</span></Nav.Link>
+                        <Nav.Link as={Link} to="/Privacy" href="/Privacy" ><FontAwesomeIcon icon={faUserShield} /><span>Privacy</span></Nav.Link>
+                        <Nav.Link as={Link} to="/Terms" href="/Terms" ><FontAwesomeIcon icon={faFileContract} /><span>Terms</span></Nav.Link>
                     </div >
 
                     <div className="footer-cell">

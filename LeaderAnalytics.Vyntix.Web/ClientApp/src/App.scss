@@ -475,8 +475,8 @@ a {
 }
 
 .subscribeCheckbox {
-    height: clamp(20px,2vw,40px);
-    width: clamp(20px,2vw,40px);
+    height: clamp(20px,1.5vw,30px);
+    width: clamp(20px,1.5vw,30px);
 }
 
 .selectedPlan {
@@ -534,6 +534,19 @@ a {
         margin-right: 6px;
     }
 }
+
+/* --------------------------------------- 
+# Subscription Confirmation
+--------------------------------------- */
+
+.green-border {
+    border: solid 4px lightgreen !important;
+
+}
+.trans-border {
+    border: solid 4px transparent !important;
+}
+
 
 /* --------------------------------------- 
 # Contact us

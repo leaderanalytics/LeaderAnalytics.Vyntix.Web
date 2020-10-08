@@ -1,8 +1,8 @@
-﻿import React, { useContext } from 'react';
+﻿import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { GlobalContext, AppState } from '../AppState';
-import { Button } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom'
+import { Button } from 'react-bootstrap';
 import AppConfig  from '../appconfig';
 import { loadStripe } from '@stripe/stripe-js';
 import { GetAppState, SaveAppState } from '../Services/Services';
@@ -15,6 +15,26 @@ function SubConfirmation() {
     const history = useHistory();
     const appState: AppState = GetAppState();
     const orderTotal = appState.SubscriptionPlan?.Cost ?? 0;
+    const [termsChecked, setTermsChecked] = useState(false);
+    const [privacyChecked, setPrivacyChecked] = useState(false);
+    const [canCreateSubscription, setCanCreateSubscription] = useState(false);
+
+
+    const handleSelectionChange = (event: any) => {
+        if (event.target.id === "chkTerms")
+        {
+            setTermsChecked(event.target.checked);
+        }
+        else if (event.target.id === "chkPrivacy")
+        {
+            setPrivacyChecked(event.target.checked);
+        }
+        else
+            throw new Error("unknown event origin.");
+
+    
+    };
+
 
     const Checkout = async () => {
 
@@ -71,6 +91,8 @@ function SubConfirmation() {
             history.push("/SubActivationFailure");
         }
     }
+    useEffect(() => setCanCreateSubscription(termsChecked && privacyChecked));
+  
 
     return (
         <div className="content-root container-fluid dark-bg" >
@@ -79,42 +101,58 @@ function SubConfirmation() {
                     <span className="rh5">Confirm your subscription</span>
                 </div>
             </div>
-            <div className="rmt1 rml2 rmr2 rmb1">
+            <div className="rmt1 rml13 rmr13 rmb1">
                 <SelectedPlan />
-            </div>
+                <div className="rh6">
 
-            <div>
-                Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank">documentation</Link> page for a complete description of the Vyntix service.
-            </div>
-
-            <div>
-
-                <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
-                    <div className="rh6">
-                        <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
-                        <div>Back to Subscriptions</div>
-
+                    <div className="rmt2">
+                        Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank">documentation</Link> page for a complete description of the Vyntix service.
                     </div>
-                </Button>
 
-                {
-                    orderTotal > 0 ?
+                    <div className="rmt2">
+                        <input className="mr-2 subscribeCheckbox" type="checkbox" onChange={handleSelectionChange} id="chkTerms"></input>
+                        <span>
+                            I have read, I understand, and I agree to the <Link to="/Terms" target="_blank" ><span>Vyntix Terms of Use</span></Link>.
+                        </span>
+                    </div>
 
-                        <Button onClick={Checkout} className="iconButton rmt1 rmb1" >
-                            <div className="rh6">
-                                <div>Check out</div>
-                                <FontAwesomeIcon className="rh4" icon={faShoppingCart} />
-                            </div>
-                        </Button>
-                    :
-                        <Button onClick={Checkout} className="iconButton rmt1 rmb1" >
-                            <div className="rh6">
-                                <div>Create Subscription</div>
-                                <FontAwesomeIcon className="rh4" icon={faKey} />
-                            </div>
-                        </Button>
-                }
+                    <div className="rmt2"  >
+                        <input className="mr-2 subscribeCheckbox" type="checkbox" onChange={handleSelectionChange} id="chkPrivacy"></input>
+                        <span>
+                            I have read, I understand, and I agree to the <Link to="/Privacy" target="_blank" ><span>Vyntix Privacy Policy</span></Link>.
+                        </span>
+                    </div>
+                </div>
+                <div className="rmt3 center-content">
 
+                    <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
+                        <div className="rh6">
+                            <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
+                            <div>Subscriptions</div>
+
+                        </div>
+                    </Button>
+
+                    {
+                        orderTotal > 0 ?
+                            
+                            <Button onClick={Checkout} className={`iconButton rmt1 rmb1 ${canCreateSubscription ? "green-border" : "trans-border" }`} disabled={!canCreateSubscription} >
+                                <div className="rh6">
+                                    <div>Check out</div>
+                                    <FontAwesomeIcon className="rh4" icon={faShoppingCart} />
+                                </div>
+                            </Button>
+                            
+                            :
+                            <Button onClick={Checkout} className="iconButton rmt1 rmb1" disabled={!canCreateSubscription} >
+                                <div className="rh6">
+                                    <div>Create Subscription</div>
+                                    <FontAwesomeIcon className="rh4" icon={faKey} />
+                                </div>
+                            </Button>
+                    }
+
+                </div>
             </div>
         </div>
     )

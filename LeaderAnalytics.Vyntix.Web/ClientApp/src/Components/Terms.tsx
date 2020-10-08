@@ -31,7 +31,7 @@ function Terms() {
                     <li>You must be of legal age to use Vyntix.</li>
                     <li>You must be truthful about your identity.</li>
                     <li>You may never give your password to anyone else.  You may not log in using an account that does not belong to you.</li>
-                    <li>You may not ever use a free, non-business subscription for a business purpose.</li>
+                    <li>You may never use a free, non-business subscription for a business purpose.</li>
                     <li>When renewing your business subscription, you must renew at the pricing tier that reflects you or your company's current annual revenue.</li>
                     <li>You must be a professional online.  You can not be rude to other users or harass them.</li>
                     <li>You must not upload anything that does not belong to you.</li>
