@@ -56,7 +56,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
             options.Customer = order.CustomerID;
             options.CollectionMethod = "send_invoice"; // Do not auto-charge customers account
-            options.TrialPeriodDays = order.IsTrial ? 30 : 0;
+            options.TrialPeriodDays = 0;
             options.Items = new List<SubscriptionItemOptions>(2);
             options.Items.Add(new SubscriptionItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 });
             options.DaysUntilDue = 1;

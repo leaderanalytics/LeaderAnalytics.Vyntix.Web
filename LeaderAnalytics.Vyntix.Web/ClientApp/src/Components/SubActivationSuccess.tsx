@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBirthdayCake, faDownload } from '@fortawesome/free-solid-svg-icons';
+import SelectedPlan from './SelectedPlan';
 
 function SubActivationSuccess() {
     const appState: AppState = useContext(GlobalContext);
@@ -18,20 +19,14 @@ function SubActivationSuccess() {
         <div className="content-root container-fluid dark-bg" >
             <div id="banner">
                 <div className="pageBanner rp1">
-                    <span className="rh5">Welcome to Vyntix your subscription is active</span>
+                    <p className="rh5">Welcome to Vyntix</p>
+                    <p className="rh5">Your subscription is active</p>
                 </div>
             </div>
 
 
             <div className="info-box colorSet1 rp1">
-                <FontAwesomeIcon className="info-box-icon rh4" icon={faBirthdayCake} />
-
-                <div className="info-box-header rmb1">
-                    Subscription details
-                </div>
-
-                    TO DO : SUBSCRIPTION DETAILS HERE
-
+                <SelectedPlan/>
             </div>
 
             <Button onClick={clickHandler} className="iconButton rmt1 rmb1" >

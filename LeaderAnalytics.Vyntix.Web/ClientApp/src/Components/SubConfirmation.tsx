@@ -101,7 +101,7 @@ function SubConfirmation() {
                     <span className="rh5">Confirm your subscription</span>
                 </div>
             </div>
-            <div className="rmt1 rml13 rmr13 rmb1">
+            <div className="rmt1 rm-fallback rmb1">
                 <SelectedPlan />
                 <div className="rh6">
 
@@ -129,7 +129,6 @@ function SubConfirmation() {
                         <div className="rh6">
                             <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
                             <div>Subscriptions</div>
-
                         </div>
                     </Button>
 
@@ -144,7 +143,7 @@ function SubConfirmation() {
                             </Button>
                             
                             :
-                            <Button onClick={Checkout} className="iconButton rmt1 rmb1" disabled={!canCreateSubscription} >
+                            <Button onClick={Checkout} className={`iconButton rmt1 rmb1 ${canCreateSubscription ? "green-border" : "trans-border"}`} disabled={!canCreateSubscription} >
                                 <div className="rh6">
                                     <div>Create Subscription</div>
                                     <FontAwesomeIcon className="rh4" icon={faKey} />

@@ -113,7 +113,7 @@ function Documentation() {
                         <div className="section-body rh6 rp1"> 
                             <p><b>Status:</b> In development</p>
                             <p><b>Expected:</b> Q4 2020</p>
-                            <p><b>Description:</b> Accesses the FRED API and creates data objects that are usable in code.</p>
+                            <p><b>Description:</b> Access the FRED API and creates data objects that are usable in code.</p>
                             <p><a href="https://leaderanalytics.github.io/Vyntix/" target="_blank">Documentation</a></p>
                         </div>
                     </div>

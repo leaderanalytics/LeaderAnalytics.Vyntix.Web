@@ -23,9 +23,11 @@ https://preview.themeforest.net/item/wave-finance-and-investment-html-template/f
 SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
 To do:
-When creating non-business sub, check that no other sub has been created before.  Also, make sure non-business subs renew automatically
-Investigate how stripe handles multiple email addresses for a single subscription
 
+In progress Investigate how stripe handles multiple email addresses for a single subscription
+Finish SubActivationSuccess and SubActivationFailure
+Manually navigate to each page. Redirect to home if state is not correct
+Add route to handle 404 errors
 Add captcha to leaderanalytics.com, also add 404 handler.
-Add checkboxes to final sub page - user must agree to Terms and privacy.
+
 https://github.blog/2016-08-22-publish-your-project-documentation-with-github-pages/

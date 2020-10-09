@@ -15,7 +15,8 @@ import DialogProps from '../Model/DialogProps';
 
 const TopNav = () => {
     const appState: AppState = useContext(GlobalContext);
-    const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);
+    const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);                   // UserID is maintained by Azure
+    const [hasCustomerID, setHasCustomerID] = useState(appState.CustomerID !== null && appState.CustomerID.length > 1);     // CustomerID is maintained by Stripe
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
 
     appState.RenderTopNav = () => {
@@ -65,7 +66,7 @@ const TopNav = () => {
                         <ButtonGroup>
                             <DropdownButton as={ButtonGroup} title="Profile" id="profileButton" alignRight>
                                 <Dropdown.Item eventKey="1" className="rh6" onClick={() => SignOut(appState)} >Sign Out</Dropdown.Item>
-                                <Dropdown.Item eventKey="2" className="rh6" onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
+                                <Dropdown.Item eventKey="2" className="rh6" disabled={!hasCustomerID} onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
                             </DropdownButton>
                         </ButtonGroup>
                         :

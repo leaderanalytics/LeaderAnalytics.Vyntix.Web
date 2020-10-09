@@ -12,8 +12,9 @@ namespace LeaderAnalytics.Vyntix.Web.Model
         public string CustomerID { get; set; }              // Created and maintained in Stripe -
         public List<Subscription> PriorSubscriptions { get; set; } // Prior subscriptions, if any.  Prior subscriptions may be active or expired.
         public string PaymentProviderPlanID { get; set; }   // Created and maintained in Stripe. This is the pricing identifier of the subscription the user wishes to purchase.
+        public SubscriptionPlan SubscriptionPlan { get; set; }
         public string PromoCodes { get; set; }              // Comma delimited list of coupon, discount, promo etc. codes.
-        public bool IsTrial { get; set; }                   // True if the subscription is a free trial.
+
 
         public SubscriptionOrder()
         {

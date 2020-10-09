@@ -19,4 +19,3 @@
 
 [Security test](https://www.immuniweb.com/free/)
 
-https://github.community/t/commits-pushed-under-wrong-name-should-not-have-been-allowed/134361

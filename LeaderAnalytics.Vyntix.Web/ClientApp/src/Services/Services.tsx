@@ -125,7 +125,7 @@ export const ManageSubscription = async (appState: AppState): Promise<AsyncResul
 
     const result: AsyncResult = new AsyncResult();
 
-    if (appState?.CustomerID?.length === 0 ?? true) {
+    if (appState?.CustomerID?.length ?? 0 === 0) {
         result.ErrorMessage = "Invalid CustomerID";
         return result;
     }

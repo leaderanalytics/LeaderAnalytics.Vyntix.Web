@@ -101,12 +101,6 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             if (!String.IsNullOrEmpty(response.ErrorMessage))
                 return response;
-
-            // To do: In Renewals, check for an existing subscription and customerID.
-            // If found, update the existing subscription
-            // User must be admin to modify subscription
-            // Check CanSubscribe and CanRenew flag on subscription
-            
             
             SubscriptionPlan plan = GetActiveSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID);
 
@@ -115,6 +109,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 response.ErrorMessage = $"Subscription plan {order.PaymentProviderPlanID} was not found in the active subscription plan table.";
                 return response;
             }
+
+            order.SubscriptionPlan = plan;
             Customer customer = await GetCustomerByEmailAddress(order.UserEmail);
             
             if (customer != null)
@@ -122,9 +118,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 order.CustomerID = customer.Id;
                 order.PriorSubscriptions = await GetSubscriptionsForCustomer(customer);
             }
-
-            // order is a trial if customer has no prior subs and the sub they are ordering is not free.
-            order.IsTrial = ((!order.PriorSubscriptions?.Any()) ?? true) && plan.Cost > 0;
+            
             return response;
         }
 
@@ -134,7 +128,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 throw new ArgumentNullException("hostURL");
 
             CreateSessionResponse response = new CreateSessionResponse();
-
+         
             // Create stripe session options
             SessionCreateOptions options = new SessionCreateOptions
             {
@@ -147,7 +141,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 CustomerEmail = string.IsNullOrEmpty(order.CustomerID)? order.UserEmail : null,
                 Mode = "subscription",
                 SuccessUrl = hostURL + "/Subscription/CreateSubscription?session_id={CHECKOUT_SESSION_ID}",    // Called AFTER user submits payment
-                CancelUrl = hostURL + "/SubActivationFailure",                                                  // Called only if user cancels
+                CancelUrl = hostURL + "/SubActivationFailure"                                                  // Called only if user cancels
+                
             };
 
             // Call Stripe and create the session
@@ -198,6 +193,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             // Get the session from Stripe --------------------------------
             Session stripeSession = null;
+            
             try
             {
                 stripeSession = await new SessionService().GetAsync(sessionID);
@@ -234,7 +230,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 return errorMsg;
             }
             
-            // Write it to renewals here.
+            
 
 
             return errorMsg;
@@ -253,15 +249,20 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 result.ErrorMessage = response.ErrorMessage;
                 return result;
             }
+
             Stripe.SubscriptionCreateOptions options = new Stripe.SubscriptionCreateOptions();
             Stripe.SubscriptionService stripeSubService = new Stripe.SubscriptionService(stripeClient);
+            //trialPeriodDays is zero (if the sub is business and the customer has previously purchased or used any other subscription) OR (the price for the sub is zero i.e. non business or promo) 
+            int trialPeriodDays = (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30; 
 
             options.Customer = order.CustomerID;
             options.CollectionMethod = "send_invoice"; // Do not auto-charge customers account
-            options.TrialPeriodDays = order.IsTrial ? 30 : 0;
+            options.TrialPeriodDays = trialPeriodDays;
             options.Items = new List<SubscriptionItemOptions>(2);
             options.Items.Add(new SubscriptionItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 });
-            options.DaysUntilDue = 15;
+            options.DaysUntilDue = 0;
+            options.CollectionMethod = order.SubscriptionPlan.Cost == 0 ? "charge_automatically" : "send_invoice";
+            options.CancelAtPeriodEnd = false;
 
             try
             {
@@ -370,5 +371,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             }
             return response;
         }
+
+        
     }
 }

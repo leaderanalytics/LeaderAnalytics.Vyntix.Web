@@ -12,7 +12,7 @@ function Terms() {
 
             <div id="banner">
                 <div className="pageBanner rp1">
-                    <span className="rh5">Vyntix Terms and Conditions</span>
+                    <span className="rh5">Vyntix Terms of Use</span>
                 </div>
             </div>
 
@@ -37,7 +37,7 @@ function Terms() {
                     <li>You must not upload anything that does not belong to you.</li>
                     <li>Anything you upload in a public forum or as a public data series can be modified, deleted, or re-published by Leader Analytics.</li>
                     <li>We collect informaton that identifies you personally, such as your name and your IP address.</li>
-                    <li>Vyntix and all it's related components are provided without warranty of any kind. When you use them you are doing so at your own risk.</li>
+                    <li>All of the components that comprise the Vyntix service are provided without warranty of any kind. When you use them you are doing so at your own risk.</li>
                     <li>There are no refunds, prorated or otherwise.  Use the free trial period to your advantage.  If you need some extra free time please send us an email and we will make every effort to accomodate you.</li>
                     <li>You must never use Vyntix in a manner that violates any law or for any illegal purpose.</li>
                 </ul>
@@ -47,7 +47,7 @@ function Terms() {
 
                 <div id="banner">
                     <div className="pageBanner rp1">
-                        <span className="rh4">Vyntix Terms and Conditions</span>
+                        <span className="rh4">Vyntix Terms of Use</span>
                     </div>
                 </div>
 
@@ -421,20 +421,21 @@ function Terms() {
                     14. Third-Party Links, Data Providers and Leader Analytics Apps
                 </p>
                 <p>
-                    The Service may contain:
-
-                    Links to third-party apps to install and use with Vyntix.;
-                    links to third-party websites, advertisers, services, special offers, or other events or activities,
-                    that are not owned or controlled by Leader Analytics.
+                    The Service may contain links to third-party websites, advertisers, services, special offers, or other events or activities, that are not owned or 
+                    controlled by Leader Analytics.
 
                     Leader Analytics does not endorse or assume any responsibility for any such third-party apps, sites, information, materials, products, data, or services. 
                     If you access a third-party app or website from the Service, you do so at your own risk, and you understand that this Agreement and Leader Analytics’s Privacy Policy
-                    do not apply to your use of such sites. Before installing an app to your Leader Analytics account, please ensure you read and agree to the Terms and Conditions of the app. 
+                    do not apply to your use of such sites. 
                     You expressly relieve Leader Analytics from any and all liability arising from your use of any third-party app, website, service, or content. 
                     Additionally, your dealings with or participation in promotions of advertisers found on the Service, including payment and delivery of goods, and any 
-                    other terms (such as warranties) are solely between you and such advertisers. 
-                    You agree that Leader Analytics shall not be responsible for any loss or damage of any sort relating to your dealings with such advertisers.
+                    other terms (such as warranties) are solely between you and such advertisers. Before purchasing or using software or services from any third party, please ensure you 
+                    read and agree to the Terms and Conditions provided by the third party. 
+                    You agree that Leader Analytics shall not be responsible for any loss or damage of any kind relating to your dealings with such advertisers.
+                    You agree that you will abide by the Terms and Conditions provided by the third party and that you will not use Vyntix in any manner that might violate those Terms.
                 </p>
+                
+
                 <p>
                     15. Indemnity
                 </p>
