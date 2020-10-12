@@ -58,32 +58,34 @@ function SubSignIn() {
                     <span className="rh5">Sign in before creating a subscription</span>
                 </div>
             </div>
-            <div className="rmt1 rml2 rmr2 rmb1">
-                <SelectedPlan />
-            </div>
+            <div className="rm-fallback">
+                <div className="rmt1 rmb1">
+                    <SelectedPlan />
+                </div>
 
-            <div>
-                You must sign in using your existing acccount or create a new account before you can create your subscription.
-            </div>
+                <div className="rh6">
+                    You must sign in using your existing acccount or create a new account before you can create your subscription.
+                </div>
 
-            <div>
-                Click the button below to sign in.  If you do not have an account you can create one.
-            </div>
+                <div className="rh6">
+                    Click the button below to sign in.  If you do not have an account you can create one.
+                </div>
 
-            <div>
-                <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
-                    <div className="rh6">
-                        <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
-                        <div>Back to Subscriptions</div>
-                    </div>
-                </Button>
+                <div>
+                    <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
+                        <div className="rh6">
+                            <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
+                            <div>Back to Subscriptions</div>
+                        </div>
+                    </Button>
 
-                <Button onClick={LocalSignIn} className="iconButton rmt1 rmb1" >
-                    <div className="rh6">
-                        <div>Sign in</div>
-                        <FontAwesomeIcon className="rh4" icon={faSignInAlt} />
-                    </div>
-                </Button>
+                    <Button onClick={LocalSignIn} className="iconButton rmt1 rmb1" >
+                        <div className="rh6">
+                            <div>Sign in</div>
+                            <FontAwesomeIcon className="rh4" icon={faSignInAlt} />
+                        </div>
+                    </Button>
+                </div>
             </div>
         </div>
     )

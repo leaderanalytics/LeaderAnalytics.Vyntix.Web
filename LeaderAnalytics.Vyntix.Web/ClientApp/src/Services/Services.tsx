@@ -125,7 +125,7 @@ export const ManageSubscription = async (appState: AppState): Promise<AsyncResul
 
     const result: AsyncResult = new AsyncResult();
 
-    if (appState?.CustomerID?.length ?? 0 === 0) {
+    if ((appState?.CustomerID?.length ?? 0) === 0) {
         result.ErrorMessage = "Invalid CustomerID";
         return result;
     }
@@ -141,15 +141,19 @@ export const ManageSubscription = async (appState: AppState): Promise<AsyncResul
     });
     
     result.Success = response.status < 300;
+    const json = await response.json();
 
-    if (!result.Success) {
-        result.ErrorMessage = await response.json();
+    if (result.Success) {
+        window.location = json;
     }
-    const redirectUrl = await response.json();
-    window.location = redirectUrl;
+    else {
+        result.ErrorMessage = json;
+    }
     return result;
 
-    // Need to call GetSubscriptionInfo after returned by Stripe
+    // After a user navigates to stripe portal, Stripe calls back using url "../lsi/1"
+    // This tells us to reload the users subscription info in the event they made some change.
+    // See also /Components/Home.tsx
 }
 
 export const GetSubscriptionInfo = async (appState: AppState) => {
@@ -169,5 +173,6 @@ export const GetSubscriptionInfo = async (appState: AppState) => {
     var json = (await response.json()) as any;
     appState.CustomerID = json.customerID;
     appState.SubscriptionID = json.subscriptionID;
+    appState.SubscriptionCount = json.subscriptionCount;
     SaveAppState(appState);
 }

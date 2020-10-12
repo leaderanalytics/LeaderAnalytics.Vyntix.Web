@@ -18,6 +18,7 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     public class SubscriptionController : Controller
     {
         private SubscriptionService subscriptionService;
+        private string Host => $"{this.Request.Scheme}://{this.Request.Host}";
 
         public SubscriptionController(SubscriptionService subscriptionService)
         {
@@ -35,19 +36,24 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         {
             return Json(subscriptionService.GetActiveSubscriptionPlans());
         }
-
-        // This method is called when user clicks "Proceed to checkout".  
-        // It calls the payment processor and requests a session be created.
-        // Note that the subscription is created after customer submits payment
+        
         [HttpPost]
-        public async Task<ActionResult<CreateSessionResponse>> ApproveSubscriptionOrder(SubscriptionOrder order) 
+        public async Task<JsonResult> IsPrepaymentRequired(SubscriptionOrder order)
         {
-            string uri = this.Request.Scheme + "://" + this.Request.Host;
-            CreateSessionResponse response = await subscriptionService.ApproveSubscriptionOrder(order);
-
-            if (string.IsNullOrEmpty(response.ErrorMessage))
-                response = await subscriptionService.CreateSession(order, uri);
+            CreateSubscriptionResponse response = await subscriptionService.ApproveSubscriptionOrder(order);
             
+            if(string.IsNullOrEmpty(response.ErrorMessage))
+                return Json(subscriptionService.IsPrepaymentRequired(order));
+
+            return Json(null);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> CreateSubscription(SubscriptionOrder order)
+        {
+      
+            CreateSubscriptionResponse response = await subscriptionService.CreateSubscription(order, Host);
+
             if (string.IsNullOrEmpty(response.ErrorMessage))
                 return Ok(response);
             else
@@ -55,25 +61,23 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         }
 
         // This method is called by the payment processor after the user has submitted payment.
-        [HttpGet]
-        public async Task<ActionResult> CreateSubscription()
+        [HttpGet]                      
+        public async Task<ActionResult> ConfirmSubscription()
         {
             string sessionID = Request.Query["session_id"];
-            string redirect = $"{this.Request.Scheme}://{this.Request.Host}";
-            string errorMsg = await subscriptionService.ConfirmOrderCreationFromSession(sessionID);
+            string errorMsg = await subscriptionService.ConfirmSubscription(sessionID);
+            return RedirectToStatus(string.IsNullOrEmpty(errorMsg));
+        }
 
-            if (string.IsNullOrEmpty(errorMsg))
-                redirect += ($"/SubActivationSuccess");  
-            else
-                redirect += ($"/SubActivationFailure");
-
+        private ActionResult RedirectToStatus(bool success)
+        {
+            string redirect = $"{Host}/SubActivation" + (success ? "Success" : "Failure");
             return new RedirectResult(redirect, false);
         }
 
         [HttpPost]
         public async Task<ActionResult> ManageSubscription([FromBody] string customerID) {
-            string host = $"{this.Request.Scheme}://{this.Request.Host}";
-            AsyncResult<string> result = await subscriptionService.CreateStripePortalSession(customerID, host);
+            AsyncResult<string> result = await subscriptionService.ManageSubscriptions(customerID, Host);
 
             if (!result.Success)
                 return BadRequest(JsonSerializer.Serialize(result.ErrorMessage));

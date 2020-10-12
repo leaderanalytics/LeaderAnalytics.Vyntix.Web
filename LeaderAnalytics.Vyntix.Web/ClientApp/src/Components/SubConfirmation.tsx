@@ -18,42 +18,57 @@ function SubConfirmation() {
     const [termsChecked, setTermsChecked] = useState(false);
     const [privacyChecked, setPrivacyChecked] = useState(false);
     const [canCreateSubscription, setCanCreateSubscription] = useState(false);
-
+    const [hideTrialPeriodMsg, setHideTrialPeriodMsg] = useState(true);
 
     const handleSelectionChange = (event: any) => {
         if (event.target.id === "chkTerms")
-        {
             setTermsChecked(event.target.checked);
-        }
         else if (event.target.id === "chkPrivacy")
-        {
             setPrivacyChecked(event.target.checked);
-        }
         else
             throw new Error("unknown event origin.");
+    };
+
+    const order = {
+        UserID: appState.UserID,
+        UserEmail: appState.UserEmail,
+        CustomerID: appState.CustomerID,
+        SubscriptionID: appState.SubscriptionID,
+        PaymentProviderPlanID: appState.SubscriptionPlan?.PaymentProviderPlanID,
+        PromoCodes: appState.PromoCodes
+    };
+
+    useEffect(() => {
+        // Check if customer will get directed to payment processor upon confirming their subscription
+        // This will happen if the sub is not eligible for a trial period and is not free.
+
+        fetch('/subscription/IsPrepaymentRequired', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(order)
+        }).then(response => {
+            response.json().then(j => {
+                setHideTrialPeriodMsg(j === null || j === false);
+            });
+        });
+    },[1]);
 
     
-    };
 
 
     const Checkout = async () => {
 
-        if (appState.UserID === null || appState.UserID.length < 2 || appState.SubscriptionPlan === null)
+        if (appState.UserID === null || appState.UserID.length < 2 || appState.UserEmail === null || appState.SubscriptionPlan === null)
             return;
 
         // At this point the user is logged in and has made a subscription selection. 
         // Post user identity and subscription selection back to the server for validation.
         
-        const order = {
-            UserID: appState.UserID,
-            UserEmail: appState.UserEmail,                    
-            CustomerID: appState.CustomerID,
-            SubscriptionID: appState.SubscriptionID,
-            PaymentProviderPlanID: appState.SubscriptionPlan?.PaymentProviderPlanID,
-            PromoCodes: appState.PromoCodes
-        };
+        
 
-        let response = await fetch('/subscription/ApproveSubscriptionOrder', {
+        let response = await fetch('/subscription/CreateSubscription', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
@@ -66,20 +81,15 @@ function SubConfirmation() {
         if (response.status < 300) {
             // Order approval is OK
 
-            if (orderTotal > 0) {
-                // Redirect to payment processor
+            if (approval.sessionID !== null) {
+                // If approval.SessionID is not null, we need to redirect to 
+                // payment processor so customer can make payment immediately:
                 const stripe = await loadStripe(AppConfig.StripeApiKey);
                 stripe?.redirectToCheckout({ sessionId: approval.sessionID });
             }
             else {
-                // Create a no cost subscription
-                let createResponse = await fetch('/subscription/CreateNoCostSubscription', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(order)
-                });
+                // We are done.  Customer has created a subscription with a trial period
+                // or a free subscription.
                 history.push("/SubActivationSuccess");
             }
         }
@@ -104,6 +114,10 @@ function SubConfirmation() {
             <div className="rmt1 rm-fallback rmb1">
                 <SelectedPlan />
                 <div className="rh6">
+
+                    <div className="rmt2" hidden={hideTrialPeriodMsg}>
+                        This subscription is not eligible for a trial period because you have received a trial period for subscriptions you have purchased previously.  Only one trial period per subscriber is granted.
+                    </div>
 
                     <div className="rmt2">
                         Please review your subscription carefully. Read the <Link className="rh6" to="/Documentation" target="_blank">documentation</Link> page for a complete description of the Vyntix service.

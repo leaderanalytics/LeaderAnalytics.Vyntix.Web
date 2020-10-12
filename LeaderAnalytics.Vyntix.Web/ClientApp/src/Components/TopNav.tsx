@@ -15,12 +15,15 @@ import DialogProps from '../Model/DialogProps';
 
 const TopNav = () => {
     const appState: AppState = useContext(GlobalContext);
-    const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);                   // UserID is maintained by Azure
-    const [hasCustomerID, setHasCustomerID] = useState(appState.CustomerID !== null && appState.CustomerID.length > 1);     // CustomerID is maintained by Stripe
+    const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);   // UserID is maintained by Azure
+    const [hasActiveSub, setHasActiveSub] = useState(appState.SubscriptionID !== null && appState.SubscriptionID.length > 1); // True if user has an active subscription.
+    const [hasAnySub, setHasAnySub] = useState(appState.SubscriptionCount > 0); // True if user has any subscription - active or not.
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
 
     appState.RenderTopNav = () => {
-        setisSignedIn(appState.UserID !== null && appState.UserID.length > 1)
+        setisSignedIn(appState.UserID !== null && appState.UserID.length > 1);
+        setHasAnySub(appState.SubscriptionCount > 0);
+        setHasActiveSub(appState.SubscriptionID !== null && appState.SubscriptionID.length > 1);
     };
 
     const LocalSignIn = async (event: any) => {
@@ -29,6 +32,7 @@ const TopNav = () => {
         const tmpIsSignedIn: boolean = errorMsg.length === 0;
 
         setisSignedIn(tmpIsSignedIn);
+        appState.RenderTopNav();
 
         if (tmpIsSignedIn) {
             appState.SignInCallback?.call(null, tmpIsSignedIn);
@@ -64,9 +68,9 @@ const TopNav = () => {
 
                     {isSignedIn ?
                         <ButtonGroup>
-                            <DropdownButton as={ButtonGroup} title="Profile" id="profileButton" alignRight>
+                            <DropdownButton as={ButtonGroup} title="Profile" id="profileButton" alignRight className={`${hasActiveSub ? "green-border" : "trans-border"}`}>
                                 <Dropdown.Item eventKey="1" className="rh6" onClick={() => SignOut(appState)} >Sign Out</Dropdown.Item>
-                                <Dropdown.Item eventKey="2" className="rh6" disabled={!hasCustomerID} onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
+                                <Dropdown.Item eventKey="2" className="rh6" disabled={!hasAnySub} onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
                             </DropdownButton>
                         </ButtonGroup>
                         :

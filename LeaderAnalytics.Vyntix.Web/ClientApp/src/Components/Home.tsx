@@ -19,8 +19,11 @@ function Home() {
 
     useAsyncEffect(async () => {
         if (id !== undefined && id === "1") {
+
             // After a user navigates to stripe portal, Stripe calls back using url "../lsi/1"
             // This tells us to reload the users subscription info in the event they made some change.
+            // See also /Services/Services.tx - ManageSubscription
+
             await GetSubscriptionInfo(appState);
             history.push("/"); // get rid of /lsi/1
         }

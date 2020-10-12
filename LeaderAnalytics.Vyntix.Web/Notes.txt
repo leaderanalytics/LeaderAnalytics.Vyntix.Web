@@ -24,8 +24,12 @@ SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
 To do:
 
-In progress Investigate how stripe handles multiple email addresses for a single subscription
-Finish SubActivationSuccess and SubActivationFailure
+Revise subplans screen.  Show dropdown with income limits.
+Add a captcha to submit subscription
+Turn on email verification.  Make sure email is verified before allowing a sub to be created.
+Investigate using msgraph for storage of extra email address.
+
+Create test scripts - think of all scenerios such as extending all subscriptions
 Manually navigate to each page. Redirect to home if state is not correct
 Add route to handle 404 errors
 Add captcha to leaderanalytics.com, also add 404 handler.

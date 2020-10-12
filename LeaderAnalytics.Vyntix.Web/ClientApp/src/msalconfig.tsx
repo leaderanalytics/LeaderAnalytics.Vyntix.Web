@@ -14,7 +14,8 @@ export default class MSALConfig {
         authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/B2C_1_susi",
         validateAuthority: false,
         navigateToLoginRequestUrl: true,
-        redirectUri: "https://localhost:5031/"
+        redirectUri: "https://localhost:5031/",
+        postLogoutRedirectUri: "https://localhost:5031/"
     };
     public cache = {
         CacheLocation: "localStorage", // LocalStorage allows single signon accross tabs.

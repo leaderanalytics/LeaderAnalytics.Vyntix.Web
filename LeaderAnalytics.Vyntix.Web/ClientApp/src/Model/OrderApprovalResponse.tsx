@@ -1,4 +1,4 @@
 ﻿export default class OrderApprovalResponse {
     public ErrorMessage: string = "";
-    public SessionID: string = "";
+    public Redirect: boolean = false;
 };

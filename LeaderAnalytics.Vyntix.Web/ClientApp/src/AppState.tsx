@@ -8,12 +8,12 @@ export class AppState {
     public UserID: string = "";
     public UserEmail: string = "";  // Need this here until I figure out a way to get email from MSGraph.
     public CustomerID: string = ""; 
-    public SubscriptionID: string = "";  // Existing paid subscription, if any
+    public SubscriptionID: string = "";     // Active subscription, if any
+    public SubscriptionCount: number = 0;   // Number of subscriptions - active or not.  If > 0, user can navigate to Stripe portal. 
     public Token: IdToken | null = null;
     public SignInCallback: (isSignedIn: boolean) => void = (isSignedIn) => { };
     public RenderTopNav: () => void = () => { };
     public Message: string = "";
-    public IsSubscriptionActive: boolean = false;
     // Order
     public PromoCodes: string = "";
     public SubscriptionPlan: SubscriptionPlan | null = null;
