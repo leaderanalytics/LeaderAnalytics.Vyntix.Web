@@ -485,6 +485,23 @@ a {
 }
 
 
+.planInfoBox {
+    display:flex;
+    flex-direction:column;
+    flex-grow:1;
+    border:1px solid black;
+    border-collapse:collapse;
+
+}
+.planSelector {
+    font-size: clamp(20px,2vw,40px) !important;
+}
+.pricing-grid-collapse {
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+}
+
 @include media-breakpoint-down(md) {
 
     #subPlansTopContainer {
@@ -492,11 +509,12 @@ a {
     }
 
     #subPlansLeft {
-        display:flex;
-        justify-content:center;
+        display: flex;
+        justify-content: center;
+
         img {
-            width:80vw;
-            height:auto;
+            width: 80vw;
+            height: auto;
         }
     }
 
@@ -532,6 +550,10 @@ a {
     .cell-desc .cell-cost, .cell-dur {
         margin-left: 6px;
         margin-right: 6px;
+    }
+
+    .pricing-grid-collapse {
+        flex-direction:column;
     }
 }
 

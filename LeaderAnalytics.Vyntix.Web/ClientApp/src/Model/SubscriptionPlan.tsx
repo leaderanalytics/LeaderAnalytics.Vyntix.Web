@@ -3,6 +3,7 @@
     public EndDate?: Date;                              // The date after which the plan can no longer be subscribed too. 
     public PaymentProviderPlanID: string = "";         // ID used by a payment provider i.e. Stripe price ID.
     public PlanDescription: string = "";               // Complete description of the plan and it's terms.
+    public ShortDescription: string = "";
     public Cost: number = 0;                           // The amount charged to the customers account each billing period.
     public BillingPeriods: number = 2;                 // The number of times the customer is charged each year.  12 = monthly, 2 = every six months, etc. 
     public DisplaySequence: number = 0;                // Ordinal position. 

@@ -22,12 +22,11 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     {
         private static HttpClient apiClient;
         private IActionContextAccessor accessor;
-        private AzureADConfig config;
+        
 
         public EMailController(AzureADConfig config, IActionContextAccessor accessor)
         {
-            this.config = config;
-            this.accessor = accessor;
+            this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
 
             if (apiClient == null)
             {
@@ -72,7 +71,7 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             try
             {
                 
-                var apiResult = await apiClient.GetStreamAsync(QueryHelpers.AddQueryString("api/Message/CaptchaImage", "ipaddress", ipaddress));
+                var apiResult = await apiClient.GetStreamAsync(QueryHelpers.AddQueryString("api/Captcha/CaptchaImage", "ipaddress", ipaddress));
                 return new FileStreamResult(apiResult, "image/jpeg");
             }
             catch (Exception ex)

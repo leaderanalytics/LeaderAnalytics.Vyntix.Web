@@ -7,7 +7,7 @@ import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
 import { SaveAppState, FormatMoney } from '../Services/Services';
-import { Image, Button, Nav } from 'react-bootstrap';
+import { Image, Button, Nav, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight, faStar, faCheck, faTools } from '@fortawesome/free-solid-svg-icons';
 import fourGuys from '../Assets/fourguys1.jpg';
@@ -19,7 +19,8 @@ import DialogProps from '../Model/DialogProps';
 function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
     const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
-    const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan?.PaymentProviderPlanID ?? '');
+    const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan);
+    const [selectedPlanID, setSelectedPlanID] = useState(appState.SubscriptionPlan?.PaymentProviderPlanID ?? '');
     const [message, setMessage] = useState('');
     const history = useHistory();
     const [plans, setPlans] = useState(new Array<SubscriptionPlan>());
@@ -30,8 +31,14 @@ function SubPlans() {
 
         useAsyncEffect(async (isMounted) => {
 
-            if (isMounted() && plans.length === 0)
-                setPlans(await GetSubscriptionPlans());
+            if (isMounted() && plans.length === 0) {
+                const p = await GetSubscriptionPlans();
+                setPlans(p);
+
+                if (selectedPlan === null)
+                    setSelectedPlan(p[0]);
+            }
+
 
             setLoading(false);
 
@@ -41,7 +48,11 @@ function SubPlans() {
     }
     
 
-    const handleSelectionChange = (event: any) => setSelectedPlan(event.target.checked ? event.target.dataset.providerid : '');
+    const handleDropdownSelectionChange = (event: any) => {
+        const p: SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === event.target.value)[0];
+        setSelectedPlan(p);
+    }
+    const handleSelectionChange = (event: any) => setSelectedPlanID(event.target.checked ? event.target.dataset.providerid : '');
 
     const handleRowSelectionChange = (event: any) => {
         var target = event.target;
@@ -54,7 +65,7 @@ function SubPlans() {
             }
         }
 
-        setSelectedPlan(plan === selectedPlan ? '' : plan);
+        setSelectedPlanID(plan === selectedPlanID ? '' : plan);
     }
 
     const handlePromoCodeChange = (event: any) => setPromoCodes(event.target.value);
@@ -62,13 +73,13 @@ function SubPlans() {
     const handleSubmit = async (event: SyntheticEvent) => {
         event.preventDefault();
 
-        if (selectedPlan?.length < 1 ?? true) {
+        if (selectedPlan === null) {
             setDialogProps(new DialogProps("Please choose a subscription plan.", DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
             return;
         }
 
         // get the selected subscription
-        appState.SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === selectedPlan)[0];
+        appState.SubscriptionPlan = selectedPlan;
         appState.PromoCodes = promoCodes;
         SaveAppState(appState);
 
@@ -85,9 +96,9 @@ function SubPlans() {
     const renderPlans = (plans: SubscriptionPlan[]) => {
         return (
             plans.filter(x => x.DisplaySequence > 0).sort(x => x.DisplaySequence).map((val, i) => (
-                <div className={(val).PaymentProviderPlanID === selectedPlan ? "gridrow selectedPlan" : "gridrow"} data-providerid={(val).PaymentProviderPlanID} onClick={handleRowSelectionChange} key={i}>
+                <div className={(val).PaymentProviderPlanID === selectedPlanID ? "gridrow selectedPlan" : "gridrow"} data-providerid={(val).PaymentProviderPlanID} onClick={handleRowSelectionChange} key={i}>
                     <div className="cell-sub">
-                        <input checked={(val).PaymentProviderPlanID === selectedPlan} onChange={handleSelectionChange} type="checkbox" data-providerid={(val).PaymentProviderPlanID} className="subscribeCheckbox"></input>
+                        <input checked={(val).PaymentProviderPlanID === selectedPlanID} onChange={handleSelectionChange} type="checkbox" data-providerid={(val).PaymentProviderPlanID} className="subscribeCheckbox"></input>
                     </div>
 
                     <div className="cell-desc">
@@ -156,9 +167,9 @@ function SubPlans() {
             <div id="freeSubContainer" className=" rh6 rp1 rmt1">
                 <FontAwesomeIcon icon={faTools} className="rh5 rm1" />
                 <p>
-                    Vyntix is still under development.  All business use subscriptons are FREE until the service is officially released.
+                    Vyntix is still under development.  All business use subscriptions are FREE until the service is officially released.
                     Please choose the subscription plan that applies to you from the list below and click Continue.  You will be prompted to create an account however you will not be asked for a 
-                    credit card.  You can you renew your subscription at no cost as often as you wish while Vyntix is under develpment.  Free business use subscriptions will expire
+                    credit card.  You can you renew your subscription at no cost as often as you wish while Vyntix is under development.  Free business use subscriptions will expire
                     approximately thirty days after Vyntix is released. See the <Link className="rh6" to="/Documentation" >Documentation</Link> page for estimated pricing.
                 </p>
                 <FontAwesomeIcon icon={faTools} className="rh5 rm1" />
@@ -167,21 +178,61 @@ function SubPlans() {
 
             <form onSubmit={handleSubmit}>
 
-                <div id="promoCodes" className="rmt1 rmb1 rp1" >
-                    <label>Enter promo codes, if any, here.  Seperate multiple codes with a comma:</label>
+                <div id="promoCodes" className="rmt1 rp1" >
+                    <label>Enter promo codes, if any, here.  Separate multiple codes with a comma:</label>
                     <input type="text" value={promoCodes} onChange={handlePromoCodeChange}></input>
                 </div>
 
-                <div id="subPlans" className="sub-plan-grid rh6">
-                    <div className="sub-plan-grid-header gridheaderrow" >
-                        <div className="cell-sub">Select</div>
-                        <div className="cell-desc">Plan description</div>
-                        <div className="cell-cost">Monthly cost</div>
-                        <div className="cell-dur">Duration</div>
-                        <div className="cell-total">Total cost</div>
+             
+
+                <div>
+                    <div className="rh6 rmt3">
+                        Vyntix subscriptions are value priced.  This pricing model allows independent business owners and very small businesses to use a Vyntix subscription at a price they can afford.
+                        To determine the cost of your subscription, choose an amount from the list below that reflects your company's total gross income for the last year for which you have completed a tax return.
                     </div>
-                    {renderPlans(plans)}
+                    <div className="pricing-grid-collapse rmt3">
+                        <div className="planInfoBox">
+                            <div className="pageBanner section-header rp1">
+                                <span className="rh5">Total gross income</span>
+                            </div>
+                            <div className="rp1 d-flex justify-content-end">
+                                <Form.Control as="select" onChange={handleDropdownSelectionChange} className="planSelector">
+                                    {plans.filter(x => x.DisplaySequence > 0).sort(x => x.DisplaySequence).map(x => <option selected={(x.PaymentProviderPlanID === appState.SubscriptionPlan?.PaymentProviderPlanID ?? false)} key={x.PaymentProviderPlanID} value={x.PaymentProviderPlanID} className="rh5">{x.ShortDescription}</option>)}
+                                </Form.Control>
+                            </div>
+                        </div>
+
+                        <div className="planInfoBox">
+                            <div className="pageBanner section-header rp1">
+                                <span className="rh5">Cost per month</span>
+                            </div>
+                            <div className="rp1 d-flex justify-content-end">
+                                <span className="rh4">{FormatMoney(selectedPlan?.MonthlyCost ?? 0)}</span>
+                            </div>
+
+                        </div>
+
+                        <div className="planInfoBox">
+                            <div className="pageBanner section-header rp1">
+                                <span className="rh5">Duration</span>
+                            </div>
+                            <div className="rp1 d-flex justify-content-end">
+                                <span className="rh4">{12 / (selectedPlan?.BillingPeriods ?? 2)} Months</span>
+                            </div>
+                        </div>
+
+
+                        <div className="planInfoBox">
+                            <div className="pageBanner section-header rp1">
+                                <span className="rh5">Total cost</span>
+                            </div>
+                            <div className="rp1 d-flex justify-content-end">
+                                <span className="rh4">{FormatMoney(selectedPlan?.Cost ?? 0)}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
                 <Button type="submit" value={0} className="iconButton rmt1 rmb1" >
                     <div className="rh6">
                         <div>Continue</div>

@@ -10,6 +10,10 @@ using LeaderAnalytics.Vyntix.Web.Services;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
+using LeaderAnalytics.Core.Azure;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.Net.Http;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace LeaderAnalytics.Vyntix.Web.Controllers
 {
@@ -17,12 +21,21 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     [Route("[controller]/[action]")]
     public class SubscriptionController : Controller
     {
+        private static HttpClient apiClient;
+        private IActionContextAccessor accessor;
         private SubscriptionService subscriptionService;
         private string Host => $"{this.Request.Scheme}://{this.Request.Host}";
 
-        public SubscriptionController(SubscriptionService subscriptionService)
+        public SubscriptionController(AzureADConfig config, IActionContextAccessor accessor, SubscriptionService subscriptionService)
         {
+            this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
+
+            if (apiClient == null)
+            {
+                ClientCredentialsHelper helper = new ClientCredentialsHelper(config);
+                apiClient = helper.AuthorizedClient();
+            }
         }
 
         [HttpGet]
@@ -51,8 +64,17 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateSubscription(SubscriptionOrder order)
         {
-      
-            CreateSubscriptionResponse response = await subscriptionService.CreateSubscription(order, Host);
+            CreateSubscriptionResponse response = new CreateSubscriptionResponse();
+            string ipaddress = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
+            var captchaResult = await apiClient.GetAsync($"api/Captcha/Submit?ipaddress={ipaddress}&code={order.Captcha}");
+
+            if (captchaResult.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                response.ErrorMessage = JsonSerializer.Deserialize<string>(await captchaResult.Content.ReadAsStringAsync());
+                return StatusCode(300, response);
+            }
+            
+            response = await subscriptionService.CreateSubscription(order, Host);
 
             if (string.IsNullOrEmpty(response.ErrorMessage))
                 return Ok(response);

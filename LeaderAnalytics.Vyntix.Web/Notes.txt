@@ -24,7 +24,6 @@ SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
 To do:
 
-Revise subplans screen.  Show dropdown with income limits.
 Add a captcha to submit subscription
 Turn on email verification.  Make sure email is verified before allowing a sub to be created.
 Investigate using msgraph for storage of extra email address.

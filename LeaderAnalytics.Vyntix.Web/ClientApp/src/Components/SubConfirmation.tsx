@@ -2,7 +2,7 @@
 import { NavLink, Link } from 'react-router-dom';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
-import { Button } from 'react-bootstrap';
+import {Image, Button } from 'react-bootstrap';
 import AppConfig  from '../appconfig';
 import { loadStripe } from '@stripe/stripe-js';
 import { GetAppState, SaveAppState } from '../Services/Services';
@@ -10,6 +10,10 @@ import SelectedPlan from './SelectedPlan';
 import OrderApprovalResponse from '../Model/OrderApprovalResponse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faArrowCircleLeft, faKey } from '@fortawesome/free-solid-svg-icons';
+import Dialog from './Dialog';
+import DialogType from '../Model/DialogType';
+import DialogProps from '../Model/DialogProps';
+
 
 function SubConfirmation() {
     const history = useHistory();
@@ -19,6 +23,10 @@ function SubConfirmation() {
     const [privacyChecked, setPrivacyChecked] = useState(false);
     const [canCreateSubscription, setCanCreateSubscription] = useState(false);
     const [hideTrialPeriodMsg, setHideTrialPeriodMsg] = useState(true);
+    const CAPTCHA_URL = AppConfig.host + "email/captchaImage";
+    const [captcha, setCaptcha] = useState("");
+    const [captchaImgUrl, setCaptchaUrl] = useState(CAPTCHA_URL + '?d=' + new Date().getTime().toString());
+    const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
 
     const handleSelectionChange = (event: any) => {
         if (event.target.id === "chkTerms")
@@ -35,7 +43,8 @@ function SubConfirmation() {
         CustomerID: appState.CustomerID,
         SubscriptionID: appState.SubscriptionID,
         PaymentProviderPlanID: appState.SubscriptionPlan?.PaymentProviderPlanID,
-        PromoCodes: appState.PromoCodes
+        PromoCodes: appState.PromoCodes,
+        Captcha:""
     };
 
     useEffect(() => {
@@ -55,18 +64,15 @@ function SubConfirmation() {
         });
     },[1]);
 
-    
-
-
     const Checkout = async () => {
 
-        if (appState.UserID === null || appState.UserID.length < 2 || appState.UserEmail === null || appState.SubscriptionPlan === null)
+        if (appState.UserID === null || appState.UserID.length < 2 || appState.UserEmail === null || appState.SubscriptionPlan === null || (captcha?.length ?? 0) === 0)
             return;
 
         // At this point the user is logged in and has made a subscription selection. 
         // Post user identity and subscription selection back to the server for validation.
-        
-        
+
+        order.Captcha = captcha;
 
         let response = await fetch('/subscription/CreateSubscription', {
             method: 'POST',
@@ -96,16 +102,15 @@ function SubConfirmation() {
         else {
 
             // Approval error
-            appState.Message = approval.errorMessage;
-            SaveAppState(appState);
-            history.push("/SubActivationFailure");
+            setDialogProps(new DialogProps(approval.errorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
         }
     }
-    useEffect(() => setCanCreateSubscription(termsChecked && privacyChecked));
+    useEffect(() => setCanCreateSubscription(termsChecked && privacyChecked && (captcha?.length ?? 0) > 0));
   
 
     return (
         <div className="content-root container-fluid dark-bg" >
+            <Dialog dialogProps={dialogProps} />
             <div id="banner">
                 <div className="pageBanner rp1">
                     <span className="rh5">Confirm your subscription</span>
@@ -135,6 +140,18 @@ function SubConfirmation() {
                         <span>
                             I have read, I understand, and I agree to the <Link to="/Privacy" target="_blank" ><span>Vyntix Privacy Policy</span></Link>.
                         </span>
+                    </div>
+
+                    <div className="rmt2"  >
+                        <div>
+                            <Image id="captchaImage" src={captchaImgUrl} />
+                        </div>
+                        <div className="form-inline rmt1">
+                            <div className="form-group">
+                                <label className="control-label">Enter the numbers shown above:&nbsp; </label>
+                                <input type="text" style={{ width: "90px" }} className="form-control" onChange={e => setCaptcha(e.target.value)}></input>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="rmt3 center-content">
