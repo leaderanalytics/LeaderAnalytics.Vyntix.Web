@@ -23,11 +23,17 @@ https://preview.themeforest.net/item/wave-finance-and-investment-html-template/f
 SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
 To do:
-
-Investigate using msgraph for storage of extra email address.
-Create test scripts - think of all scenerios such as extending all subscriptions
+Re-theme the site
+Recreate products in stripe using products vs prices
 Manually navigate to each page. Redirect to home if state is not correct
 Add route to handle 404 errors
 Add captcha to leaderanalytics.com, also add 404 handler remember that mail api controller was refactored.
+Implement telemetry in Azure
+DEPLOY
+Implement using msgraph for storage of extra email address.
+Create test scripts - think of all scenerios such as extending all subscriptions
+
+
+
 
 https://github.blog/2016-08-22-publish-your-project-documentation-with-github-pages/
