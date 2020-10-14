@@ -19,3 +19,4 @@
 
 [Security test](https://www.immuniweb.com/free/)
 
+[How to create MS Graph Schema Extensions](https://docs.microsoft.com/en-us/graph/api/schemaextension-post-schemaextensions?view=graph-rest-1.0&tabs=csharp)

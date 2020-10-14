@@ -48,6 +48,9 @@ export const SignIn = async (appState: AppState): Promise<string> => {
             appState.UserID = response.account.accountIdentifier;
             appState.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
             appState.Token = response.idToken;
+            // Todo - check isNew when creating new user - populate billing email. isNew will be 'true' (string)
+            const isNew: string = response.idTokenClaims?.newUser ?? '';
+
             await GetSubscriptionInfo(appState);
             SaveAppState(appState);
         }
