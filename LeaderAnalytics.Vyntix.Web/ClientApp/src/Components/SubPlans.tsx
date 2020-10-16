@@ -20,8 +20,7 @@ function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
     const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
     const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan);
-    const [selectedPlanID, setSelectedPlanID] = useState(appState.SubscriptionPlan?.PaymentProviderPlanID ?? '');
-    const [message, setMessage] = useState('');
+    const [monthlyCost, setMonthlyCost] = useState(appState.SubscriptionPlan?.MonthlyCost ?? 0);
     const history = useHistory();
     const [plans, setPlans] = useState(new Array<SubscriptionPlan>());
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
@@ -35,14 +34,14 @@ function SubPlans() {
                 const p = await GetSubscriptionPlans();
                 setPlans(p);
 
-                if (selectedPlan === null)
+                if (selectedPlan === null) {
                     setSelectedPlan(p[0]);
+                    setMonthlyCost(p[0].MonthlyCost);
+                }
             }
-
-
             setLoading(false);
 
-        }, []);
+        }, [1]);
 
         return { loading };
     }
@@ -51,22 +50,9 @@ function SubPlans() {
     const handleDropdownSelectionChange = (event: any) => {
         const p: SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === event.target.value)[0];
         setSelectedPlan(p);
+        setMonthlyCost(p.MonthlyCost);
     }
-    const handleSelectionChange = (event: any) => setSelectedPlanID(event.target.checked ? event.target.dataset.providerid : '');
-
-    const handleRowSelectionChange = (event: any) => {
-        var target = event.target;
-        var plan = target.dataset.providerid;
-
-        if (plan === undefined) {
-            while (target.parentNode !== null && target.parentNode !== undefined && plan === undefined) {
-                target = target.parentNode;
-                plan = target.dataset.providerid;
-            }
-        }
-
-        setSelectedPlanID(plan === selectedPlanID ? '' : plan);
-    }
+    
 
     const handlePromoCodeChange = (event: any) => setPromoCodes(event.target.value);
 
@@ -93,33 +79,7 @@ function SubPlans() {
         }
     }
 
-    const renderPlans = (plans: SubscriptionPlan[]) => {
-        return (
-            plans.filter(x => x.DisplaySequence > 0).sort(x => x.DisplaySequence).map((val, i) => (
-                <div className={(val).PaymentProviderPlanID === selectedPlanID ? "gridrow selectedPlan" : "gridrow"} data-providerid={(val).PaymentProviderPlanID} onClick={handleRowSelectionChange} key={i}>
-                    <div className="cell-sub">
-                        <input checked={(val).PaymentProviderPlanID === selectedPlanID} onChange={handleSelectionChange} type="checkbox" data-providerid={(val).PaymentProviderPlanID} className="subscribeCheckbox"></input>
-                    </div>
-
-                    <div className="cell-desc">
-                        <span>{(val).PlanDescription}</span>
-                    </div>
-
-                    <div className="cell-cost">
-                        <span>{FormatMoney((val).MonthlyCost)}</span>
-                    </div>
-
-                    <div className="cell-dur">
-                        <span>{(12 / val.BillingPeriods).toString() + ((12 / val.BillingPeriods) === 1 ? ' Month' : ' Months') }</span>
-                    </div>
-
-                    <div className="cell-total">
-                        <span>{FormatMoney((val).Cost)}</span>
-                    </div>
-                </div>
-            ))
-        )
-    }
+    
        
 
     // -------------------------------------
@@ -207,7 +167,7 @@ function SubPlans() {
                                 <span className="rh5">Cost per month</span>
                             </div>
                             <div className="rp1 d-flex justify-content-end">
-                                <span className="rh4">{FormatMoney(selectedPlan?.MonthlyCost ?? 0)}</span>
+                                <span className="rh4">{FormatMoney(monthlyCost)}</span>
                             </div>
 
                         </div>

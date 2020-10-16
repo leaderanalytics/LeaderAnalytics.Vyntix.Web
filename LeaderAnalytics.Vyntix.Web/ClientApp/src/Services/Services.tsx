@@ -26,7 +26,6 @@ export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
         s.StartDate = json[i].startDate;
         result.push(s);
     }
-    
     return result;
 }
 
@@ -93,6 +92,7 @@ export const GetAppState = (): AppState => {
         SignOut(appState);
         return GetAppState();
     }
+    appState.SubscriptionPlan = SubscriptionPlan.Create(appState.SubscriptionPlan);
     return appState;
 }
 

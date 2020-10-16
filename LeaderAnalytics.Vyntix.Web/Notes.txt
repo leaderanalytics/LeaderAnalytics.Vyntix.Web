@@ -29,11 +29,12 @@ Manually navigate to each page. Redirect to home if state is not correct
 Add route to handle 404 errors
 Add captcha to leaderanalytics.com, also add 404 handler remember that mail api controller was refactored.
 Implement telemetry in Azure
+Update terms:  How many users can an organization add - must do work for org only.
+Add basic documentation - i.e. what is a vintage. https://www.oecd.org/sdd/40315408.pdf
 DEPLOY
 Implement using msgraph for storage of extra email address and opt-in flag and other variables as needed.
 After log-in, check if the user is new.  If so, redirect to a page that allows them to opt-in and gathers additional info i.e. name.
 Create test scripts - think of all scenerios such as extending all subscriptions
-
 
 
 

@@ -1,11 +1,13 @@
-﻿import React, {useContext} from 'react';
+﻿import React from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router';
 import { useHistory } from 'react-router-dom'
 import { Container, Image, Row, Col } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
 import { GetSubscriptionInfo } from '../Services/Services';
 import { useAsyncEffect } from 'use-async-effect';
-import models_that_lead from '../Assets/build_models_that_lead.png';
+//import models_that_lead from '../Assets/build_models_that_lead.png';
+import models_that_lead from '../Assets/lead.jpg';
 import managing_the_future from '../Assets/the_platform_for_managing_the_future2.png';
 import number_jumble from '../Assets/number_jumble.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -37,6 +39,7 @@ function Home() {
             </div>
 
             <div className="container-fluid dark-bg">
+                
                 <Container fluid >
                     <Row>
                         <Col className="rm2">

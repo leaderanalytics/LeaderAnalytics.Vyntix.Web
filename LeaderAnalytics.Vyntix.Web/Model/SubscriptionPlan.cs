@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LeaderAnalytics.Core;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace LeaderAnalytics.Vyntix.Web.Model
 {
