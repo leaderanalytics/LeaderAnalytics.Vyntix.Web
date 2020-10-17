@@ -5,15 +5,22 @@ import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBirthdayCake, faDownload } from '@fortawesome/free-solid-svg-icons';
 import SelectedPlan from './SelectedPlan';
-import { GetSubscriptionInfo } from '../Services/Services';
+import { IsNullOrEmpty, GetSubscriptionInfo } from '../Services/Services';
 import { useAsyncEffect } from 'use-async-effect';
 
 function SubActivationSuccess() {
     const appState: AppState = useContext(GlobalContext);
-    
     const history = useHistory();
+
+
+
     useAsyncEffect(async () => {
-        await GetSubscriptionInfo(appState);   
+        await GetSubscriptionInfo(appState);
+
+        // After reloading appState, make sure user is signed in and has a valid subscription.  Redirect to home if not.
+        if (IsNullOrEmpty(appState.CustomerID) || IsNullOrEmpty(appState.SubscriptionID))
+            history.push("/Home");
+
         appState.RenderTopNav();
     },[1]);
 

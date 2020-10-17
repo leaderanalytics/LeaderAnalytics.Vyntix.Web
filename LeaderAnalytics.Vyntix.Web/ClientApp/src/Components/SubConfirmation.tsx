@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom'
 import {Image, Button } from 'react-bootstrap';
 import AppConfig  from '../appconfig';
 import { loadStripe } from '@stripe/stripe-js';
-import { GetAppState, SaveAppState } from '../Services/Services';
+import { IsNullOrEmpty, GetAppState } from '../Services/Services';
 import SelectedPlan from './SelectedPlan';
 import OrderApprovalResponse from '../Model/OrderApprovalResponse';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -27,6 +27,11 @@ function SubConfirmation() {
     const [captcha, setCaptcha] = useState("");
     const [captchaImgUrl, setCaptchaUrl] = useState(CAPTCHA_URL + '?d=' + new Date().getTime().toString());
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
+
+
+    // Make sure user is signed in and has a valid subscription.  Redirect to home if not.
+    if (IsNullOrEmpty(appState.CustomerID) || appState.SubscriptionPlan == null)
+        history.push("/Home");
 
     const handleSelectionChange = (event: any) => {
         if (event.target.id === "chkTerms")

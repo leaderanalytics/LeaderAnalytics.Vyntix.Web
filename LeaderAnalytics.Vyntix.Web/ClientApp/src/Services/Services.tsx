@@ -180,3 +180,5 @@ export const GetSubscriptionInfo = async (appState: AppState) => {
     appState.SubscriptionCount = json.subscriptionCount;
     SaveAppState(appState);
 }
+
+export const IsNullOrEmpty = (s: string) : boolean => { return s === null || s.length === 0 };

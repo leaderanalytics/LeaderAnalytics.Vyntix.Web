@@ -20,7 +20,6 @@ function SubPlans() {
     const appState: AppState = useContext(GlobalContext);
     const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
     const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan);
-    const [monthlyCost, setMonthlyCost] = useState(appState.SubscriptionPlan?.MonthlyCost ?? 0);
     const history = useHistory();
     const [plans, setPlans] = useState(new Array<SubscriptionPlan>());
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
@@ -36,7 +35,6 @@ function SubPlans() {
 
                 if (selectedPlan === null) {
                     setSelectedPlan(p[0]);
-                    setMonthlyCost(p[0].MonthlyCost);
                 }
             }
             setLoading(false);
@@ -50,7 +48,6 @@ function SubPlans() {
     const handleDropdownSelectionChange = (event: any) => {
         const p: SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === event.target.value)[0];
         setSelectedPlan(p);
-        setMonthlyCost(p.MonthlyCost);
     }
     
 
@@ -167,7 +164,7 @@ function SubPlans() {
                                 <span className="rh5">Cost per month</span>
                             </div>
                             <div className="rp1 d-flex justify-content-end">
-                                <span className="rh4">{FormatMoney(monthlyCost)}</span>
+                                <span className="rh4">{FormatMoney(selectedPlan?.MonthlyCost ?? 0)}</span>
                             </div>
 
                         </div>

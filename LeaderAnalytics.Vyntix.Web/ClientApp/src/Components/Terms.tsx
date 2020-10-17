@@ -16,7 +16,7 @@ function Terms() {
                 </div>
             </div>
 
-            Date of last update: Sept 30, 2020
+            <p className="rh5">Date of last update: Sept 28, 2020</p>
 
             <div id="banner">
                 <div className="pageBanner rp1">
@@ -31,8 +31,8 @@ function Terms() {
                     <li>You must be of legal age to use Vyntix.</li>
                     <li>You must be truthful about your identity.</li>
                     <li>You may never give your password to anyone else.  You may not log in using an account that does not belong to you.</li>
-                    <li>You may never use a free, non-business subscription for a business purpose.</li>
-                    <li>When renewing your business subscription, you must renew at the pricing tier that reflects you or your company's current annual revenue.</li>
+                    <li>You may never use a free, non-business subscription for a business activity or purpose.</li>
+                    <li>When renewing your business subscription, you must renew at the pricing tier that reflects you or your company's current annual income.</li>
                     <li>You must be a professional online.  You can not be rude to other users or harass them.</li>
                     <li>You must not upload anything that does not belong to you.</li>
                     <li>Anything you upload in a public forum or as a public data series can be modified, deleted, or re-published by Leader Analytics.</li>
@@ -79,7 +79,7 @@ function Terms() {
 
 
                 <p>
-                    Eligibility. 
+                    Eligibility 
                 </p>
                 <p>
                     You may use the Service only if you can form a binding contract with Leader Analytics, 
@@ -93,7 +93,7 @@ function Terms() {
                     The Service may not be available to Users previously disqualified from the Service by Leader Analytics.
                 </p>
                 <p>
-                    License to use the Vyntix Service. 
+                    License to use the Vyntix Service 
                 </p>
                 <p>
                     Subject to the terms and conditions of this Agreement, you are hereby granted a non-exclusive, limited, non-transferable, freely revocable 
@@ -145,7 +145,7 @@ function Terms() {
                 </p>
                 <p>
                     A Non-Business Subscription may only be used by individual researchers, individual investors, students, and instructors. 
-                    It may not be used for any business activity. A business activity is any activity that is performed with an expectation of payment or benefit of any kind being received.
+                    It may not be used for any business activity or purpose. See the definition of "Business activity or purpose" in section 3.2 below.
                 </p>
                 <p>
                     Individual researchers are individuals who research for their own interest or who share their finding with others free of charge and without expectation of payment
@@ -162,8 +162,10 @@ function Terms() {
                     3.2 Business Subscriptions
                 </p>
                 <p>
-                    A Business Subscription must be used by any individual or organization who uses it during the course of any activity that is performed 
-                    with an expectation of payment or benefit of any kind being received.
+                    A Business Subscription is required for individual or organization who uses the service for a business activity or purpose.
+                </p>
+                <p>
+                    A business activity or purpose is any activity that is performed or any value that is produced with an expectation of payment or benefit of any kind being received.
                 </p>
                 <p>
                     Individuals and organizations who must use a business subscription include but are not limited to: Bloggers, authors, consultants, advisors, and wealth managers who work with 
@@ -173,7 +175,27 @@ function Terms() {
                     Payment or benefit includes, but is not limited to: authorship fees, subscription fees, advertising revenue, royalties, profit sharing, capital gains,
                     or promotional exposure for a business in which there is an interest.
                 </p>
-
+                <p>
+                    3.2.1 Business Subscription user accounts
+                </p>
+                <p>
+                    If you purchase a subscription on behalf of an organization you may create any reasonable number of individual user accounts that can be used 
+                    to accesss the Service.  In so doing, you agree to the following:
+                    <ul>
+                        <li>
+                            The organization will maintain an administrative email account.  The person responsible for the account must be an employee or
+                            owner of the organization and must be authorized to make or execute financial decisions on behalf of the organization.
+                        </li>
+                        <li>
+                            Each person receiving a login must be under the supervision of an employee of the organizaion.
+                        </li>
+                        <li>
+                            Each person receiving a login is bound the Vyntix Terms of Use. Without limitation, individuals accessing the Service on behalf of the
+                            organization may use the service only for the fulfillment of their duties within the organizaion, with those duties being of direct benefit to
+                            the organization only.  
+                        </li>
+                    </ul>
+                </p>
                 <p>
                     4. Service Rules
                 </p>
@@ -350,7 +372,7 @@ function Terms() {
                     9. Paid Services
                 </p>
                 <p>
-                    9.1 Billing Policies.
+                    9.1 Billing Policies
                 </p>
                 <p>
                     Certain aspects of the Service may be provided for a fee or other charge. If you elect to use paid aspects of the Service, you agree to the 
@@ -358,16 +380,16 @@ function Terms() {
                     charges, or amend fees and charges for existing services, at any time in its sole discretion.
                 </p>
                 <p>
-                    9.2 No Refunds.
+                    9.2 No Refunds
                 </p>
                 <p>
                     You may cancel your Leader Analytics account at any time; however, there are no refunds for cancellation. 
-                    In the event that Leader Analytics suspends or terminates your account or this Agreement, you understand and agree that you shall 
+                    In the event that Leader Analytics suspends or terminates your account or this Agreement, you understand and agree that you will 
                     receive no refund or exchange for any credits, any unused time on a subscription, any license or subscription fees for any portion of the Service, 
                     any content or data associated with your account, or for anything else.
                 </p>
                 <p>
-                    9.3 Payment Information; Taxes.
+                    9.3 Payment Information
                 </p>
                 <p>
                     All information that you provide in connection with a purchase or transaction or other monetary transaction interaction with the Service must be accurate, 

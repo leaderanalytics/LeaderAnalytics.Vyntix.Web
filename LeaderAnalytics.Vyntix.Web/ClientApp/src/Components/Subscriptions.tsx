@@ -24,12 +24,16 @@ function Subscriptions() {
         event.preventDefault();
         const elem = document.activeElement as any;
         const planChoice = elem.value;
-
+        
         if (planChoice === "0")                               
             history.push("/SubPlans"); // Business subscription
         else if (planChoice === "1") {
             // Non-business subscription
             appState.SubscriptionPlan = (await GetSubscriptionPlans()).filter(x => x.PlanDescription.indexOf('Free non-business') > -1)[0];
+
+            if (appState.SubscriptionPlan === null)
+                throw new Error("Non-business plan was not found.");
+
             SaveAppState(appState);
 
             // if the user is not logged in, prompt them to log in.

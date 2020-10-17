@@ -18,6 +18,10 @@ import ScrollToTop from './Components/ScrollToTop';
 import Privacy from './Components/Privacy';
 import Terms from './Components/Terms';
 
+// This is a callback for stripe that tells us to reload subscription info:
+// path="/lsi/:id"
+//
+
 function App() {
     const appState: AppState = GetAppState();
     return (
@@ -39,6 +43,7 @@ function App() {
                     <Route exact path="/subplans" component={SubPlans} />
                     <Route exact path="/privacy" component={Privacy} />
                     <Route exact path="/terms" component={Terms} />
+                    <Route path="*" component={Home} />
                 </Switch>
                 <Footer/>
             </Router>

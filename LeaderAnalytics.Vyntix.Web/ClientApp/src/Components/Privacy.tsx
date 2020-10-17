@@ -12,7 +12,7 @@ function Privacy() {
 
             <div id="banner">
                 <div className="pageBanner rp1">
-                    <span className="rh5">Privacy Policy</span>
+                    <span className="rh5">Vyntix Privacy Policy</span>
                 </div>
             </div>
 
@@ -64,7 +64,9 @@ function Privacy() {
 
                 <p className="rh5">Information we do not collect</p>
                     We do not gather any information about the data elements, methodologies, algorithms, or code our Users use to build models.  Our software and services do not use or contain code that 
-                    attempts to harvest this information. Our network and servers contain no facility for storing or analyzing information of this nature.  During the course of resolving technical 
+                    attempts to harvest this information. Our network and servers contain no facility for storing or analyzing information of this nature.
+                Our software may log some data elements if it encounters an error.  This information may be necessary in assisting us in resolving and fixing technical issues.
+                This information is requested and retained only for the purpose of resolving a specific technical issue.  Furthermore, during the course of resolving technical 
                 issues, we may ask the User for specific details about data series they are using as well as other relevent information.  We will use this information only to assist the User in resolving their
                 technical issue.  It is the responsiblity of the User to protect confidential information during the course of resolving technical issues. 
 

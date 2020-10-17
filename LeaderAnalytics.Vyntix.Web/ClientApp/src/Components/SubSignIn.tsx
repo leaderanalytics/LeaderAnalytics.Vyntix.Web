@@ -19,6 +19,10 @@ function SubSignIn() {
     const [errorMsg, setErrorMsg] = useState('');
     const history = useHistory();
 
+    // Make sure user has selected a subscription.  Redirect to home if not.
+    if (appState.SubscriptionPlan == null)
+        history.push("/Home");
+
     // The SignIn method in the Nav component calls the method that is assigned to appState.SignInCallback.
     // We want the user to navigate to SubConfirmation when they log in using the SignIn button on the Nav component.
     // OR the SignIn button we show on this page:

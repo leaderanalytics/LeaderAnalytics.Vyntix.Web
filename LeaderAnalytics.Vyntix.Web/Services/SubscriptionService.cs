@@ -114,6 +114,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 response.ErrorMessage = "User ID cannot be null.  Please log in before purchasing a subscription.";
             else if (!await graphService.VerifyUser(order.UserID))
                 response.ErrorMessage = "Invalid User ID.";
+            if (string.IsNullOrEmpty(order.PaymentProviderPlanID))
+                response.ErrorMessage = "Invalid subscription identifier.  PaymentProviderPlanID can not be null.";
 
             if (!String.IsNullOrEmpty(response.ErrorMessage))
                 return response;
@@ -265,10 +267,10 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             string customerID = stripeSession.CustomerId;
             string subscriptionID = stripeSession.SubscriptionId;
             Stripe.Subscription subscription = null;
-            
+            Stripe.SubscriptionService subscriptionService = new Stripe.SubscriptionService();
             try
             {
-                 subscription = await new Stripe.SubscriptionService().GetAsync(subscriptionID);
+                 subscription = await subscriptionService.GetAsync(subscriptionID);
             }
             catch (Exception ex)
             {
@@ -285,6 +287,16 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 return errorMsg;
             }
 
+            // Update the collection method to send invoice.  Stripe does not allow this setting in the session object that is sent to the Checkout screen.
+            try
+            {
+                await subscriptionService.UpdateAsync(subscription.Id, new SubscriptionUpdateOptions { CollectionMethod = "send_invoice", DaysUntilDue = 1 });
+            }
+            catch (Exception ex)
+            {
+                errorMsg = $"Failed to update subscription with ID ({subscription.Id}).  Customer ID is {customerID}.";
+                Log.Fatal(errorMsg);
+            }
             return errorMsg;
         }
 
@@ -420,9 +432,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return response;
         }
 
-
-        
-        public int GetTrialPeriodDays(SubscriptionOrder order) => (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30;
+        public int GetTrialPeriodDays(SubscriptionOrder order) => 0; // (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30;
 
         public bool IsPrepaymentRequired(SubscriptionOrder order) => GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
     }
