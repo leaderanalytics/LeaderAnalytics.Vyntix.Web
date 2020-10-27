@@ -20,3 +20,35 @@
 [Security test](https://www.immuniweb.com/free/)
 
 [How to create MS Graph Schema Extensions](https://docs.microsoft.com/en-us/graph/api/schemaextension-post-schemaextensions?view=graph-rest-1.0&tabs=csharp)
+
+# Documentation
+Vyntix documentation is located on wsl (Windows Subsystem for Linux)
+    
+    \\wsl$\Ubuntu\home\sam\vyntix
+
+To start the Ubuntu machine type `wsl` at a windows command prompt.
+
+
+## Ubuntu
+Update package list: sudo apt update
+
+## VS Code
+[Using VS Code on WSL](https://code.visualstudio.com/docs/remote/wsl)
+
+## Jekyll
+[Jekyll Tutorial](https://jekyllrb.com/docs/step-by-step/01-setup/)
+
+In Ubuntu type `cd /home/sam/vyntix/docs`
+Build site and output to _site: jekyll build
+Serve site (also builds in real time):  jekyll serve  hosts at http://localhost:4000.
+
+Use VS Code as an editor
+Open folder at `/home/sam/vyntix`
+type `code .` to open VS Code
+
+Visual Studio only:
+if front matter does not work: 
+Click Save As... in Visual Studio.
+On the save button click the dropdown and click Save with Encoding
+Select Unicode (UTF-8 without signature) - Codepage 65001
+
