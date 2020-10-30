@@ -23,8 +23,6 @@ https://preview.themeforest.net/item/wave-finance-and-investment-html-template/f
 SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
 To do:
-Fix font size
-Add price file
 Add captcha to leaderanalytics.com, also add 404 handler remember that mail api controller was refactored.
 Implement telemetry in Azure
 

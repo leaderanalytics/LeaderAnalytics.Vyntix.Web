@@ -114,7 +114,7 @@ function Documentation() {
                             <p><b>Status:</b> In development</p>
                             <p><b>Expected:</b> Q4 2020</p>
                             <p><b>Description:</b> Access the FRED API and creates data objects that are usable in code.</p>
-                            <p><a href="https://leaderanalytics.github.io/Vyntix/" target="_blank">Documentation</a></p>
+                            <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
 
@@ -127,7 +127,7 @@ function Documentation() {
                             <p><b>Status:</b> In development</p>
                             <p><b>Expected:</b> Q1 2021</p>
                             <p><b>Description:</b> Cross platform (Linux/Mac/Windows) command line utilitiy that a downloads data from FRED and saves it to a file or a database.</p>
-                            <p><a href="https://leaderanalytics.github.io/Vyntix/" target="_blank">Documentation</a></p>
+                            <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
 
@@ -141,7 +141,7 @@ function Documentation() {
                             <p><b>Status:</b> In development</p>
                             <p><b>Expected:</b> Q2 2021</p>
                             <p><b>Description:</b> Windows desktop utility for managing data from multiple data providers.</p>
-                            <p><a href="https://leaderanalytics.github.io/Vyntix/" target="_blank">Documentation</a></p>
+                            <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
 
@@ -154,7 +154,7 @@ function Documentation() {
                             <p><b>Status:</b> In development</p>
                             <p><b>Expected:</b> Q3 2021</p>
                             <p><b>Description:</b> An API for creating and managing forecasts.</p>
-                            <p><a href="https://leaderanalytics.github.io/Vyntix/" target="_blank">Documentation</a></p>
+                            <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
 
@@ -168,7 +168,7 @@ function Documentation() {
                             <p><b>Status:</b> In development</p>
                             <p><b>Expected:</b> Q3 2021</p>
                             <p><b>Description:</b> Windows desktop application for managing forecasts.</p>
-                            <p><a href="https://leaderanalytics.github.io/Vyntix/" target="_blank">Documentation</a></p>
+                            <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
                 </div>
