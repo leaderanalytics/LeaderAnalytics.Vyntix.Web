@@ -6,5 +6,5 @@
     public static loginScopes: any = { scopes: ['openid', 'profile'] };
     public static StripeApiKey : string = "pk_live_51H4XDXLYasEZvdvrGjxforOOCxAWCrOxLPoJOjeFvFI0DBxCjEEWVrpecKtDtEbxkFTf3ZQSK2AcuGAxP5xPER3c00VFCBO4Sw";
     public static StripeClientId: string = "";
-    public static api_url: string = 'https://leaderanalytics.com';
+    public static api_url: string = 'https://leaderanalytics.com/api';
 }
