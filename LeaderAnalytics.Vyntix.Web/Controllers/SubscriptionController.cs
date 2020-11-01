@@ -14,6 +14,7 @@ using LeaderAnalytics.Core.Azure;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Serilog;
 
 namespace LeaderAnalytics.Vyntix.Web.Controllers
 {
@@ -73,8 +74,17 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
                 response.ErrorMessage = JsonSerializer.Deserialize<string>(await captchaResult.Content.ReadAsStringAsync());
                 return StatusCode(300, response);
             }
-            
-            response = await subscriptionService.CreateSubscription(order, Host);
+
+            try
+            {
+                response = await subscriptionService.CreateSubscription(order, Host);
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessage = "Error";
+                Log.Error(ex.ToString());
+            }
+
 
             if (string.IsNullOrEmpty(response.ErrorMessage))
                 return Ok(response);
