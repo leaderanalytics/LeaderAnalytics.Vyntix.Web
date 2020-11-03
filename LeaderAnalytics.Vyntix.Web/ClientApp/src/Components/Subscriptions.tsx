@@ -8,8 +8,8 @@ import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
 import { SaveAppState } from '../Services/Services';
-import business from '../Assets/business-use.png';
-import nonbusiness from '../Assets/non-business-use.png';
+import business from '../Assets/business-use.jpg';
+import nonbusiness from '../Assets/non-business-use.jpg';
 import businesstxt from '../Assets/business-use-txt.png';
 import nonbusinesstxt from '../Assets/non-business-use-txt.png';
 import freetrial from '../Assets/free-trial.png';
@@ -59,7 +59,7 @@ function Subscriptions() {
 
                 <div id="subPlanTypes">
                     <div className="subPlanType">
-                        <Image src={business} fluid />
+                        <Image src={business} fluid  />
                         <Image src={businesstxt} className="subTypeText" />
                         <div className="subPlanTypeDescription rp1 rh6">
                             <p>

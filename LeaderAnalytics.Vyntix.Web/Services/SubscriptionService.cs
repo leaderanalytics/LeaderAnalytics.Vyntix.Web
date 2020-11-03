@@ -52,7 +52,12 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task<Customer> GetCustomerByEmailAddress(string customerEmail)
         {
             CustomerService customerService = new CustomerService(stripeClient);
-            Customer customer = (await customerService.ListAsync(new CustomerListOptions { Email = customerEmail, Expand= new List<string> { "data.subscriptions" } })).FirstOrDefault();
+            Stripe.SubscriptionService subscriptionService = new Stripe.SubscriptionService(stripeClient);
+            Customer customer = (await customerService.ListAsync(new CustomerListOptions { Email = customerEmail })).FirstOrDefault();
+            
+            if (customer != null)
+                customer.Subscriptions = await subscriptionService.ListAsync(new SubscriptionListOptions { Customer = customer.Id, Status = "all" });
+            
             return customer;
         }
 
@@ -317,15 +322,21 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             Stripe.SubscriptionCreateOptions options = new Stripe.SubscriptionCreateOptions();
             Stripe.SubscriptionService stripeSubService = new Stripe.SubscriptionService(stripeClient);
-            
             int trialPeriodDays = GetTrialPeriodDays(order);
-                      
             options.Customer = order.CustomerID;
-            options.CollectionMethod = "send_invoice"; // "charge_automatically";  // Do not auto-charge customers account
+            // Do not auto-charge customers account if the cost of the subscription is greater than zero.
+            options.CollectionMethod = order.SubscriptionPlan.Cost > 0 ? "send_invoice" : "charge_automatically";
+            
+            if(options.CollectionMethod == "send_invoice")
+                options.DaysUntilDue = 1; // Can not be zero. Can only be set if CollectionMethod is "send_invoice"
+            
             options.TrialPeriodDays = trialPeriodDays;
+            
+
             options.Items = new List<SubscriptionItemOptions>(2);
             options.Items.Add(new SubscriptionItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 });
-            options.DaysUntilDue = 1; // Can not be zero. Can only be set if CollectionMethod is "send_invoice"
+
+            
             options.CancelAtPeriodEnd = false;
             
             try
@@ -432,7 +443,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return response;
         }
 
-        public int GetTrialPeriodDays(SubscriptionOrder order) => 0; // (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30;
+        public int GetTrialPeriodDays(SubscriptionOrder order) => (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30;
 
         public bool IsPrepaymentRequired(SubscriptionOrder order) => GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
     }

@@ -107,7 +107,7 @@ function SubConfirmation() {
         else {
 
             // Approval error
-            setDialogProps(new DialogProps(approval.errorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+            setDialogProps(new DialogProps(approval.errorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); history.push("/"); }));
         }
     }
     useEffect(() => setCanCreateSubscription(termsChecked && privacyChecked && (captcha?.length ?? 0) > 0));

@@ -30,11 +30,13 @@ Limit job authorization scope to current project for release pipelines
 
 SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
 
+Google Mobile-Friendly Test: https://search.google.com/test/mobile-friendly
+Google Search console: https://search.google.com/search-console/about
+
 To do:
-Fix Login issue.  Check if user is logged in when navigating to site.
+
+Review site on phone and make adjustments.
 Implement telemetry in Azure
-Implement using msgraph for storage of extra email address and opt-in flag and other variables as needed.
-After log-in, check if the user is new.  If so, redirect to a page that allows them to opt-in and gathers additional info i.e. name.
 Add basic documentation - i.e. what is a vintage. https://www.oecd.org/sdd/40315408.pdf
 Create test scripts - think of all scenerios such as extending all subscriptions
 

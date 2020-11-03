@@ -123,5 +123,12 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             SubscriptionInfoResponse response = await subscriptionService.GetSubscriptionInfo(userEmail);
             return response;
         }
+
+        [HttpPost]
+        public void LogInfo([FromBody] string msg)
+        {
+            var request = Request;
+            Log.Information(msg);
+        }
     }
 }

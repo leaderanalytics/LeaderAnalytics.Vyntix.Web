@@ -43,6 +43,7 @@ export const SignIn = async (appState: AppState): Promise<string> => {
         const response = await userAgentApplication.loginPopup(AppConfig.loginScopes);
 
         if (response.idToken !== null) {
+            Log("LOGIN SUCCESS Account Name: " + response.account.name + " Email: " + response.idTokenClaims?.emails[0]);
             appState.UserName = response.account.name;
             appState.UserID = response.account.accountIdentifier;
             appState.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
@@ -56,6 +57,7 @@ export const SignIn = async (appState: AppState): Promise<string> => {
     }
     catch (err) {
         // login dialog throws if user cancels
+        Log("LOGIN FAILURE Error Msg: " + err);
         msg = 'The login attempt was not successful.';
     }
     return msg;
@@ -182,3 +184,19 @@ export const GetSubscriptionInfo = async (appState: AppState) => {
 }
 
 export const IsNullOrEmpty = (s: string) : boolean => { return s === null || s.length === 0 };
+
+export const Log = async (msg: string) => {
+
+    if (IsNullOrEmpty(msg))
+        return;
+
+    const url = AppConfig.host + 'subscription/loginfo';
+
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(msg)
+    });
+}

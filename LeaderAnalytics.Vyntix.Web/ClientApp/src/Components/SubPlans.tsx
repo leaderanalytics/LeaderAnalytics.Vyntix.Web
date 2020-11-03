@@ -10,7 +10,7 @@ import { SaveAppState, FormatMoney } from '../Services/Services';
 import { Image, Button, Nav, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight, faStar, faCheck, faTools } from '@fortawesome/free-solid-svg-icons';
-import fourGuys from '../Assets/fourguys1.jpg';
+import fourGuys from '../Assets/fourguys.jpg';
 import blueNeural from '../Assets/blue-neural1.png';
 import Dialog from './Dialog';
 import DialogType from '../Model/DialogType';
