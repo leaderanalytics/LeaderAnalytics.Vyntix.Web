@@ -12,7 +12,6 @@ import Dialog from './Dialog';
 import DialogType from '../Model/DialogType';
 import DialogProps from '../Model/DialogProps';
 
-
 const TopNav = () => {
     const appState: AppState = useContext(GlobalContext);
     const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);   // UserID is maintained by Azure

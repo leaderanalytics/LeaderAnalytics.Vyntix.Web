@@ -10,9 +10,10 @@ import { faKey, faSignInAlt, faArrowCircleLeft } from '@fortawesome/free-solid-s
 import Dialog from './Dialog';
 import DialogProps from '../Model/DialogProps';
 import DialogType from '../Model/DialogType';
-import { string } from 'prop-types';
+import AppInsights from '../Services/AppInsights';
 
 function SubSignIn() {
+    AppInsights.LogPageView("SubSignIn");
     const appState: AppState = useContext(GlobalContext);
     var [isSignedIn, setisSignedIn] = useState(appState.UserID != null && appState.UserID.length > 1);
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));

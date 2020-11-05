@@ -1,11 +1,12 @@
 ﻿import React, { useContext } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {  faTools } from '@fortawesome/free-solid-svg-icons';
+import { faTools} from '@fortawesome/free-solid-svg-icons';
+import AppInsights from '../Services/AppInsights';
 
 function Privacy() {
+    AppInsights.LogPageView("Privacy");
 
-    
     return (
 
         <div className="container-fluid content-root dark-bg">

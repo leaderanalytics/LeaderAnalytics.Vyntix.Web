@@ -1,7 +1,12 @@
 ﻿import React, { useContext } from 'react';
 import { Accordion, Card } from 'react-bootstrap';
+import AppInsights from '../Services/AppInsights';
 
 function Documentation() {
+    AppInsights.LogPageView("Documentation");
+    const CardClick = (name: string) => {
+        AppInsights.LogEvent("Documentation Card Click", { "Name": name });
+    }
 
     return (
         <div className="container-fluid content-root dark-bg">
@@ -23,7 +28,7 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="0" className="faq-header">
+                    <Accordion.Toggle as={Card.Header} eventKey="0" className="faq-header" onClick={() => CardClick('0')}>
                         <span className="rh5">When will Vyntix be released?</span>
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="0">
@@ -40,7 +45,7 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="1" className="faq-header">
+                    <Accordion.Toggle as={Card.Header} eventKey="1" className="faq-header" onClick={() => CardClick('1')}>
                         <span className="rh5">What will the monthly cost for a subscription be?</span>
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="1">
@@ -55,7 +60,7 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="2" className="faq-header">
+                    <Accordion.Toggle as={Card.Header} eventKey="2" className="faq-header" onClick={(e) => CardClick('2')}>
                         <span className="rh5">Will Vyntix support data providers other than FRED?</span>
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="2">
@@ -69,7 +74,7 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="3" className="faq-header">
+                    <Accordion.Toggle as={Card.Header} eventKey="3" className="faq-header" onClick={() => CardClick('3')}>
                         <span className="rh5">What are the differences beween the subscription plans?</span>
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="3">
@@ -81,7 +86,7 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="4" className="faq-header">
+                    <Accordion.Toggle as={Card.Header} eventKey="4" className="faq-header" onClick={() => CardClick('4')}>
                         <span className="rh5">Does my Vyntix subscription include the cost of data?</span>
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="4">

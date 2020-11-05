@@ -6,6 +6,7 @@ import * as MSAL from 'msal';
 import MSALConfig from '../msalconfig';
 import ContactRequest from '../Model/ContactRequest';
 import AsyncResult from '../Model/AsyncResult';
+import AppInsights from './AppInsights';
 
 // Get active subscription plans
 export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
@@ -43,20 +44,21 @@ export const SignIn = async (appState: AppState): Promise<string> => {
         const response = await userAgentApplication.loginPopup(AppConfig.loginScopes);
 
         if (response.idToken !== null) {
-            Log("LOGIN SUCCESS Account Name: " + response.account.name + " Email: " + response.idTokenClaims?.emails[0]);
             appState.UserName = response.account.name;
             appState.UserID = response.account.accountIdentifier;
             appState.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
             appState.Token = response.idToken;
             // Todo - check isNew when creating new user - populate billing email. isNew will be 'true' (string)
-            const isNew: string = response.idTokenClaims?.newUser ?? '';
-
+            const isNew: boolean = (response.idTokenClaims?.newUser ?? '') === 'true';
+            AppInsights.LogEvent("Login Success", { "email": appState.UserEmail, "IsNew": isNew })
+            Log("Login Success Account Name: " + appState.UserName + " Email: " + appState.UserEmail);
             await GetSubscriptionInfo(appState);
             SaveAppState(appState);
         }
     }
     catch (err) {
         // login dialog throws if user cancels
+        AppInsights.LogEvent("Login Failure", { "error": err })
         Log("LOGIN FAILURE Error Msg: " + err);
         msg = 'The login attempt was not successful.';
     }
@@ -64,7 +66,7 @@ export const SignIn = async (appState: AppState): Promise<string> => {
 }
 
 export const SignOut = (appState: AppState) => {
-
+    AppInsights.LogEvent("Sign Out", { "email": appState.UserEmail })
     const auth: MSAL.Configuration = new MSALConfig();
     const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
     userAgentApplication.logout();
@@ -108,9 +110,11 @@ export const FormatMoney = (num: number) => {
 }
 
 export const SendContactRequest = async (request: ContactRequest): Promise<AsyncResult> => {
+    AppInsights.LogEvent("SendContactRequest")
     const url = AppConfig.host + 'email/sendemail';
     const msg = 'From Site:LeaderAnalytics.Vyntix.Web' + '\r\nName: ' + request.Name + '\r\nPhone: ' + request.Phone + '\r\nEmail: ' + request.EMail + '\r\nRequirement: ' + request.Requirement + '\r\nComment: ' + request.Message;
-    
+    AppInsights.LogEvent("SendContactRequest", {"Message": msg});
+
     let response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -122,8 +126,10 @@ export const SendContactRequest = async (request: ContactRequest): Promise<Async
     const result: AsyncResult = new AsyncResult();
     result.Success = response.status < 300;
 
-    if (!result.Success)
+    if (!result.Success) {
         result.ErrorMessage = await response.json();
+        AppInsights.LogEvent("SendContactRequest failed", { "ErrorMessage": result.ErrorMessage })
+    }
     return result;
 }
 
@@ -135,7 +141,7 @@ export const ManageSubscription = async (appState: AppState): Promise<AsyncResul
         result.ErrorMessage = "Invalid CustomerID";
         return result;
     }
-
+    AppInsights.LogEvent("ManageSubscription", { "Email": appState.UserEmail });
     const url = AppConfig.host + 'subscription/managesubscription';
 
     let response = await fetch(url, {
@@ -154,6 +160,7 @@ export const ManageSubscription = async (appState: AppState): Promise<AsyncResul
     }
     else {
         result.ErrorMessage = json;
+        AppInsights.LogEvent("ManageSubscription failed", { "Email": appState.UserEmail, "ErrorMessage": result.ErrorMessage });
     }
     return result;
 

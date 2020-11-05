@@ -25,6 +25,7 @@ namespace LeaderAnalytics.Vyntix.Web
     {
         public IConfiguration Configuration { get; }
         private string subscriptionFilePath;
+        private const string CORS_Origins = "CORS_Origins";
 
         public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
@@ -50,8 +51,7 @@ namespace LeaderAnalytics.Vyntix.Web
 
             // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
 
-            services.AddMicrosoftWebAppAuthentication(Configuration, "AzureADB2C");
-
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureADB2C");
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
 
@@ -64,8 +64,34 @@ namespace LeaderAnalytics.Vyntix.Web
             //Configuring appsettings section AzureAdB2C, into IOptions
             services.AddOptions();
             services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureADB2C"));
-            services.AddCors();
-            
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: CORS_Origins,builder =>
+                {
+                    builder
+                    .WithOrigins(new string[]
+                    {
+                        "http://www.vyntix.com",
+                        "https://www.vyntix.com",
+                        "http://vyntix.com",
+                        "https://vyntix.com",
+                        "http://localhost",
+                        "http://dev.vyntix.com",
+                        "http://vyntix.azurewebsites.net",
+                        "https://vyntix.azurewebsites.net",
+                        "http://localhost:5032",
+                        "https://localhost:5031",
+                        "https://vyntix-staging.azurewebsites.net",
+                        "https://billing.stripe.com",
+                        "http://billing.stripe.com"
+                    })
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
+
+
             // Stripe
             Stripe.StripeConfiguration.ApiKey = Configuration["StripeApiKey"];
             Stripe.StripeClient stripeClient = new Stripe.StripeClient(Stripe.StripeConfiguration.ApiKey);
@@ -86,6 +112,7 @@ namespace LeaderAnalytics.Vyntix.Web
             services.AddSingleton(graphCredentials);
             services.AddSingleton(graphService);
             services.AddSingleton(subscriptionService);
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,30 +134,15 @@ namespace LeaderAnalytics.Vyntix.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
             app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-
 
             // With endpoint routing, the CORS middleware must be configured to execute between the calls to UseRouting and UseEndpoints.
-            app.UseCors(policy =>
-            {
-                policy.WithOrigins(new string[]
-                {
-                    "http://www.vyntix.com",
-                    "https://www.vyntix.com",
-                    "http://vyntix.com",
-                    "https://vyntix.com",
-                    "http://localhost",
-                    "http://dev.vyntix.com",
-                    "http://vyntix.azurewebsites.net",
-                    "https://vyntix.azurewebsites.net",
-                    "http://localhost:5032",
-                    "https://localhost:5031",
-                    "https://vyntix-staging.azurewebsites.net",
-                    "https://billing.stripe.com",
-                    "http://billing.stripe.com"
-                }).AllowAnyMethod().AllowAnyHeader();
-            });
+            // The call to UseCors must be placed after UseRouting, but before UseAuthorization.
+            // Middleware order: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.1#middleware-order
+
+            app.UseCors(CORS_Origins);
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

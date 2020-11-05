@@ -5,13 +5,14 @@ import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { GetAppState, SaveAppState } from '../Services/Services';
-
+import AppInsights from '../Services/AppInsights';
 
 
 function SubActivationFailure() {
     const appState: AppState = GetAppState();
     const history = useHistory();
     const msg = appState.Message;
+    AppInsights.LogEvent("SubActivationFailure", { "ErrorMessage": msg });
     appState.Message = '';
     SaveAppState(appState);
 

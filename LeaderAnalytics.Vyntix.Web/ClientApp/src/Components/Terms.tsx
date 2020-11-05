@@ -2,9 +2,10 @@
 import { NavLink, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {  faTools } from '@fortawesome/free-solid-svg-icons';
+import AppInsights from '../Services/AppInsights';
 
 function Terms() {
-
+    AppInsights.LogPageView("Terms");
     
     return (
 

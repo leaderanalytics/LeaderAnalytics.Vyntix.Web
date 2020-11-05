@@ -34,9 +34,13 @@ Google Mobile-Friendly Test: https://search.google.com/test/mobile-friendly
 Google Search console: https://search.google.com/search-console/about
 
 To do:
+https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/2534
 
 Review site on phone and make adjustments.
-Implement telemetry in Azure
+Implement Application Insights
+https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview
+
 Add basic documentation - i.e. what is a vintage. https://www.oecd.org/sdd/40315408.pdf
 Create test scripts - think of all scenerios such as extending all subscriptions
 
+https://www.foxnews.com/elections/2020/general-results

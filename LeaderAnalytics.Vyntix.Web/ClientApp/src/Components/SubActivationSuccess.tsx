@@ -7,8 +7,10 @@ import { faBirthdayCake, faDownload } from '@fortawesome/free-solid-svg-icons';
 import SelectedPlan from './SelectedPlan';
 import { IsNullOrEmpty, GetSubscriptionInfo } from '../Services/Services';
 import { useAsyncEffect } from 'use-async-effect';
+import AppInsights from '../Services/AppInsights';
 
 function SubActivationSuccess() {
+    AppInsights.LogPageView("SubActivationSuccess");
     const appState: AppState = useContext(GlobalContext);
     const history = useHistory();
 

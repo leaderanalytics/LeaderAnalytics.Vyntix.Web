@@ -15,8 +15,10 @@ import nonbusinesstxt from '../Assets/non-business-use-txt.png';
 import freetrial from '../Assets/free-trial.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
+import AppInsights from '../Services/AppInsights';
 
 function Subscriptions() {
+    AppInsights.LogPageView("Subscriptions");
     const appState: AppState = useContext(GlobalContext);
     const history = useHistory();
 
@@ -25,9 +27,12 @@ function Subscriptions() {
         const elem = document.activeElement as any;
         const planChoice = elem.value;
         
-        if (planChoice === "0")                               
+        if (planChoice === "0") {
+            AppInsights.LogEvent("Select Business Subscription");
             history.push("/SubPlans"); // Business subscription
+        }
         else if (planChoice === "1") {
+            AppInsights.LogEvent("Select Non-Business Subscription");
             // Non-business subscription
             appState.SubscriptionPlan = (await GetSubscriptionPlans()).filter(x => x.PlanDescription.indexOf('Free non-business') > -1)[0];
 

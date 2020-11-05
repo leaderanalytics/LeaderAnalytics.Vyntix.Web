@@ -17,12 +17,15 @@ import Downloads from './Components/Downloads';
 import ScrollToTop from './Components/ScrollToTop';
 import Privacy from './Components/Privacy';
 import Terms from './Components/Terms';
+import AppInsights from './Services/AppInsights';
 
 // This is a callback for stripe that tells us to reload subscription info:
 // path="/lsi/:id"
 //
 
 function App() {
+    AppInsights.Init(); // Must call before initializing AppState.
+    AppInsights.LogEvent("Application Start");
     const appState: AppState = GetAppState();
     return (
         <GlobalContext.Provider value={appState}>

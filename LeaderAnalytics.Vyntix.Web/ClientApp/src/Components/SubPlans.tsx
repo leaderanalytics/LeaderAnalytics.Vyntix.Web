@@ -15,8 +15,10 @@ import blueNeural from '../Assets/blue-neural1.png';
 import Dialog from './Dialog';
 import DialogType from '../Model/DialogType';
 import DialogProps from '../Model/DialogProps';
+import AppInsights from '../Services/AppInsights';
 
 function SubPlans() {
+    AppInsights.LogPageView("SubPlans");
     const appState: AppState = useContext(GlobalContext);
     const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
     const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan);
@@ -66,6 +68,7 @@ function SubPlans() {
         appState.PromoCodes = promoCodes;
         SaveAppState(appState);
 
+        AppInsights.LogEvent("Select Plan", { "PlanName": selectedPlan.PlanDescription });
 
         // if the user is not logged in, prompt them to log in.
         if (appState.UserID === null || appState.UserID.length < 2) {

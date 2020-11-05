@@ -13,9 +13,10 @@ import { faShoppingCart, faArrowCircleLeft, faKey } from '@fortawesome/free-soli
 import Dialog from './Dialog';
 import DialogType from '../Model/DialogType';
 import DialogProps from '../Model/DialogProps';
-
+import AppInsights from '../Services/AppInsights';
 
 function SubConfirmation() {
+    AppInsights.LogPageView("SubConfirmation");
     const history = useHistory();
     const appState: AppState = GetAppState();
     const orderTotal = appState.SubscriptionPlan?.Cost ?? 0;
@@ -76,7 +77,7 @@ function SubConfirmation() {
 
         // At this point the user is logged in and has made a subscription selection. 
         // Post user identity and subscription selection back to the server for validation.
-
+        AppInsights.LogEvent("Checkout Started");
         order.Captcha = captcha;
 
         let response = await fetch('/subscription/CreateSubscription', {
@@ -90,23 +91,26 @@ function SubConfirmation() {
         const approval = await response.json(); // see Model/OrderApprovalResponse
 
         if (response.status < 300) {
+            AppInsights.LogEvent("Checkout Order Approved");
             // Order approval is OK
 
             if (approval.sessionID !== null) {
                 // If approval.SessionID is not null, we need to redirect to 
                 // payment processor so customer can make payment immediately:
+                AppInsights.LogEvent("Checkout redirect to payment processor");
                 const stripe = await loadStripe(AppConfig.StripeApiKey);
                 stripe?.redirectToCheckout({ sessionId: approval.sessionID });
             }
             else {
                 // We are done.  Customer has created a subscription with a trial period
                 // or a free subscription.
+                AppInsights.LogEvent("Checkout without payment completed");
                 history.push("/SubActivationSuccess");
             }
         }
         else {
-
             // Approval error
+            AppInsights.LogEvent("Checkout Order Rejected", {"ErrorMessage": approval.errorMessage});
             setDialogProps(new DialogProps(approval.errorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); history.push("/"); }));
         }
     }

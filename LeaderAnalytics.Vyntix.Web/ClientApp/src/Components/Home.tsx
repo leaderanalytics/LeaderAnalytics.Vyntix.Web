@@ -12,8 +12,10 @@ import managing_the_future from '../Assets/the_platform_for_managing_the_future2
 import number_jumble from '../Assets/number_jumble.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDatabase, faCheck, faBezierCurve, faMoneyCheckAlt, faChartLine, faSearchDollar } from '@fortawesome/free-solid-svg-icons';
+import AppInsights from '../Services/AppInsights';
 
 function Home() {
+    AppInsights.LogPageView("Home");
     const history = useHistory();
     const appState: AppState = useContext(GlobalContext);
     const userName = appState.UserName;
