@@ -1,7 +1,7 @@
 ﻿using LeaderAnalytics.Vyntix.Web.Model;
 using LeaderAnalytics.Vyntix.Web.Services;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Stripe;
 using System;
 using System.Collections.Generic;
@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace LeaderAnalytics.Vyntix.Web.Tests
 {
-    [TestFixture]
+    [TestClass]
     public class StripeTests : StripeBase
     {
         private const string CUSTOMER_EMAIL = "samspam92842@gmail.com";
         private const string PLAN_DESC = "Daily Subscription Plan";
         private const string USER_ID = "0216a845-3d8e-45c9-a67f-fcc04accded2";
 
-        [Test]
+        [TestMethod]
         public async Task CreateSubscriptionIfOneDoesNotAlreadyExist()
         {
             await Delete_Customer_and_prior_subscriptions();

@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using LeaderAnalytics.Vyntix.Web.Model;
@@ -8,27 +8,28 @@ using Microsoft.Graph;
 
 namespace LeaderAnalytics.Vyntix.Web.Tests
 {
+    [TestClass]
     public class Tests : BaseTest
     {
         private GraphService graphService;
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             graphService = new GraphService(GetGraphCredentials());
         }
 
-        [Test]
+        [TestMethod]
         public async Task VerifyUsersTest()
         {
             string userID = "7aee9e27-4767-4479-a9f3-a1816e3a2b24";
-            userID = "9e32d9eb-fe41-4ff3-a351-28d47c5f099e";
+            userID = "9188040d-6c67-4c5b-b112-36a304b66dad";
             bool isValid = await graphService.VerifyUser(userID);
             Assert.IsTrue(isValid);
         }
 
 
-        [Test]
+        [TestMethod]
         public async Task GetUserByEmailTest()
         {
 

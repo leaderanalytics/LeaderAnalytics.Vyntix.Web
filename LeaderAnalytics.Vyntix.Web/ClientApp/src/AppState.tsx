@@ -1,5 +1,4 @@
 ﻿import React from 'react';
-import { IdToken } from 'msal/lib-commonjs/IdToken';
 import SubscriptionPlan from './Model/SubscriptionPlan';
 
 export class AppState {
@@ -10,7 +9,8 @@ export class AppState {
     public CustomerID: string = ""; 
     public SubscriptionID: string = "";     // Active subscription, if any
     public SubscriptionCount: number = 0;   // Number of subscriptions - active or not.  If > 0, user can navigate to Stripe portal. 
-    public Token: IdToken | null = null;
+    public ID_Token: string = "";
+    public AccessToken: string = "";
     public SignInCallback: (isSignedIn: boolean) => void = (isSignedIn) => { };
     public RenderTopNav: () => void = () => { };
     public Message: string = "";

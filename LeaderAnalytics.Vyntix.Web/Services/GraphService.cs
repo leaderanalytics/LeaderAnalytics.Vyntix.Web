@@ -63,6 +63,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             GraphServiceClient client = GetGraphServiceClient();
             IGraphServiceUsersCollectionPage users = await client.Users.Request()
                 .Filter($"otherMails/any(id:id eq '{email}')")
+                // .Filter($"userPrincipalName eq '{email}'") does not work
                 .Select(x => new { x.Id, x.OtherMails, x.Identities })
                 .GetAsync();
 

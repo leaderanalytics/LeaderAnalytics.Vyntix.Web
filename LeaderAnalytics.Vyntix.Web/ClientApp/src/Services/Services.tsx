@@ -2,11 +2,15 @@
 import SubscriptionPlan from "../Model/SubscriptionPlan";
 import { GlobalContext, AppState } from '../AppState';
 import AppConfig from '../appconfig';
-import * as MSAL from 'msal';
-import MSALConfig from '../msalconfig';
 import ContactRequest from '../Model/ContactRequest';
 import AsyncResult from '../Model/AsyncResult';
 import AppInsights from './AppInsights';
+import { AuthModule } from './AuthModule';
+import { AccountInfo } from "@azure/msal-browser";
+import App from "../App";
+
+
+const MSAL = new AuthModule();
 
 // Get active subscription plans
 export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
@@ -35,21 +39,20 @@ export const SignIn = async (appState: AppState): Promise<string> => {
     if (appState.UserID != null && appState.UserID.length > 1) {
         return 'You are already signed in.  Sign out before signing in again.';
     }
-
-    const auth: MSAL.Configuration = new MSALConfig();
-    const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
+    
     var msg: string = '';
 
     try {
-        const response = await userAgentApplication.loginPopup(AppConfig.loginScopes);
+        const response = await MSAL.login('loginPopup');
 
-        if (response.idToken !== null) {
-            appState.UserName = response.account.name;
-            appState.UserID = response.account.accountIdentifier;
-            appState.UserEmail = response.idTokenClaims?.emails[0];  // do this until we can get user email from MS Graph.
-            appState.Token = response.idToken;
-            // Todo - check isNew when creating new user - populate billing email. isNew will be 'true' (string)
-            const isNew: boolean = (response.idTokenClaims?.newUser ?? '') === 'true';
+        if (response.uniqueId.length > 1 && response.account.username.length > 1)
+        {
+            appState.UserName = response.account.name ?? "";
+            appState.UserID = response.uniqueId;
+            appState.UserEmail = response.account.username;
+            appState.ID_Token = response.idToken;
+            appState.AccessToken = response.accessToken;
+            const isNew: boolean = (response.idTokenClaims as any)?.newUser ?? false;
             AppInsights.LogEvent("Login Success", { "email": appState.UserEmail, "IsNew": isNew })
             Log("Login Success Account Name: " + appState.UserName + " Email: " + appState.UserEmail);
             await GetSubscriptionInfo(appState);
@@ -66,17 +69,15 @@ export const SignIn = async (appState: AppState): Promise<string> => {
 }
 
 export const SignOut = (appState: AppState) => {
-    AppInsights.LogEvent("Sign Out", { "email": appState.UserEmail })
-    const auth: MSAL.Configuration = new MSALConfig();
-    const userAgentApplication = new MSAL.UserAgentApplication(auth as MSAL.Configuration);
-    userAgentApplication.logout();
-
+    AppInsights.LogEvent("Sign Out", { "email": appState.UserEmail });
+    MSAL.logout();
     appState.UserName = "";
     appState.UserID = "";
     appState.UserEmail = "";
     appState.CustomerID = "";
     appState.SubscriptionID = "";
-    appState.Token = null;
+    appState.ID_Token = "";
+    appState.AccessToken = "";
     appState.PromoCodes = "";
     appState.SubscriptionPlan = null;
     localStorage.removeItem('appState');
@@ -92,7 +93,7 @@ export const GetAppState = (): AppState => {
     var s = localStorage.getItem('appState');
     var appState: AppState = (s === null || s.length === 0) ? new AppState() : JSON.parse(s);
 
-    if (Date.now() - appState.TimeStamp > 3600000 && appState.Token !== null) {
+    if (Date.now() - appState.TimeStamp > 3600000 && appState.ID_Token.length > 1) {
         SignOut(appState);
         return GetAppState();
     }

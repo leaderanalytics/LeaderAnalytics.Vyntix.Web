@@ -55,12 +55,6 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
-  <ItemGroup>
-    <None Remove="ClientApp\src\Services\AppInsights.tsx" />
-  </ItemGroup>
-
-  
   
   <ItemGroup>
     <PackageReference Include="LeaderAnalytics.Core" Version="1.0.69" />
@@ -76,17 +70,7 @@
     <PackageReference Include="Stripe.net" Version="39.16.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.9" />
   </ItemGroup>
-  
-  
-  
   <ItemGroup>
     <Folder Include="ClientApp\src\Assets\" />
   </ItemGroup>
-  
-  
-  
-  <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\src\Services\AppInsights.tsx" />
-  </ItemGroup>
- 
 </Project>

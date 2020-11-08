@@ -19,7 +19,7 @@
     "@types/react-router-dom": "^5.1.6",
     "bootstrap": "^4.5.2",
     "jquery": "^3.5.1",
-    "msal": "^1.4.3",
+    "@azure/msal-browser": "2.6.0",
     "node-sass": "^4.14.1",
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",

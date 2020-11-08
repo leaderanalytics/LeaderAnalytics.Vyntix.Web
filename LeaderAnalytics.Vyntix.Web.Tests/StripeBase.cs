@@ -4,8 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Configuration;
-using NUnit;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Stripe;
 using Moq;
 using Microsoft.AspNetCore.Hosting;
@@ -36,7 +35,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             StripeClient = Container.GetService<StripeClient>();
         }
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
         }
