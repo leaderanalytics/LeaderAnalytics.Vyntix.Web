@@ -41,6 +41,7 @@ const MSAL_CONFIG: Configuration = {
                         return;
                 }
             }
-        } 
+        }
     }
-}
+};
+export default MSAL_CONFIG;
