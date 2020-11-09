@@ -84,9 +84,15 @@ $app-navbar-height:90px;
 }
 
 /* ---------- App level ---------- */
+* {
+    margin:0;
+    padding:0;
+}
+
 a {
     color:$accent4 !important;
 }
+
 .content-root {
     
     margin-top:$app-navbar-height;
@@ -198,6 +204,18 @@ a {
         color: $accent4 !important;
 }
 
+.nav-link {
+    color: gray !important;
+}
+
+.nav-link.active {
+    color:$accent4 !important;
+
+}
+
+.nav-link:hover {
+    color: $accent4 !important;
+}
 
 /* ---------- Home ---------- */
 .info-box {
@@ -222,10 +240,12 @@ a {
 }
 .info-box-title {
     text-align:left;
+    width:clamp(100px,10vw,400px);
 }
 
 .info-box-text {
     text-align:left;
+    width:100%;
     color:$accent3;
 }
 
@@ -256,6 +276,13 @@ a {
     }
 }
 
+@include media-breakpoint-down(md) {
+
+    .info-box {
+        min-width: 300px;
+    }
+    
+}
 
 /* --------------------------------------- 
 # Subscription Types
@@ -304,6 +331,11 @@ a {
     margin-top: 2vh;
     color: $accent5;
 }
+
+.acceptableUse ul, .nonAcceptableUse ul {
+    margin-left: clamp(20px,3vw,35px);
+}
+
 .acceptableUse {
     background-color:lightgreen;
 }

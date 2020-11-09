@@ -1,5 +1,5 @@
-﻿import React, { useState, useContext, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch, Link, NavLink } from 'react-router-dom';
+﻿import React, { useState, useContext,useEffect } from 'react';
+import { BrowserRouter as Router, Route, Switch, Link, NavLink, useLocation } from 'react-router-dom';
 import { useAsyncEffect } from 'use-async-effect';
 import { GlobalContext, AppState } from '../AppState';
 import { SignIn, SignOut, ManageSubscription } from '../Services/Services';
@@ -14,6 +14,8 @@ import DialogProps from '../Model/DialogProps';
 
 const TopNav = () => {
     const appState: AppState = useContext(GlobalContext);
+    const location = useLocation();
+    const [activeLink, setActiveLink] = useState("/");
     const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);   // UserID is maintained by Azure
     const [hasActiveSub, setHasActiveSub] = useState(appState.SubscriptionID !== null && appState.SubscriptionID.length > 1); // True if user has an active subscription.
     const [hasAnySub, setHasAnySub] = useState(appState.SubscriptionCount > 0); // True if user has any subscription - active or not.
@@ -47,6 +49,9 @@ const TopNav = () => {
         if (!result.Success) 
             setDialogProps(new DialogProps(result.ErrorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
     }
+    useEffect(() => {
+        setActiveLink(location.pathname);
+    });
 
     return (
         <Navbar variant="dark" expand="lg" collapseOnSelect fixed="top" className="nav-container dark-bg">
@@ -59,7 +64,7 @@ const TopNav = () => {
             </Navbar.Toggle>
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="nav-fill w-100">
-                    <Nav.Link className="rh6" as={NavLink} to="/" href="/" exact eventKey="1" ><FontAwesomeIcon icon={faHome} className="nav-toggle nav-icon" />Home</Nav.Link>
+                    <Nav.Link className="rh6" active={activeLink === "/"} as={NavLink} to="/" href="/" exact eventKey="1" ><FontAwesomeIcon icon={faHome} className="nav-toggle nav-icon" />Home</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Subscriptions" href="/Subscriptions" eventKey="2"><FontAwesomeIcon icon={faKey} className="nav-toggle nav-icon" />Subscribe</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Documentation" href="/Documentation" eventKey="3"><FontAwesomeIcon icon={faBook} className="nav-toggle nav-icon" />Documentation</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Downloads" href="/Downloads" eventKey="4"><FontAwesomeIcon icon={faDownload} className="nav-toggle nav-icon" />Downloads</Nav.Link>

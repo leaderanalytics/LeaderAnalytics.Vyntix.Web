@@ -53,10 +53,9 @@ export const SignIn = async (appState: AppState): Promise<string> => {
             appState.ID_Token = response.idToken;
             appState.AccessToken = response.accessToken;
             const isNew: boolean = (response.idTokenClaims as any)?.newUser ?? false;
+            SaveAppState(appState);
             AppInsights.LogEvent("Login Success", { "email": appState.UserEmail, "IsNew": isNew })
             Log("Login Success Account Name: " + appState.UserName + " Email: " + appState.UserEmail);
-            await GetSubscriptionInfo(appState);
-            SaveAppState(appState);
         }
     }
     catch (err) {
@@ -65,6 +64,10 @@ export const SignIn = async (appState: AppState): Promise<string> => {
         Log("LOGIN FAILURE Error Msg: " + err);
         msg = 'The login attempt was not successful.';
     }
+
+    if (msg.length === 0)
+        await GetSubscriptionInfo(appState);
+
     return msg;
 }
 

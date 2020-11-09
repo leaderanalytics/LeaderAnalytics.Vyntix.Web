@@ -9,7 +9,7 @@ InstrumentationKey=b3548ffb-653a-481e-b900-a1aab30d75df;IngestionEndpoint=https:
 
 # Debugging in chrome
 In a command window type `npm run debug` // see package.json
-Open a Chrome window and type `chrome://inspect` as the url.
+Open a Chrome window and type `chrome://inspect#devices` as the url.
 Click "Open dedicated DevTools for Node"
 
 # Documentation for external resources

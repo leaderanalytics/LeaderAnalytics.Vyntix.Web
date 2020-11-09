@@ -26,15 +26,15 @@ function SelectedPlan() {
                     <>
                         <div className="info-box-grid">
                             <div className="info-box-title rmr1">Plan name:</div>
-                            <div className="info-box-text">{appState.SubscriptionPlan.PlanDescription}</div>
+                            <div className="info-box-text rpl2">{appState.SubscriptionPlan.PlanDescription}</div>
                         </div>
                         <div className="info-box-grid">
                             <div className="info-box-title rmr1">Duration:</div>
-                            <div className="info-box-text">{(12 / appState.SubscriptionPlan.BillingPeriods).toString() + ((12 / appState.SubscriptionPlan.BillingPeriods) === 1 ? ' Month' : ' Months')}</div>
+                            <div className="info-box-text rpl2">{(12 / appState.SubscriptionPlan.BillingPeriods).toString() + ((12 / appState.SubscriptionPlan.BillingPeriods) === 1 ? ' Month' : ' Months')}</div>
                         </div>
                         <div className="info-box-grid">
                             <div className="info-box-title rmr1">Total cost:</div>
-                            <div className="info-box-text">{FormatMoney(appState.SubscriptionPlan.Cost)}</div>
+                            <div className="info-box-text rpl2">{FormatMoney(appState.SubscriptionPlan.Cost)}</div>
                         </div>
                     </>
             }
