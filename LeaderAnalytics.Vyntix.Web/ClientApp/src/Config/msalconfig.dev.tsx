@@ -7,6 +7,16 @@
  * visit https://azuread.github.io/microsoft-authentication-library-for-js/docs/msal/modules/_configuration_.html
  * */
 import { Configuration, LogLevel } from "@azure/msal-browser";
+
+export const POLICIES = {
+    authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/",
+    userFlows: {
+        signUpSignIn: "B2C_1_susi",
+        forgotPassword: "B2C_1_password_reset",
+        editProfile: "B2C_1_edit_profile"
+    }
+}
+
 const MSAL_CONFIG: Configuration = {
     auth: {
         clientId: "7f892e9e-97d5-42fb-a553-f9d585d6742b",

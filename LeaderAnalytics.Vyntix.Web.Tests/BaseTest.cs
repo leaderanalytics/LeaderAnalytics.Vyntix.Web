@@ -9,7 +9,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 {
     public class BaseTest
     {
-        
+        protected GraphClientCredentials GraphClientCredentials { get; private set; }
 
         public BaseTest()
         {
@@ -25,14 +25,14 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
                 .Build();
 
             IConfigurationSection graphSection = Configuration.GetSection("AzureGraph");
-            GraphClientCredentials graphCredentials = new GraphClientCredentials
+            GraphClientCredentials = new GraphClientCredentials
             {
                 ClientID = graphSection.GetValue<string>("ClientID"),
                 TenantID = graphSection.GetValue<string>("TenantID"),
                 ClientSecret = graphSection.GetValue<string>("ClientSecret")
             };
 
-            return graphCredentials;
+            return GraphClientCredentials;
         }
 
     }

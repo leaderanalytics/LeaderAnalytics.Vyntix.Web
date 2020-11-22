@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Route, Switch, Link, NavLink, useLocation } from 'react-router-dom';
 import { useAsyncEffect } from 'use-async-effect';
 import { GlobalContext, AppState } from '../AppState';
-import { SignIn, SignOut, ManageSubscription } from '../Services/Services';
+import { SignIn, SignOut, ManageSubscription, ChangePassword, EditProfile } from '../Services/Services';
 import { Button, Navbar, NavDropdown, Nav, Form, FormControl, Container, Image, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faHome, faBahai, faKey, faBook, faDownload, faEnvelope, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
@@ -20,11 +20,13 @@ const TopNav = () => {
     const [hasActiveSub, setHasActiveSub] = useState(appState.SubscriptionID !== null && appState.SubscriptionID.length > 1); // True if user has an active subscription.
     const [hasAnySub, setHasAnySub] = useState(appState.SubscriptionCount > 0); // True if user has any subscription - active or not.
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
+    const [isCorpAdmin, setIsCorpAdmin] = useState(appState.IsCorpAdmin);
 
     appState.RenderTopNav = () => {
         setisSignedIn(appState.UserID !== null && appState.UserID.length > 1);
         setHasAnySub(appState.SubscriptionCount > 0);
         setHasActiveSub(appState.SubscriptionID !== null && appState.SubscriptionID.length > 1);
+        setIsCorpAdmin(appState.IsCorpAdmin);
     };
 
     const LocalSignIn = async (event: any) => {
@@ -40,6 +42,30 @@ const TopNav = () => {
         }
         else
             setDialogProps(new DialogProps(errorMsg, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+    }
+
+    const LocalChangePassword = async (event: any) => {
+        event.preventDefault();
+        const errorMsg = await ChangePassword(appState);
+
+        if (errorMsg === null || errorMsg.length === 0) {
+            setTimeout(() => setDialogProps(new DialogProps("Your password was changed successfully.  Please log in again using your new password.", DialogType.Info, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); })), 6000);
+        }
+        else
+            setDialogProps(new DialogProps(errorMsg, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+
+    }
+
+    const LocalEditProfile = async (event: any) => {
+        event.preventDefault();
+        const errorMsg = await EditProfile(appState);
+
+        if (errorMsg === null || errorMsg.length === 0) {
+            setTimeout(() => setDialogProps(new DialogProps("Your profile was modified successfully.", DialogType.Info, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); })), 2000);
+        }
+        else
+            setDialogProps(new DialogProps(errorMsg, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+
     }
 
     const LocalManageSubscription = async (event: any) => {
@@ -64,7 +90,7 @@ const TopNav = () => {
             </Navbar.Toggle>
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="nav-fill w-100">
-                    <Nav.Link className="rh6" active={activeLink === "/"} as={NavLink} to="/" href="/" exact eventKey="1" ><FontAwesomeIcon icon={faHome} className="nav-toggle nav-icon" />Home</Nav.Link>
+                    <Nav.Link className="rh6" as={NavLink} to="/" href="/" exact eventKey="1" ><FontAwesomeIcon icon={faHome} className="nav-toggle nav-icon" />Home</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Subscriptions" href="/Subscriptions" eventKey="2"><FontAwesomeIcon icon={faKey} className="nav-toggle nav-icon" />Subscribe</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Documentation" href="/Documentation" eventKey="3"><FontAwesomeIcon icon={faBook} className="nav-toggle nav-icon" />Documentation</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Downloads" href="/Downloads" eventKey="4"><FontAwesomeIcon icon={faDownload} className="nav-toggle nav-icon" />Downloads</Nav.Link>
@@ -75,10 +101,13 @@ const TopNav = () => {
                             <DropdownButton as={ButtonGroup} title="Profile" id="profileButton" alignRight className={`${hasActiveSub ? "green-border" : "trans-border"}`}>
                                 <Dropdown.Item eventKey="1" className="rh6" onClick={() => SignOut(appState)} >Sign Out</Dropdown.Item>
                                 <Dropdown.Item eventKey="2" className="rh6" disabled={!hasAnySub} onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
+                                <Dropdown.Item eventKey="3" className="rh6" onClick={LocalChangePassword} >Change Password</Dropdown.Item>
+                                <Dropdown.Item eventKey="4" className="rh6" onClick={LocalEditProfile} >Edit Profile</Dropdown.Item>
+                                <Dropdown.Item eventKey="5" className="rh6" to="/Delegates" href="/Delegates" disabled={!isCorpAdmin}>Delegated Logins</Dropdown.Item>
                             </DropdownButton>
                         </ButtonGroup>
                         :
-                        <Nav.Link className="rh6" to="/" as={NavLink} onClick={LocalSignIn} eventKey="7" exact activeClassName="zzz"><FontAwesomeIcon icon={faSignInAlt} className="nav-toggle nav-icon" />Sign in</Nav.Link>
+                        <Nav.Link className="rh6" to="/zz" href="/zz" active={ false } as={NavLink} onClick={LocalSignIn} eventKey="7" exact><FontAwesomeIcon icon={faSignInAlt} className="nav-toggle nav-icon" />Sign in</Nav.Link>
                     }
                 </Nav>
             </Navbar.Collapse>

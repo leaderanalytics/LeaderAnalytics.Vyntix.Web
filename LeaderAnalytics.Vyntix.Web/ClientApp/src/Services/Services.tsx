@@ -7,7 +7,8 @@ import AsyncResult from '../Model/AsyncResult';
 import AppInsights from './AppInsights';
 import { AuthModule } from './AuthModule';
 import { AccountInfo } from "@azure/msal-browser";
-import App from "../App";
+import UserRecord from "../Model/UserRecord";
+
 
 
 const MSAL = new AuthModule();
@@ -47,15 +48,39 @@ export const SignIn = async (appState: AppState): Promise<string> => {
 
         if (response.uniqueId.length > 1 && response.account.username.length > 1)
         {
-            appState.UserName = response.account.name ?? "";
-            appState.UserID = response.uniqueId;
-            appState.UserEmail = response.account.username;
-            appState.ID_Token = response.idToken;
-            appState.AccessToken = response.accessToken;
-            const isNew: boolean = (response.idTokenClaims as any)?.newUser ?? false;
-            SaveAppState(appState);
-            AppInsights.LogEvent("Login Success", { "email": appState.UserEmail, "IsNew": isNew })
-            Log("Login Success Account Name: " + appState.UserName + " Email: " + appState.UserEmail);
+            // Get claims.  See Azure AD B2C -> User flows -> B2C_1_susi -> Application claims
+            const claims: any = response.idTokenClaims;
+
+            // Check if user is banned or suspended
+
+            if (claims?.extension_IsBanned ?? false)
+                msg = "This login has been permanently banned.";
+            else if (claims?.extension_SuspendedUntil !== null && typeof claims.extension_SuspendedUntil !== 'undefined') {
+                const suspensionDate = new Date(claims.extension_SuspendedUntil.substring(1));  // strip off leading "z" that we use to prevent Azure from converting to ticks.  Results in local time zone
+                const now = new Date();
+
+                if (now < suspensionDate)
+                    msg = "This account is suspended until " + suspensionDate.toLocaleDateString() + " " + suspensionDate.toLocaleTimeString();
+            }
+
+
+            if (IsNullOrEmpty(msg)) {
+
+                // Success
+
+                appState.UserName = response.account.name ?? "";
+                appState.UserID = response.uniqueId;
+                appState.UserEmail = response.account.username;
+                appState.ID_Token = response.idToken;
+                appState.AccessToken = response.accessToken;
+                appState.BillingID = claims.extension_BillingID;
+                appState.IsCorpAdmin = (claims.extension_IsCorporateAdmin as boolean) ?? false;
+                appState.IsOptIn = (claims.extension_IsOptIn as boolean) ?? false;
+                const isNew: boolean = (response.idTokenClaims as any)?.newUser ?? false;  // not an extension
+                SaveAppState(appState);
+                AppInsights.LogEvent("Login Success", { "email": appState.UserEmail, "IsNew": isNew })
+                Log("Login Success Account Name: " + appState.UserName + " Email: " + appState.UserEmail);
+            }
         }
     }
     catch (err) {
@@ -77,12 +102,15 @@ export const SignOut = (appState: AppState) => {
     appState.UserName = "";
     appState.UserID = "";
     appState.UserEmail = "";
+    appState.BillingID = "";
     appState.CustomerID = "";
     appState.SubscriptionID = "";
     appState.ID_Token = "";
     appState.AccessToken = "";
     appState.PromoCodes = "";
     appState.SubscriptionPlan = null;
+    appState.IsCorpAdmin = false;
+    appState.IsOptIn = false;
     localStorage.removeItem('appState');
 }
 
@@ -97,7 +125,7 @@ export const GetAppState = (): AppState => {
     var appState: AppState = (s === null || s.length === 0) ? new AppState() : JSON.parse(s);
 
     if (Date.now() - appState.TimeStamp > 3600000 && appState.ID_Token.length > 1) {
-        SignOut(appState);
+        SignOut(appState); 
         return GetAppState();
     }
     appState.SubscriptionPlan = SubscriptionPlan.Create(appState.SubscriptionPlan);
@@ -211,3 +239,30 @@ export const Log = async (msg: string) => {
         body: JSON.stringify(msg)
     });
 }
+
+export const ChangePassword = async (appState: AppState): Promise<string> =>
+{
+    var errorMsg = await MSAL.resetPassword();
+
+    if (IsNullOrEmpty(errorMsg))
+        await SignOut(appState);
+
+    return errorMsg;
+}
+
+export const EditProfile = async (appState: AppState): Promise<string> => {
+    var errorMsg = await MSAL.editProfile();
+    return errorMsg;
+}
+
+
+//export const GetUserRecord = async (userID: string): Promise<UserRecord> => {
+
+//    if (IsNullOrEmpty(userID))
+//        throw new Error("userID is required.");
+
+//    const url = AppConfig.host + 'subscription/getsubscriptioninfo';
+//    let response = await fetch(url + "&id=" + userID);
+//    const json = await response.json();
+//    return (json) as UserRecord;
+//}

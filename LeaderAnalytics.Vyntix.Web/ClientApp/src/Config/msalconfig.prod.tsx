@@ -8,6 +8,16 @@
  * */
 
 import { Configuration, LogLevel } from "@azure/msal-browser";
+
+export const POLICIES = {
+    authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/",
+    userFlows: {
+        signUpSignIn: "B2C_1_susi",
+        forgotPassword: "B2C_1_password_reset",
+        editProfile: "B2C_1_edit_profile"
+    }
+}
+
 const MSAL_CONFIG: Configuration = {
     auth: {
         clientId: "f16f44ba-20c7-4fc0-a940-f70def6146eb",

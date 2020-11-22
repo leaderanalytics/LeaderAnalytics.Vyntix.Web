@@ -1,6 +1,7 @@
 ﻿import { PublicClientApplication, AuthorizationUrlRequest, SilentRequest, AuthenticationResult, Configuration, LogLevel, AccountInfo, InteractionRequiredAuthError, EndSessionRequest, RedirectRequest, PopupRequest } from "@azure/msal-browser";
 import { SsoSilentRequest } from "@azure/msal-browser/dist/src/request/SsoSilentRequest";
-import MSAL_CONFIG from '../msalconfig';
+import MSAL_CONFIG, { POLICIES } from '../msalconfig';
+import AppInsights from './AppInsights';
 
 export class AccountInfoClass implements AccountInfo
 {
@@ -170,8 +171,21 @@ export class AuthModule {
         var response: AuthenticationResult = new AuthenticationResultClass();
 
         if (signInType === "loginPopup") {
-            response = await this.myMSALObj.loginPopup(this.loginRequest);
-            this.account = response.account;
+            try {
+                response = await this.myMSALObj.loginPopup(this.loginRequest);
+                this.account = response.account;
+            }
+            catch (ex)
+            {
+                if ((ex as Error).message.indexOf("AADB2C90118") > -1) {
+                    await this.resetPassword();
+                }
+                else
+                {
+                    AppInsights.LogException(ex);
+                    throw ex;
+                }
+            }
         }
         return response;
     }
@@ -183,9 +197,40 @@ export class AuthModule {
         const logOutRequest: EndSessionRequest = {
             account: this.account as AccountInfo
         };
-
         this.myMSALObj.logout(logOutRequest);
     }
 
-    
+    async resetPassword(): Promise<string> {
+        var errorMsg: string = "";
+        var request: PopupRequestClass = new PopupRequestClass();
+        request.authority = POLICIES.authority + POLICIES.userFlows.forgotPassword;
+        var response: AuthenticationResult = new AuthenticationResultClass();
+
+        try
+        {
+            response = await this.myMSALObj.loginPopup(request);
+        }
+        catch (ex)
+        {
+            AppInsights.LogException(ex);
+            errorMsg = "The attempt to change the password was not successful.";
+        }
+        return errorMsg;
+    }
+
+    async editProfile(): Promise<string> {
+        var errorMsg: string = "";
+        var request: PopupRequestClass = new PopupRequestClass();
+        request.authority = POLICIES.authority + POLICIES.userFlows.editProfile;
+        var response: AuthenticationResult = new AuthenticationResultClass();
+
+        try {
+            response = await this.myMSALObj.loginPopup(request);
+        }
+        catch (ex) {
+            AppInsights.LogException(ex);
+            errorMsg = "The attempt to edit the profile was not successful.";
+        }
+        return errorMsg;
+    }
 }

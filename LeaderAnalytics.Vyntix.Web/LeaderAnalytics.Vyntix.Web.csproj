@@ -57,6 +57,7 @@
   </Target>
   
   <ItemGroup>
+    <PackageReference Include="LeaderAnalytics.Caching" Version="0.0.30" />
     <PackageReference Include="LeaderAnalytics.Core" Version="1.0.69" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Microsoft.Graph" Version="3.19.0" />
@@ -73,4 +74,5 @@
   <ItemGroup>
     <Folder Include="ClientApp\src\Assets\" />
   </ItemGroup>
+  
 </Project>

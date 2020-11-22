@@ -34,8 +34,13 @@ Google Mobile-Friendly Test: https://search.google.com/test/mobile-friendly
 Google Search console: https://search.google.com/search-console/about
 
 To do:
-https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/2564
+
 https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/756
+
+https://docs.microsoft.com/en-us/answers/questions/161383/query-to-get-user-by-email-when-email-is-stored-in.html
+https://docs.microsoft.com/en-us/answers/questions/161295/how-to-verify-a-domain-so-a-schema-extension-can-b.html
+https://docs.microsoft.com/en-us/answers/questions/170516/how-to-get-custom-attributes-from-claims.html
+
 
 Review site on phone and make adjustments.
 Add basic documentation - i.e. what is a vintage. https://www.oecd.org/sdd/40315408.pdf

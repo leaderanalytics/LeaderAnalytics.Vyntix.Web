@@ -13,7 +13,22 @@ Open a Chrome window and type `chrome://inspect#devices` as the url.
 Click "Open dedicated DevTools for Node"
 
 # Documentation for external resources
+
+## Azure AD B2C and OAuth 
+
+[Microsoft identity platform and OAuth 2.0 authorization code flow (Diagram)](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
 [Stripe API Reference](https://stripe.com/docs/api)
+
+[OAuth 2.0 authorization code flow in Azure Active Directory B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/authorization-code-flow)
+
+[How to validate a token](https://stackoverflow.com/questions/59840170/validating-the-token-recieved-from-azure-ad-b2c-using-the-values-from-jwks-uri)
+
+[Configure password change using custom policies in Azure Active Directory B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/custom-policy-password-change)
+
+## MS Graph
+[How to create MS Graph Schema Extensions](https://docs.microsoft.com/en-us/graph/api/schemaextension-post-schemaextensions?view=graph-rest-1.0&tabs=csharp)
+
+## Stripe
 
 [Test Credit Card Numbers](https://stripe.com/docs/testing)
 
@@ -34,7 +49,7 @@ Click "Open dedicated DevTools for Node"
 
 [Security test](https://www.immuniweb.com/free/)
 
-[How to create MS Graph Schema Extensions](https://docs.microsoft.com/en-us/graph/api/schemaextension-post-schemaextensions?view=graph-rest-1.0&tabs=csharp)
+
 
 
 
