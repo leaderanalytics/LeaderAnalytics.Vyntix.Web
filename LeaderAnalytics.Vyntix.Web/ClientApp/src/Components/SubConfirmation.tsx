@@ -50,7 +50,8 @@ function SubConfirmation() {
         SubscriptionID: appState.SubscriptionID,
         PaymentProviderPlanID: appState.SubscriptionPlan?.PaymentProviderPlanID,
         PromoCodes: appState.PromoCodes,
-        Captcha:""
+        Captcha: "",
+        CorpSubscriptionID: appState.CorpSubscriptionID
     };
 
     useEffect(() => {

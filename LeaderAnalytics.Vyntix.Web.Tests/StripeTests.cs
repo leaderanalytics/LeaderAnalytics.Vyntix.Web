@@ -40,7 +40,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             SubscriptionPlan plan = subService.GetSubscriptionPlans().First(x => x.PlanDescription == PLAN_DESC);
             Customer customer = await subService.CreateCustomer(CUSTOMER_EMAIL);
             SubscriptionOrder order = new SubscriptionOrder { CustomerID = customer.Id, UserEmail = CUSTOMER_EMAIL, UserID = USER_ID, PaymentProviderPlanID = plan.PaymentProviderPlanID };
-            CreateSubscriptionResponse response = await subService.CreateInvoicedSubscription(order);
+            CreateSubscriptionResponse response = await subService.CreateInvoicedSubscription(order,"https://localhost");
 
         }
 

@@ -10,9 +10,8 @@ using LeaderAnalytics.Vyntix.Web.Services;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
-using LeaderAnalytics.Core.Azure;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using System.Net.Http;
+
+
 using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
 
@@ -22,21 +21,12 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     [Route("[controller]/[action]")]
     public class SubscriptionController : Controller
     {
-        private static HttpClient apiClient;
-        private IActionContextAccessor accessor;
         private SubscriptionService subscriptionService;
         private string Host => $"{this.Request.Scheme}://{this.Request.Host}";
 
-        public SubscriptionController(AzureADConfig config, IActionContextAccessor accessor, SubscriptionService subscriptionService)
+        public SubscriptionController(SubscriptionService subscriptionService)
         {
-            this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
-
-            if (apiClient == null)
-            {
-                ClientCredentialsHelper helper = new ClientCredentialsHelper(config);
-                apiClient = helper.AuthorizedClient();
-            }
         }
 
         [HttpGet]
@@ -65,31 +55,21 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateSubscription(SubscriptionOrder order)
         {
-            CreateSubscriptionResponse response = new CreateSubscriptionResponse();
-            string ipaddress = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
-            var captchaResult = await apiClient.GetAsync($"api/Captcha/Submit?ipaddress={ipaddress}&code={order.Captcha}");
-
-            if (captchaResult.StatusCode != System.Net.HttpStatusCode.OK)
-            {
-                response.ErrorMessage = JsonSerializer.Deserialize<string>(await captchaResult.Content.ReadAsStringAsync());
-                return StatusCode(300, response);
-            }
-
             try
             {
-                response = await subscriptionService.CreateSubscription(order, Host);
+                CreateSubscriptionResponse response = await subscriptionService.CreateSubscription(order, Host);
+
+                if (string.IsNullOrEmpty(response.ErrorMessage))
+                    return Ok(response);
+                else
+                    return StatusCode(300, response);
             }
             catch (Exception ex)
             {
-                response.ErrorMessage = "Error";
-                Log.Error(ex.ToString());
+                string s = ex.ToString();
+                Log.Error(s);
+                return StatusCode(500, s);
             }
-
-
-            if (string.IsNullOrEmpty(response.ErrorMessage))
-                return Ok(response);
-            else
-                return StatusCode(300, response);
         }
 
         // This method is called by the payment processor after the user has submitted payment.
@@ -125,10 +105,25 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         }
 
         [HttpPost]
+        public async Task<ActionResult<CorpSubscriptionInfoResponse>> GetCorpSubscriptionInfo([FromBody] string userEmail)
+        {
+            CorpSubscriptionInfoResponse response = await subscriptionService.GetCorpSubscriptionInfo(userEmail);
+            return response;
+        }
+
+        [HttpPost]
         public void LogInfo([FromBody] string msg)
         {
             var request = Request;
             Log.Information(msg);
+        }
+        
+        [HttpPost]
+        public void CorpCredentialApproval([FromBody] (string,string,bool) args)
+        {
+            string admin = args.Item1;
+            string sub = args.Item2;
+            bool isApproved = args.Item3;
         }
     }
 }

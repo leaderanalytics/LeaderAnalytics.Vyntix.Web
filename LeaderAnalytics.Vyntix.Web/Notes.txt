@@ -42,7 +42,11 @@ https://docs.microsoft.com/en-us/answers/questions/161295/how-to-verify-a-domain
 https://docs.microsoft.com/en-us/answers/questions/170516/how-to-get-custom-attributes-from-claims.html
 
 
-Review site on phone and make adjustments.
 Add basic documentation - i.e. what is a vintage. https://www.oecd.org/sdd/40315408.pdf
 Create test scripts - think of all scenerios such as extending all subscriptions
+
+Modify AppState
+Add input on Business subscription page
+Add logic on subconfirmation to send email
+Add text on sub activation success to indicate an email has been sent to corp admin.
 

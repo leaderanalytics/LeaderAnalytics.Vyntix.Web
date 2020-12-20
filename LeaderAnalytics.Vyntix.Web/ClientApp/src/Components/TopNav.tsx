@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Route, Switch, Link, NavLink, useLocation } from 'react-router-dom';
 import { useAsyncEffect } from 'use-async-effect';
 import { GlobalContext, AppState } from '../AppState';
-import { SignIn, SignOut, ManageSubscription, ChangePassword, EditProfile } from '../Services/Services';
+import { SignIn, SignOut, ManageSubscription, ChangePassword, EditProfile, IsNullOrEmpty } from '../Services/Services';
 import { Button, Navbar, NavDropdown, Nav, Form, FormControl, Container, Image, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faHome, faBahai, faKey, faBook, faDownload, faEnvelope, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
@@ -18,13 +18,13 @@ const TopNav = () => {
     const [activeLink, setActiveLink] = useState("/");
     const [isSignedIn, setisSignedIn] = useState(appState.UserID !== null && appState.UserID.length > 1);   // UserID is maintained by Azure
     const [hasActiveSub, setHasActiveSub] = useState(appState.SubscriptionID !== null && appState.SubscriptionID.length > 1); // True if user has an active subscription.
-    const [hasAnySub, setHasAnySub] = useState(appState.SubscriptionCount > 0); // True if user has any subscription - active or not.
+    const [hasAnySub, setHasAnySub] = useState(appState.SubscriptionCount > 0 && IsNullOrEmpty(appState.BillingID)); // True if user has any subscription - active or not.
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
     const [isCorpAdmin, setIsCorpAdmin] = useState(appState.IsCorpAdmin);
 
     appState.RenderTopNav = () => {
         setisSignedIn(appState.UserID !== null && appState.UserID.length > 1);
-        setHasAnySub(appState.SubscriptionCount > 0);
+        setHasAnySub(appState.SubscriptionCount > 0 && IsNullOrEmpty(appState.BillingID));
         setHasActiveSub(appState.SubscriptionID !== null && appState.SubscriptionID.length > 1);
         setIsCorpAdmin(appState.IsCorpAdmin);
     };

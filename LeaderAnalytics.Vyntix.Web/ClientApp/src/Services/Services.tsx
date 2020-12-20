@@ -1,5 +1,6 @@
 ﻿import { string, number } from "prop-types";
 import SubscriptionPlan from "../Model/SubscriptionPlan";
+import CorpSubscriptionInfo from "../Model/CorpSubscriptionInfo";
 import { GlobalContext, AppState } from '../AppState';
 import AppConfig from '../appconfig';
 import ContactRequest from '../Model/ContactRequest';
@@ -15,22 +16,16 @@ const MSAL = new AuthModule();
 
 // Get active subscription plans
 export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
-    const url = window.location.origin + '/Subscription/GetActiveSubscriptionPlans';
+    const url = AppConfig.host + 'Subscription/GetActiveSubscriptionPlans';
     const response = await fetch(url);
     const json = await response.json();
     var result: SubscriptionPlan[] = new Array<SubscriptionPlan>();
 
     for (let i = 0; i < json.length; i++) {
-        var s: SubscriptionPlan = new SubscriptionPlan();
-        s.BillingPeriods = json[i].billingPeriods;
-        s.Cost = json[i].cost;
-        s.DisplaySequence = json[i].displaySequence;
-        s.EndDate = json[i].endDate;
-        s.PaymentProviderPlanID = json[i].paymentProviderPlanID;
-        s.PlanDescription = json[i].planDescription;
-        s.ShortDescription = json[i].shortDescription;
-        s.StartDate = json[i].startDate;
-        result.push(s);
+        const p = DeserializeSubscriptionPlan(json[i]);
+
+        if (p !== null)
+            result.push(p);
     }
     return result;
 }
@@ -111,6 +106,8 @@ export const SignOut = (appState: AppState) => {
     appState.SubscriptionPlan = null;
     appState.IsCorpAdmin = false;
     appState.IsOptIn = false;
+    appState.CorpSubscriptionID = "";
+    appState.CorpAdminEmail = "";
     localStorage.removeItem('appState');
 }
 
@@ -124,7 +121,7 @@ export const GetAppState = (): AppState => {
     var s = localStorage.getItem('appState');
     var appState: AppState = (s === null || s.length === 0) ? new AppState() : JSON.parse(s);
 
-    if (Date.now() - appState.TimeStamp > 3600000 && appState.ID_Token.length > 1) {
+    if (Date.now() - appState.TimeStamp > 3600000 && (appState.ID_Token?.length ?? 0) > 1) {
         SignOut(appState); 
         return GetAppState();
     }
@@ -143,7 +140,7 @@ export const FormatMoney = (num: number) => {
 
 export const SendContactRequest = async (request: ContactRequest): Promise<AsyncResult> => {
     AppInsights.LogEvent("SendContactRequest")
-    const url = AppConfig.host + 'email/sendemail';
+    const url = AppConfig.host + 'email/SendContactRequest';
     const msg = 'From Site:LeaderAnalytics.Vyntix.Web' + '\r\nName: ' + request.Name + '\r\nPhone: ' + request.Phone + '\r\nEmail: ' + request.EMail + '\r\nRequirement: ' + request.Requirement + '\r\nComment: ' + request.Message;
     AppInsights.LogEvent("SendContactRequest", {"Message": msg});
 
@@ -219,10 +216,34 @@ export const GetSubscriptionInfo = async (appState: AppState) => {
     appState.CustomerID = json.customerID;
     appState.SubscriptionID = json.subscriptionID;
     appState.SubscriptionCount = json.subscriptionCount;
+    appState.BillingID = json.billingID;
     SaveAppState(appState);
 }
 
-export const IsNullOrEmpty = (s: string) : boolean => { return s === null || s.length === 0 };
+
+export const GetCorpSubscriptionInfo = async (corpSubscriptionID: string): Promise<CorpSubscriptionInfo> => {
+
+    if (IsNullOrEmpty(corpSubscriptionID))
+        throw new Error("corpSubscriptionID can not be null");
+
+    const url = AppConfig.host + 'subscription/GetCorpSubscriptionInfo';
+
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(corpSubscriptionID)
+    });
+    var json = (await response.json()) as any;
+    var info = new CorpSubscriptionInfo();
+    info.AdminEmail = json.adminEmail;
+    info.SubscriptionPlan = DeserializeSubscriptionPlan(json.subscriptionPlan);
+    return info;
+}
+
+
+export const IsNullOrEmpty = (s: string): boolean => { return s === null || typeof s === 'undefined' || s.length === 0 };
 
 export const Log = async (msg: string) => {
 
@@ -254,7 +275,22 @@ export const EditProfile = async (appState: AppState): Promise<string> => {
     var errorMsg = await MSAL.editProfile();
     return errorMsg;
 }
+const DeserializeSubscriptionPlan = (json: any): SubscriptionPlan | null =>
+{
+    if (IsNullOrEmpty(json))
+        return null;
 
+    var s: SubscriptionPlan = new SubscriptionPlan();
+    s.BillingPeriods = json.billingPeriods;
+    s.Cost = json.cost;
+    s.DisplaySequence = json.displaySequence;
+    s.EndDate = json.endDate;
+    s.PaymentProviderPlanID = json.paymentProviderPlanID;
+    s.PlanDescription = json.planDescription;
+    s.ShortDescription = json.shortDescription;
+    s.StartDate = json.startDate;
+    return s;
+}
 
 //export const GetUserRecord = async (userID: string): Promise<UserRecord> => {
 

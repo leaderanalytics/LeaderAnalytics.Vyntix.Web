@@ -11,6 +11,12 @@ using System.Text.Json;
 using LeaderAnalytics.Core;
 using System.Security.Cryptography.X509Certificates;
 using System.Runtime.CompilerServices;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.Net.Http;
+using LeaderAnalytics.Core.Azure;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
@@ -21,14 +27,23 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private SessionCache sessionCache;
         private string subscriptionFile;
         private List<SubscriptionPlan> subscriptionPlans;
+        private static HttpClient apiClient;
+        private IActionContextAccessor accessor;
 
-        public SubscriptionService(GraphService graphService, StripeClient stripeClient, SessionCache sessionCache, string subscriptionFilePath)
+        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, GraphService graphService, StripeClient stripeClient, SessionCache sessionCache, string subscriptionFilePath)
         {
+            this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.graphService = graphService;
             this.stripeClient = stripeClient;
             this.sessionCache = sessionCache;
             this.subscriptionFile = subscriptionFilePath ?? throw new ArgumentNullException("subscriptionFilePath");
             subscriptionPlans = new List<SubscriptionPlan>();
+
+            if (apiClient == null)
+            {
+                ClientCredentialsHelper helper = new ClientCredentialsHelper(config);
+                apiClient = helper.AuthorizedClient();
+            }
         }
 
         public List<SubscriptionPlan> GetActiveSubscriptionPlans() => GetSubscriptionPlans().Where(x => x.IsCurrent()).ToList();
@@ -94,6 +109,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                     sub.PlanDescription = plan.PlanDescription;
                     sub.StartDate = stripeSub.CurrentPeriodStart;
                     sub.EndDate = stripeSub.CurrentPeriodEnd;
+                    sub.Status = stripeSub.Status;
                     subs.Add(sub);
                 }
             }
@@ -124,8 +140,34 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             if (!String.IsNullOrEmpty(response.ErrorMessage))
                 return response;
-            
-            SubscriptionPlan plan = GetActiveSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID);
+
+            SubscriptionPlan plan = null;
+
+            if (string.IsNullOrEmpty(order.CorpSubscriptionID))
+                plan = GetActiveSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID);
+            else
+            {
+                CorpSubscriptionInfoResponse corpResponse = await GetCorpSubscriptionInfo(order.CorpSubscriptionID);
+
+                if (corpResponse == null || string.IsNullOrEmpty(corpResponse.AdminEmail))
+                {
+                    response.ErrorMessage = "Invalid Corporate Subscription ID.";
+                    return response;
+                }
+
+                if (corpResponse.SubscriptionPlan == null)
+                {
+                    response.ErrorMessage = "No active corporate subscription was found.";
+                    return response;
+                }
+                plan = corpResponse.SubscriptionPlan;
+
+                if (order.UserEmail.Split('@')[1]?.ToLower() != corpResponse.AdminEmail.Split('@')[1]?.ToLower())
+                {
+                    response.ErrorMessage = "User email domain must match email domain of corporate admin.";
+                    return response;
+                }
+            }
 
             if (plan == null)
             {
@@ -163,7 +205,17 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if(order == null)
                 throw new ArgumentNullException(nameof(order));
 
-            CreateSubscriptionResponse response = await ApproveSubscriptionOrder(order);
+            CreateSubscriptionResponse response = new CreateSubscriptionResponse();
+            string ipaddress = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
+            var captchaResult = await apiClient.GetAsync($"api/Captcha/Submit?ipaddress={ipaddress}&code={order.Captcha}");
+
+            if (captchaResult.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                response.ErrorMessage = JsonSerializer.Deserialize<string>(await captchaResult.Content.ReadAsStringAsync());
+                return response;
+            }
+
+            response = await ApproveSubscriptionOrder(order);
 
             if (!string.IsNullOrEmpty(response.ErrorMessage))
                 return response;
@@ -173,7 +225,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (IsPrepaymentRequired(order))
                 response = await CreatePrepaidSubscription(order, hostURL);
             else
-                response = await CreateInvoicedSubscription(order);
+                response = await CreateInvoicedSubscription(order, hostURL);
             
             return response;
         }
@@ -307,18 +359,23 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         /// <summary>
         /// Creates a subscription that is billed to the customer and paid at a future date (typically after a trial period).
+        /// Also creates a Corporate Subscription.
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
-        public async Task<CreateSubscriptionResponse> CreateInvoicedSubscription(SubscriptionOrder order) 
+        public async Task<CreateSubscriptionResponse> CreateInvoicedSubscription(SubscriptionOrder order, string hostURL) 
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
 
             CreateSubscriptionResponse response = new CreateSubscriptionResponse();
 
-            if (!string.IsNullOrEmpty(response.ErrorMessage))
+            if (!string.IsNullOrEmpty(order.CorpSubscriptionID))
+            {
+                // We don't actually create the corporate subscription here - we send out an email so the corp admin can approve.
+                await SendCorpSubscriptionApprovalEmail(order.CorpSubscriptionID, order.UserID, hostURL);
                 return response;
+            }
 
             Stripe.SubscriptionCreateOptions options = new Stripe.SubscriptionCreateOptions();
             Stripe.SubscriptionService stripeSubService = new Stripe.SubscriptionService(stripeClient);
@@ -331,12 +388,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 options.DaysUntilDue = 1; // Can not be zero. Can only be set if CollectionMethod is "send_invoice"
             
             options.TrialPeriodDays = trialPeriodDays;
-            
-
             options.Items = new List<SubscriptionItemOptions>(2);
             options.Items.Add(new SubscriptionItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 });
-
-            
             options.CancelAtPeriodEnd = false;
             
             try
@@ -348,6 +401,10 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 response.ErrorMessage = "Subscription creation failed.  Please try again later.";
                 Log.Error("Error creating subscription. UserID: {u}, Ex: {e} ", order.UserID, ex.ToString());
             }
+
+            if(string.IsNullOrEmpty(response.ErrorMessage))
+                Log.Information("CreateInvoicedSubscription: An invoiced subscription was created for user {userid}.  The plan is {plan}.", order.UserID, order.PaymentProviderPlanID);
+
             return response;
         }
 
@@ -426,9 +483,32 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             
             SubscriptionInfoResponse response = new SubscriptionInfoResponse();
 
+            // Check to see if we are logging in under a corporate login.  
+            // When logging in as a corporate login, Azure BillingID field contains UserID of
+            // a corporate admin.  We then use the email address of that admin to get billing info.
+
+            string subscriberEmail = userEmail;
+            UserRecord userRecord = await graphService.GetUserByEmailAddress(userEmail);
+
+            if (userRecord != null)
+            {
+                response.BillingID = userRecord.BillingID;
+                
+                if (!string.IsNullOrEmpty(response.BillingID)) // BillingID will be set if user is a corp user
+                {
+                    UserRecord adminRecord = await graphService.GetUserRecordByID(response.BillingID);
+
+                    if (adminRecord == null)
+                        throw new Exception($"Could not load admin user record with ID {response.BillingID}.  The referencing user ID is {userRecord.User.Id}");
+
+                    subscriberEmail = adminRecord.EMailAddress;  // use the email address of the admin to look up subscription in stripe.
+                }
+            }
+             
+
             // Create a customer if one does not exist.  Every email address in Azure should have a corresponding customer in Stripe.
             // In dev customer accounts get zapped so we need to recreate them here.
-            Customer customer = await CreateCustomer(userEmail);
+            Customer customer = await CreateCustomer(subscriberEmail);
 
             if (customer == null)
                 return response;
@@ -443,8 +523,95 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return response;
         }
 
-        public int GetTrialPeriodDays(SubscriptionOrder order) => (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30;
+        public async Task<CorpSubscriptionInfoResponse> GetCorpSubscriptionInfo(string corpAdminUserID)
+        {
+            if (string.IsNullOrEmpty(corpAdminUserID))
+                throw new ArgumentNullException(corpAdminUserID);
+            
+            UserRecord user = await graphService.GetUserRecordByID(corpAdminUserID);
 
-        public bool IsPrepaymentRequired(SubscriptionOrder order) => GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
+            if (user == null || ! user.IsCorporateAdmin)
+                return null;
+
+            CorpSubscriptionInfoResponse response = new CorpSubscriptionInfoResponse();
+            response.AdminEmail = user.EMailAddress;
+            Customer customer = await GetCustomerByEmailAddress(user.EMailAddress);
+
+            if (customer == null)
+                return response;
+
+            List<Model.Subscription> subs = await GetSubscriptionsForCustomer(customer);
+            
+
+            if (subs?.Any() ?? false)
+            {
+                Model.Subscription sub = subs.FirstOrDefault(x => x.IsActive);
+
+                if (sub != null)
+                    response.SubscriptionPlan = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == sub.PaymentProviderPlanID);
+            }
+            return response;
+        }
+
+        public async Task SendCorpSubscriptionApprovalEmail(string adminID, string subscriberID, string hostURL)
+        {
+            if (string.IsNullOrEmpty(adminID))
+                throw new ArgumentNullException(nameof(adminID));
+            if(string.IsNullOrEmpty(subscriberID))
+                throw new ArgumentNullException(nameof(subscriberID));
+
+            UserRecord record = await graphService.GetUserRecordByID(subscriberID);
+            UserRecord adminRecord = await graphService.GetUserRecordByID(adminID);
+
+            if (record == null)
+                throw new Exception($"User (subscriber) with ID {subscriberID} was not found.");
+
+            if (adminRecord == null)
+                throw new Exception($"User (admin) with ID {adminID} was not found.");
+
+
+            StringBuilder sb = new StringBuilder();
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.Services.SubApprovalEmailTemplate.html"))
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    sb.Append(reader.ReadToEnd());
+                }
+            }
+
+            if (sb.Length == 0)
+                throw new Exception("Error retrieving email template.");
+
+            sb.Replace("%USER_NAME%", record.User.DisplayName);
+            sb.Replace("%USER_EMAIL%", record.EMailAddress);
+            sb.Replace("%URL%", hostURL);
+            sb.Replace("%ADMIN_ID%", adminID); // This is titled "Corporate Subscription ID" in the UI.
+            sb.Replace("%SUB_ID%", subscriberID);
+            string emailContent = sb.ToString();
+            
+            EmailMessage email = new EmailMessage
+            {
+                To = new string[] { adminRecord.EMailAddress, "leaderanalytics@outlook.com" },
+                From = "leaderanalytics@outlook.com",
+                Subject = "Request for Vyntix Login Credentials",
+                Msg = emailContent
+            };
+
+            var apiResult = await apiClient.PostAsync("api/Message/SendMessage", new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json"));
+            Log.Information("CreateInvoicedSubscription: A Corporate Subscription was created for User {userid}. The BillingID is {corpSubscriptionID}.", subscriberID, adminID);
+        }
+
+        public async Task CreateDelegateSubscription(string adminID, string subscriberID)
+        {
+            // Todo:  validate admin and user.
+            UserRecord record = await graphService.GetUserRecordByID(subscriberID);
+            record.BillingID = adminID;
+            await graphService.UpdateUser(record);
+            Log.Information("CreateDelegateSubscription: A Corporate Delegate Subscription was created for User {userID}. The BillingID is {corpSubscriptionID}.", subscriberID, adminID);
+        }
+
+        public int GetTrialPeriodDays(SubscriptionOrder order) => (!string.IsNullOrEmpty(order.CorpSubscriptionID)) || (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30;
+
+        public bool IsPrepaymentRequired(SubscriptionOrder order) => string.IsNullOrEmpty(order.CorpSubscriptionID) && GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
     }
 }

@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using System.Text;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
@@ -23,32 +24,140 @@ namespace LeaderAnalytics.Vyntix.Web.Services
     // https://docs.microsoft.com/en-us/answers/questions/65589/how-to-look-up-a-user-by-personal-email-address.html
     // https://docs.microsoft.com/en-us/answers/questions/76716/request-for-documenatation-how-is-user-record-popu.html
     // https://docs.microsoft.com/en-us/power-bi/admin/service-admin-alternate-email-address-for-power-bi
-    
-    
+    // https://docs.microsoft.com/en-us/answers/questions/161383/query-to-get-user-by-email-when-email-is-stored-in.html
+    // https://github.com/microsoftgraph/microsoft-graph-docs/issues/10672
+    // https://stackoverflow.com/questions/64959347/how-do-i-create-a-user-in-code-add-it-azure-ad-b2c-then-log-in-as-that-user-us
+    // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/846
+    // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/847
+
     public class GraphService
     {
         private GraphServiceClient client;
         private const string _endpoint = "https://graph.microsoft.com/beta";
+        private const string _ADendpoint = "https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/users?api-version=1.6";
         private string _accessToken;
-        
+        private string USER_FIELDS = $"id, userprincipalname, mail, displayname, mailnickname, accountenabled, identities, othermails, {UserAttributes.BillingID}, {UserAttributes.IsBanned}, {UserAttributes.IsCorporateAdmin}, {UserAttributes.IsOptIn}, {UserAttributes.PaymentProviderCustomerID}, {UserAttributes.SuspendedUntil}";
 
         public GraphService(GraphClientCredentials credentials)
         {
-            this.client = GetGraphServiceClient(credentials ?? throw new ArgumentNullException("credentials"));
+            this.client = CreateGraphServiceClient(credentials ?? throw new ArgumentNullException("credentials"));
             _accessToken = GetToken(credentials).GetAwaiter().GetResult();
-        
         }
 
         public async Task<List<User>> FindUser(string id)
         {
             var page = client.Users.Request()
-                 .Select($"id, mail, identities, othermails, {UserAttributes.BillingID}, {UserAttributes.IsBanned}, {UserAttributes.IsCorporateAdmin}, {UserAttributes.IsOptIn}, {UserAttributes.PaymentProviderCustomerID}, {UserAttributes.SuspendedUntil}");
-
+                 .Select(USER_FIELDS);
+            
             if (!string.IsNullOrEmpty(id))
                 page = page.Filter($"id eq '{id}'");
 
-            List<User> users =(await page.GetAsync()).ToList();
+            List<User> users = null;
+            try
+            {
+                 users = (await page.GetAsync())?.ToList();
+            }
+            catch (Microsoft.Graph.ServiceException)
+            {
+                
+            }
             return users;
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            return (await client.Users.Request().Select(x => new
+            {
+                x.Id,
+                // x.ODataType, Parsing OData Select and Expand failed: Term '@odata.type' is not valid in a $select or $expand expression.
+                x.AdditionalData,
+                x.TransitiveMemberOf,
+                x.ScopedRoleMemberOf,
+                x.RegisteredDevices,
+                x.OwnedObjects,
+                x.OwnedDevices,
+                x.Oauth2PermissionGrants,
+                x.MemberOf,
+                x.Manager,
+                x.LicenseDetails,
+                x.DirectReports,
+                //x.Skills,
+                //x.Schools,
+                //x.Responsibilities,
+                //x.PreferredName,
+                //x.Interests,
+                //x.HireDate,
+                //x.Birthday,
+                //x.AboutMe,
+                
+                //x.DeviceEnrollmentLimit,
+                //x.Activities,
+                x.Settings,
+                //x.DeviceManagementTroubleshootingEvents,
+                //x.ManagedAppRegistrations,
+                //x.ManagedDevices,
+                x.Extensions,
+                //x.FollowedSites,
+                //x.Photos,
+                x.Photo,
+                //x.People,
+                //x.InferenceClassification,
+                x.UserType,
+                //x.UsageLocation,
+                x.LastPasswordChangeDateTime,
+                
+                x.JobTitle,
+                x.IsResourceAccount,
+                x.ImAddresses,
+                x.Identities,
+                x.GivenName,
+                x.FaxNumber,
+                x.ExternalUserStateChangeDateTime,
+                x.ExternalUserState,
+                x.EmployeeId,
+                x.DisplayName,
+                x.Department,
+                x.CreationType,
+                x.CreatedDateTime,
+                x.Country,
+                x.ConsentProvidedForMinor,
+                x.CompanyName,
+                x.City,
+                x.BusinessPhones,
+                x.AssignedPlans,
+                x.AssignedLicenses,
+                x.AgeGroup,
+                x.AccountEnabled,
+                x.LegalAgeGroupClassification,
+                x.LicenseAssignmentStates,
+                x.MailNickname,
+                x.Surname,
+                x.StreetAddress,
+                x.State,
+                x.SignInSessionsValidFromDateTime,
+                x.ProxyAddresses,
+                x.ProvisionedPlans,
+                x.PreferredLanguage,
+                x.PostalCode,
+                x.PasswordProfile,
+                x.PasswordPolicies,
+                x.UserPrincipalName,
+                x.OtherMails,
+                x.OnPremisesSyncEnabled,
+                x.OnPremisesSecurityIdentifier,
+                x.OnPremisesSamAccountName,
+                x.OnPremisesProvisioningErrors,
+                x.OnPremisesLastSyncDateTime,
+                x.OnPremisesImmutableId,
+                x.OnPremisesExtensionAttributes,
+                x.OnPremisesDomainName,
+                x.OnPremisesDistinguishedName,
+                x.OfficeLocation,
+                x.MobilePhone,
+                x.OnPremisesUserPrincipalName
+            }
+            
+            ).GetAsync()).ToList();
         }
 
         public async Task<bool> VerifyUser(string userID)
@@ -68,7 +177,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task<UserRecord> GetUserRecordByID(string id)
         {
             UserRecord record = null;
-            User user = (await FindUser(id)).FirstOrDefault();
+            User user = (await FindUser(id))?.FirstOrDefault();
 
             if (user != null)
                 record = new UserRecord(user);
@@ -78,7 +187,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public async Task UpdateUser(UserRecord user)
         {
-            User graphUser = user.ToGraphUser();
+            User graphUser = user.User;
             
             var result = await client.Users[graphUser.Id]
             .Request()
@@ -86,54 +195,54 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             
         }
 
-        public async Task<User> GetUserByEmailAddress2(string email)
+        public async Task<User> CreateUser(UserRecord userRecord)
         {
-            IGraphServiceUsersCollectionPage users = await client.Users.Request()
-                .Filter($"otherMails/any(id:id eq '{email}')")
-                // .Filter($"userPrincipalName eq '{email}'") does not work
-                .Select(x => new { x.Id, x.OtherMails, x.Identities })
-                .GetAsync();
-
-            return users[0];
+            User user = userRecord?.User ?? throw new ArgumentNullException("userRecord");
+            return await CreateUser(user);
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<User> CreateUser(User user)
         {
-            // Does not work
-            //var users = (await client.Users.Request()
-            //    .Select(x => new { x.Id, x.OtherMails, x.Identities })
-            //    .Filter($"otherMails/any(id:id eq 'samspam92841@gmail.com') or identities/any(ids:ids/issuerassignedid eq 'samspam92841@gmail.com')")
-            //    .GetAsync());
-
-            // Read all users into memory
-            IGraphServiceUsersCollectionPage users = await client.Users.Request()
-                .Select(x => new { x.Id, x.OtherMails, x.Identities, x.Mail })
-                .GetAsync();
-
-            // find a user
-            var user = users.First(x => x.Identities.Any(y => y.IssuerAssignedId == "samspam92841@gmail.com"));
-            
-            // set extension property to a dummy value
-            user.AdditionalData = new Dictionary<string, object> { { UserAttributes.BillingID, "Test" } };
-            
-            // updateResponse is null
-            var updateResponse = await client.Users[user.Id].Request().UpdateAsync(user);
-
-            // Read users a second time
-            users = await client.Users.Request()
-                .Select($"id, identities, othermails, {UserAttributes.BillingID}")
-                .GetAsync();
-
-            // find the user we just updated
-            user = users.First(x => x.Identities.Any(y => y.IssuerAssignedId == "samspam92841@gmail.com"));
-            
-            // Nope.  No data.  This throws.
-            var field = user.AdditionalData[UserAttributes.BillingID];
-
-            return users.ToList();
+            var result = await client.Users.Request().AddAsync(user);
+            return result;
         }
 
-        private GraphServiceClient GetGraphServiceClient(GraphClientCredentials credentials)
+        public async Task DeleteUser(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                throw new Exception("id is required.");
+
+            await client.Users[id].Request().DeleteAsync();
+        }
+
+        public async Task<UserRecord> GetUserByEmailAddress(string email)
+        {
+            IGraphServiceUsersCollectionPage users = await client.Users.Request()
+                .Select(USER_FIELDS)
+                .Filter($"identities/any(ids:ids/issuerassignedid eq '{email}' and ids/issuer eq 'x')")
+                .GetAsync();
+
+            if(users.Any())
+                return new UserRecord(users[0]);
+            
+            return null;
+        }
+
+        public async Task<List<UserRecord>> GetDelegateUsers(string ownerID)
+        {
+            List<User> users = await GetAllUsers();
+            List<UserRecord> records = new List<UserRecord>(users.Count);
+
+            foreach (User user in users.Where(x => x.AdditionalData != null))
+            {
+                if (user.AdditionalData.TryGetValue(UserAttributes.BillingID, out object userOwner) && userOwner.ToString() == ownerID)
+                    records.Add(new UserRecord(user));
+            }
+
+            return records;
+        }
+
+        private GraphServiceClient CreateGraphServiceClient(GraphClientCredentials credentials)
         {
             var ccab = ConfidentialClientApplicationBuilder
                 .Create(credentials.ClientID)
@@ -153,7 +262,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 .WithTenantId(credentials.TenantID)
                 .Build();
 
-            var tokenResult = ccab.AcquireTokenForClient(new List<string> { "https://graph.microsoft.com/.default" });
+            //var tokenResult = ccab.AcquireTokenForClient(new List<string> { "https://graph.microsoft.com/.default" });
+            var tokenResult = ccab.AcquireTokenForClient(new List<string> { "https://graph.windows.net/.default" });
             var token = await tokenResult.ExecuteAsync();
             return token.AccessToken;
         }

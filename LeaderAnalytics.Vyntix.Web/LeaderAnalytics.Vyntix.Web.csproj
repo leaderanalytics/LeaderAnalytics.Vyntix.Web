@@ -55,12 +55,16 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <None Remove="SubApprovalEmailTemplate.html" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="LeaderAnalytics.Caching" Version="0.0.30" />
-    <PackageReference Include="LeaderAnalytics.Core" Version="1.0.69" />
+    <PackageReference Include="LeaderAnalytics.Core" Version="1.0.70" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
-    <PackageReference Include="Microsoft.Graph" Version="3.19.0" />
+    <PackageReference Include="Microsoft.Graph" Version="3.21.0" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.5" />
     <PackageReference Include="Microsoft.Identity.Web" Version="1.2.0" />
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.2.0" />
@@ -73,6 +77,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ClientApp\src\Assets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SubApprovalEmailTemplate.html" />
   </ItemGroup>
   
 </Project>

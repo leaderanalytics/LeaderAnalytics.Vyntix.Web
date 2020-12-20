@@ -23,96 +23,20 @@ namespace LeaderAnalytics.Vyntix.Web
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
-        private string subscriptionFilePath;
+        private IConfiguration configuration { get; }
+        private IWebHostEnvironment environment;
         private const string CORS_Origins = "CORS_Origins";
 
-        public Startup(IWebHostEnvironment env, IConfiguration configuration)
+        public Startup(IWebHostEnvironment env, IConfiguration config)
         {
-            string configFilePath = string.Empty;
-
-            if (env.EnvironmentName == "Development")
-                configFilePath = "C:\\Users\\sam\\OneDrive\\LeaderAnalytics\\Config\\Vyntix.Web";
-
-            Configuration = new ConfigurationBuilder()
-                .AddConfiguration(configuration)
-                .AddJsonFile(Path.Combine(configFilePath, $"appsettings.{env.EnvironmentName}.json"), false)
-                .Build();
-            
-            subscriptionFilePath = Path.Combine(configFilePath, $"subscriptions.{env.EnvironmentName}.json");
+            environment = env;
+            configuration = config;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            AzureADConfig config = AzureADConfig.ReadFromConfig(Configuration);
-            services.AddSingleton(config);
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-
-            // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
-
-            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureADB2C");
-            services.AddControllersWithViews()
-                .AddMicrosoftIdentityUI();
-
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/build";
-            });
-
-            //Configuring appsettings section AzureAdB2C, into IOptions
-            services.AddOptions();
-            services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureADB2C"));
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: CORS_Origins,builder =>
-                {
-                    builder
-                    .WithOrigins(new string[]
-                    {
-                        "http://www.vyntix.com",
-                        "https://www.vyntix.com",
-                        "http://vyntix.com",
-                        "https://vyntix.com",
-                        "http://localhost",
-                        "http://dev.vyntix.com",
-                        "http://vyntix.azurewebsites.net",
-                        "https://vyntix.azurewebsites.net",
-                        "http://localhost:5032",
-                        "https://localhost:5031",
-                        "https://vyntix-staging.azurewebsites.net",
-                        "https://billing.stripe.com",
-                        "http://billing.stripe.com"
-                    })
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-                });
-            });
-
-
-            // Stripe
-            Stripe.StripeConfiguration.ApiKey = Configuration["StripeApiKey"];
-            Stripe.StripeClient stripeClient = new Stripe.StripeClient(Stripe.StripeConfiguration.ApiKey);
-            services.AddSingleton(stripeClient);
-
-            // Graph Credentials
-            IConfigurationSection graphSection = Configuration.GetSection("AzureGraph");
-            GraphClientCredentials graphCredentials = new GraphClientCredentials
-            {
-                ClientID = graphSection.GetValue<string>("ClientID"),
-                TenantID = graphSection.GetValue<string>("TenantID"),
-                ClientSecret = graphSection.GetValue<string>("ClientSecret")
-            };
-            GraphService graphService = new GraphService(graphCredentials);
-            SessionCache sessionCache = new SessionCache();
-            SubscriptionService subscriptionService = new Services.SubscriptionService(graphService, stripeClient, sessionCache, subscriptionFilePath);
-
-            services.AddSingleton(graphCredentials);
-            services.AddSingleton(graphService);
-            services.AddSingleton(subscriptionService);
-            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+            new ServiceCollectionCreator().ConfigureServices(services, configuration, environment.EnvironmentName);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -121,9 +45,7 @@ namespace LeaderAnalytics.Vyntix.Web
             //spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
 
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
             {
                 app.UseExceptionHandler("/Home/Error");

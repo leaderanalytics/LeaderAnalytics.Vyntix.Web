@@ -1,5 +1,6 @@
 ﻿using LeaderAnalytics.Vyntix.Web.Model;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,11 +11,11 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
     public class BaseTest
     {
         protected GraphClientCredentials GraphClientCredentials { get; private set; }
-
+        IServiceCollection Container { get; set; }
+        
         public BaseTest()
         {
-        
-
+            BuildContainer();
         }
 
         protected GraphClientCredentials GetGraphCredentials()
@@ -35,5 +36,11 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             return GraphClientCredentials;
         }
 
+        protected void BuildContainer()
+        {
+            Container = new ServiceCollection();
+            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+            new ServiceCollectionCreator().ConfigureServices(Container, config, "Development");
+        }
     }
 }

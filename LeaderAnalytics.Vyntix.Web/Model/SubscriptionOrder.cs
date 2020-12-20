@@ -15,6 +15,7 @@ namespace LeaderAnalytics.Vyntix.Web.Model
         public SubscriptionPlan SubscriptionPlan { get; set; }
         public string PromoCodes { get; set; }              // Comma delimited list of coupon, discount, promo etc. codes.
         public string Captcha { get; set; }
+        public string CorpSubscriptionID { get; set; }
 
         public SubscriptionOrder()
         {

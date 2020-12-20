@@ -37,17 +37,17 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> SendEMail(EmailMsg msg)
+        public async Task<IActionResult> SendContactRequest(ContactRequest msg)
         {
             IActionResult result = null;
             msg.IP_Address = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();        
             
             try
             {
-                var apiResult = await apiClient.PostAsync("api/Message/SendEmail", new StringContent(JsonSerializer.Serialize(msg), Encoding.UTF8, "application/json"));
+                var apiResult = await apiClient.PostAsync("api/Message/SendContactRequest", new StringContent(JsonSerializer.Serialize(msg), Encoding.UTF8, "application/json"));
 
                 if (apiResult.StatusCode == System.Net.HttpStatusCode.Created)
-                    result = CreatedAtAction("SendEMail", "email") as IActionResult;
+                    result = CreatedAtAction("SendContactRequest", "email") as IActionResult;
                 else
                 {
                     string errorMsg = await apiResult.Content.ReadAsStringAsync();

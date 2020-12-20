@@ -34,7 +34,25 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             bool isValid = await graphService.VerifyUser(userID);
             Assert.IsTrue(isValid);
         }
-       
+
+
+        [TestMethod]
+        public async Task GetUserByIDTest()
+        {
+            string id = "761f6057-d861-4433-8462-fdec3eb0de95";
+            UserRecord record = (await graphService.GetUserRecordByID(id));
+            Assert.IsNotNull(record);
+        }
+
+
+        [TestMethod]
+        public async Task GetUserByEmailAddressTest()
+        {
+            string email = "samspam92841@gmail.com";
+            UserRecord record = await graphService.GetUserByEmailAddress(email);
+            Assert.IsNotNull(record);
+        }
+
 
         [TestMethod]
         public async Task GetAllUsersTest()
@@ -49,18 +67,103 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             string userID = "4ca22b1d-5299-4cae-ab35-f23ef0f59343";
             User user = (await graphService.FindUser(userID)).First();
             UserRecord record = new UserRecord(user);
-            string guid = Guid.NewGuid().ToString();
-            DateTime now = DateTime.UtcNow; 
-            record.BillingID = guid;
+            record.BillingID = null;
             record.IsBanned = false;
-            record.IsCorporateAdmin = true;
-            record.IsOptIn = true;
-            record.PaymentProviderCustomerID = guid;
-            record.SuspendedUntil = now;
+            record.SuspendedUntil = null;
+            record.IsCorporateAdmin = false;
             await graphService.UpdateUser(record);
             record = await graphService.GetUserRecordByID(userID);
-            Assert.AreEqual(guid, record.BillingID);
-            Assert.AreEqual(now, record.SuspendedUntil);
+        }
+
+        
+
+        
+
+        [TestMethod]
+        public async Task DeleteUserTest()
+        {
+
+
+        }
+
+
+      
+
+        
+
+        [TestMethod]
+        public async Task CreateUserTest()
+        {
+            // MUST use this EXACT syntax.  See https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/850
+            string myDomain = "LeaderAnalytics.onmicrosoft.com";
+
+            var user = new User { DisplayName = "John Smith" };
+            user.Identities = new List<ObjectIdentity>()
+            {
+                    new ObjectIdentity
+                    {
+                        SignInType = "emailAddress",
+                        Issuer = myDomain,
+                        IssuerAssignedId = "jsmith@yahoo.com"
+                    }
+            };
+
+            user.PasswordProfile = new PasswordProfile
+            {
+                Password = "ABC12345!!",
+                ForceChangePasswordNextSignIn = false
+            };
+            user.PasswordPolicies = "DisablePasswordExpiration";
+            user.AccountEnabled = true;
+            User addedUser = await graphService.CreateUser(user); // Passes
+        }
+
+        [TestMethod]
+        public async Task CreateUserTest2()
+        {
+            string myDomain = "LeaderAnalytics.onmicrosoft.com";
+
+            var user = new User { DisplayName = "John Smith" };
+            user.Identities = new List<ObjectIdentity>();
+
+            user.Identities = user.Identities.Append(
+                    new ObjectIdentity
+                    {
+                        SignInType = "emailAddress",
+                        Issuer = myDomain,
+                        IssuerAssignedId = "jsmith@yahoo.com"
+                    });
+
+            user.PasswordProfile = new PasswordProfile
+            {
+                Password = "ABC12345!!",
+                ForceChangePasswordNextSignIn = false
+            };
+            user.PasswordPolicies = "DisablePasswordExpiration";
+            user.AccountEnabled = true;
+            User addedUser = await graphService.CreateUser(user); // Passes
+        }
+
+
+
+        [TestMethod]
+        public async Task GetDelegatedUsersTest()
+        {
+            string userID1 = "";
+            object userOwner1 = "";
+            string userID2 = "";
+            object userOwner2 = "";
+
+            List<User> users = await graphService.GetAllUsers();
+            
+            if (users.Count < 2)
+                return;
+
+            userID1 = users[0].Id;
+            users[0].AdditionalData?.TryGetValue(UserAttributes.BillingID, out userOwner1);
+
+            userID2 = users[1].Id;
+            users[1].AdditionalData?.TryGetValue(UserAttributes.BillingID, out userOwner2);
         }
 
 
@@ -146,6 +249,9 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
             try
             {
+                // https://docs.microsoft.com/en-us/graph/api/application-post-extensionproperty?view=graph-rest-1.0&tabs=csharp
+
+                // this is wrong.  see above.
                 var response = await graphServiceClient.SchemaExtensions
                     .Request()
                     .AddAsync(schemaExtension);
@@ -155,5 +261,10 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
                 string y = ex.ToString();
             }
         }
+
+      
     }
+
+
+    
 }

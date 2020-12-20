@@ -2,7 +2,7 @@
 import { useState, useContext, SyntheticEvent } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useAsyncEffect } from 'use-async-effect';
-import { GetSubscriptionPlans } from '../Services/Services';
+import { GetSubscriptionPlans, GetCorpSubscriptionInfo, IsNullOrEmpty } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
 import { useHistory } from 'react-router-dom'
@@ -21,6 +21,7 @@ function SubPlans() {
     AppInsights.LogPageView("SubPlans");
     const appState: AppState = useContext(GlobalContext);
     const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
+    const [corpSubscriptionID, setCorpSubscriptionID] = useState(appState.CorpSubscriptionID);
     const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan);
     const history = useHistory();
     const [plans, setPlans] = useState(new Array<SubscriptionPlan>());
@@ -51,24 +52,48 @@ function SubPlans() {
         const p: SubscriptionPlan = plans.filter(x => x.PaymentProviderPlanID === event.target.value)[0];
         setSelectedPlan(p);
     }
-    
 
     const handlePromoCodeChange = (event: any) => setPromoCodes(event.target.value);
 
+    const handleCorpSubIDChange = (event: any) => setCorpSubscriptionID(event.target.value);
+
     const handleSubmit = async (event: SyntheticEvent) => {
         event.preventDefault();
+        var tmpSelectedPlan: SubscriptionPlan = new SubscriptionPlan();
 
-        if (selectedPlan === null) {
-            setDialogProps(new DialogProps("Please choose a subscription plan.", DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
-            return;
+        if (IsNullOrEmpty(corpSubscriptionID)) {
+
+            if (selectedPlan === null) {
+                setDialogProps(new DialogProps("Please choose a subscription plan.", DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+                return;
+            }
+            tmpSelectedPlan = selectedPlan;
+        }
+        else {
+            // User input a corporate subscription ID (which is just the Azure userID of the corp Admin)
+            // Find the corporate subscription using corpSubscriptionID which is just
+            // the Azure user ID of the corp admin.  If found, return a SubscriptionPlan object
+            // otherwise null.  We do not validate the email address here because the user is
+            // probably not signed in.
+
+            const corpSubscriptionInfo = await GetCorpSubscriptionInfo(corpSubscriptionID);    
+
+            if (corpSubscriptionInfo === null || corpSubscriptionInfo.SubscriptionPlan === null) {
+                setDialogProps(new DialogProps("The Corporate Subscription ID specified is invalid or does not have a current subscription.", DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
+                return;
+            }
+            appState.CorpSubscriptionID = corpSubscriptionID;
+            appState.CorpAdminEmail = corpSubscriptionInfo.AdminEmail;
+            setSelectedPlan(corpSubscriptionInfo.SubscriptionPlan);
+            tmpSelectedPlan = corpSubscriptionInfo.SubscriptionPlan;
         }
 
         // get the selected subscription
-        appState.SubscriptionPlan = selectedPlan;
+        appState.SubscriptionPlan = tmpSelectedPlan;
         appState.PromoCodes = promoCodes;
         SaveAppState(appState);
 
-        AppInsights.LogEvent("Select Plan", { "PlanName": selectedPlan.PlanDescription });
+        AppInsights.LogEvent("Select Plan", { "PlanName": selectedPlan?.PlanDescription });
 
         // if the user is not logged in, prompt them to log in.
         if (appState.UserID === null || appState.UserID.length < 2) {
@@ -78,9 +103,6 @@ function SubPlans() {
             history.push("/SubConfirmation");
         }
     }
-
-    
-       
 
     // -------------------------------------
     
@@ -141,6 +163,9 @@ function SubPlans() {
                 <div id="promoCodes" className="rmt1 rp1" >
                     <label>Enter promo codes, if any, here.  Separate multiple codes with a comma:</label>
                     <input type="text" value={promoCodes} onChange={handlePromoCodeChange}></input>
+                    <div></div>
+                    <label>Enter corporate subscription identifier, if any, here:</label>
+                    <input type="text" value={corpSubscriptionID} onChange={handleCorpSubIDChange}></input>
                 </div>
 
              
