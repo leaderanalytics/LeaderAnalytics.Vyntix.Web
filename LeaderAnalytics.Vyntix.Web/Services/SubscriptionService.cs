@@ -17,12 +17,13 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net.Http;
 using LeaderAnalytics.Core.Azure;
+using LeaderAnalytics.Vyntix.Web.Domain;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
     public class SubscriptionService
     {
-        private GraphService graphService;
+        private IGraphService graphService;
         private StripeClient stripeClient;
         private SessionCache sessionCache;
         private string subscriptionFile;
@@ -30,13 +31,13 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private static HttpClient apiClient;
         private IActionContextAccessor accessor;
 
-        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, GraphService graphService, StripeClient stripeClient, SessionCache sessionCache, string subscriptionFilePath)
+        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, IGraphService graphService, StripeClient stripeClient, SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath)
         {
             this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.graphService = graphService;
             this.stripeClient = stripeClient;
             this.sessionCache = sessionCache;
-            this.subscriptionFile = subscriptionFilePath ?? throw new ArgumentNullException("subscriptionFilePath");
+            this.subscriptionFile = subscriptionFilePath?.Value ?? throw new ArgumentNullException("subscriptionFilePath");
             subscriptionPlans = new List<SubscriptionPlan>();
 
             if (apiClient == null)
@@ -555,6 +556,9 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public async Task SendCorpSubscriptionApprovalEmail(string adminID, string subscriberID, string hostURL)
         {
+
+            // https://www.campaignmonitor.com/dev-resources/guides/coding-html-emails/
+
             if (string.IsNullOrEmpty(adminID))
                 throw new ArgumentNullException(nameof(adminID));
             if(string.IsNullOrEmpty(subscriberID))
@@ -571,7 +575,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
 
             StringBuilder sb = new StringBuilder();
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.Services.SubApprovalEmailTemplate.html"))
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.SubApprovalEmailTemplate.html"))
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
@@ -588,16 +592,17 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             sb.Replace("%ADMIN_ID%", adminID); // This is titled "Corporate Subscription ID" in the UI.
             sb.Replace("%SUB_ID%", subscriberID);
             string emailContent = sb.ToString();
-            
+
             EmailMessage email = new EmailMessage
             {
                 To = new string[] { adminRecord.EMailAddress, "leaderanalytics@outlook.com" },
                 From = "leaderanalytics@outlook.com",
                 Subject = "Request for Vyntix Login Credentials",
-                Msg = emailContent
+                Msg = emailContent,
+                IsHTML = true
             };
 
-            var apiResult = await apiClient.PostAsync("api/Message/SendMessage", new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json"));
+            var apiResult = await apiClient.PostAsync("api/Message/SendEMailMessage", new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json"));
             Log.Information("CreateInvoicedSubscription: A Corporate Subscription was created for User {userid}. The BillingID is {corpSubscriptionID}.", subscriberID, adminID);
         }
 

@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using System.Text;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using LeaderAnalytics.Vyntix.Web.Domain;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
@@ -30,7 +31,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
     // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/846
     // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/847
 
-    public class GraphService
+    public class GraphService : IGraphService
     {
         private GraphServiceClient client;
         private const string _endpoint = "https://graph.microsoft.com/beta";
@@ -48,18 +49,18 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         {
             var page = client.Users.Request()
                  .Select(USER_FIELDS);
-            
+
             if (!string.IsNullOrEmpty(id))
                 page = page.Filter($"id eq '{id}'");
 
             List<User> users = null;
             try
             {
-                 users = (await page.GetAsync())?.ToList();
+                users = (await page.GetAsync())?.ToList();
             }
             catch (Microsoft.Graph.ServiceException)
             {
-                
+
             }
             return users;
         }
@@ -89,7 +90,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 //x.HireDate,
                 //x.Birthday,
                 //x.AboutMe,
-                
+
                 //x.DeviceEnrollmentLimit,
                 //x.Activities,
                 x.Settings,
@@ -105,7 +106,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 x.UserType,
                 //x.UsageLocation,
                 x.LastPasswordChangeDateTime,
-                
+
                 x.JobTitle,
                 x.IsResourceAccount,
                 x.ImAddresses,
@@ -156,7 +157,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 x.MobilePhone,
                 x.OnPremisesUserPrincipalName
             }
-            
+
             ).GetAsync()).ToList();
         }
 
@@ -165,7 +166,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             User user;
             try
             {
-                user = await client.Users[userID].Request().GetAsync(); 
+                user = await client.Users[userID].Request().GetAsync();
             }
             catch (Microsoft.Graph.ServiceException)
             {
@@ -188,11 +189,11 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task UpdateUser(UserRecord user)
         {
             User graphUser = user.User;
-            
+
             var result = await client.Users[graphUser.Id]
             .Request()
             .UpdateAsync(graphUser);
-            
+
         }
 
         public async Task<User> CreateUser(UserRecord userRecord)
@@ -222,9 +223,9 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 .Filter($"identities/any(ids:ids/issuerassignedid eq '{email}' and ids/issuer eq 'x')")
                 .GetAsync();
 
-            if(users.Any())
+            if (users.Any())
                 return new UserRecord(users[0]);
-            
+
             return null;
         }
 

@@ -1,4 +1,5 @@
 ﻿using LeaderAnalytics.Core.Azure;
+using LeaderAnalytics.Vyntix.Web.Domain;
 using LeaderAnalytics.Vyntix.Web.Model;
 using LeaderAnalytics.Vyntix.Web.Services;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -26,7 +27,8 @@ namespace LeaderAnalytics.Vyntix.Web
             if (environmentName == "Development")
                 configFilePath = config["AuthConfig"];
 
-            string subscriptionFilePath = Path.Combine(configFilePath, $"subscriptions.{environmentName}.json");
+            SubscriptionFilePathParameter subscriptionFilePath = new SubscriptionFilePathParameter() { Value = Path.Combine(configFilePath, $"subscriptions.{environmentName}.json") };
+            services.AddSingleton(subscriptionFilePath);
 
             IConfiguration Configuration = new ConfigurationBuilder()
            .AddConfiguration(config)
@@ -94,13 +96,16 @@ namespace LeaderAnalytics.Vyntix.Web
                 TenantID = graphSection.GetValue<string>("TenantID"),
                 ClientSecret = graphSection.GetValue<string>("ClientSecret")
             };
-            GraphService graphService = new GraphService(graphCredentials);
-            SessionCache sessionCache = new SessionCache();
-            SubscriptionService subscriptionService = new Services.SubscriptionService(azureConfig, accessor, graphService, stripeClient, sessionCache, subscriptionFilePath);
+            IGraphService graphService = new GraphService(graphCredentials);
+
+            //SessionCache sessionCache = new SessionCache();
+            //SubscriptionService subscriptionService = new Services.SubscriptionService(azureConfig, accessor, graphService, stripeClient, sessionCache, subscriptionFilePath);
+            //services.AddSingleton(subscriptionService);
 
             services.AddSingleton(graphCredentials);
-            services.AddSingleton(graphService);
-            services.AddSingleton(subscriptionService);
+            services.AddSingleton<IGraphService>(graphService);
+            services.AddSingleton(typeof(SessionCache));
+            services.AddSingleton(typeof(SubscriptionService));
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
     }

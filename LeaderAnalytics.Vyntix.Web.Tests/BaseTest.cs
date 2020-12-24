@@ -11,7 +11,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
     public class BaseTest
     {
         protected GraphClientCredentials GraphClientCredentials { get; private set; }
-        IServiceCollection Container { get; set; }
+        protected IServiceCollection Container { get; set; }
         
         public BaseTest()
         {
