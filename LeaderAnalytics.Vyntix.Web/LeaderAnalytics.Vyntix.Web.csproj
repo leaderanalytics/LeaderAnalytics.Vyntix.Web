@@ -58,6 +58,7 @@
 
   <ItemGroup>
     <None Remove="SubApprovalEmailTemplate.html" />
+    <None Remove="SubApprovalEmailTemplate2.html" />
   </ItemGroup>
   
   <ItemGroup>
@@ -79,7 +80,13 @@
     <Folder Include="ClientApp\src\Assets\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="SubApprovalEmailTemplate2.html" />
     <EmbeddedResource Include="SubApprovalEmailTemplate.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="ClientApp\public\VyntixLogo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
 </Project>

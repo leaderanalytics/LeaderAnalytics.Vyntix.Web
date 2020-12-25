@@ -118,12 +118,10 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             Log.Information(msg);
         }
         
-        [HttpPost]
-        public void CorpCredentialApproval([FromBody] (string,string,bool) args)
+        [HttpGet]
+        public void CorpCredentialApproval(string a, string u, bool o)
         {
-            string admin = args.Item1;
-            string sub = args.Item2;
-            bool isApproved = args.Item3;
+            int x = 1;
         }
     }
 }

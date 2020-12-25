@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net.Http;
 using LeaderAnalytics.Core.Azure;
 using LeaderAnalytics.Vyntix.Web.Domain;
+using System.Net.Mail;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
@@ -30,14 +31,16 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private List<SubscriptionPlan> subscriptionPlans;
         private static HttpClient apiClient;
         private IActionContextAccessor accessor;
+        private EMailClient emailClient;
 
-        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, IGraphService graphService, StripeClient stripeClient, SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath)
+        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, IGraphService graphService, StripeClient stripeClient, SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath, EMailClient eMailClient)
         {
             this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.graphService = graphService;
             this.stripeClient = stripeClient;
             this.sessionCache = sessionCache;
             this.subscriptionFile = subscriptionFilePath?.Value ?? throw new ArgumentNullException("subscriptionFilePath");
+            this.emailClient = eMailClient;
             subscriptionPlans = new List<SubscriptionPlan>();
 
             if (apiClient == null)
@@ -556,8 +559,10 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public async Task SendCorpSubscriptionApprovalEmail(string adminID, string subscriberID, string hostURL)
         {
-
             // https://www.campaignmonitor.com/dev-resources/guides/coding-html-emails/
+            // https://stackoverflow.com/questions/32825779/gmail-not-showing-inline-images-cid-im-sending-with-system-net-mail
+            // We can't serialize MailMessage so we have to inject and use SMTP client here 
+
 
             if (string.IsNullOrEmpty(adminID))
                 throw new ArgumentNullException(nameof(adminID));
@@ -573,9 +578,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (adminRecord == null)
                 throw new Exception($"User (admin) with ID {adminID} was not found.");
 
-
             StringBuilder sb = new StringBuilder();
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.SubApprovalEmailTemplate.html"))
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.SubApprovalEmailTemplate2.html"))
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
@@ -586,24 +590,46 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (sb.Length == 0)
                 throw new Exception("Error retrieving email template.");
 
+            string responseUrl = hostURL + "/Subscription/CorpCredentialApproval?a=" + adminID + "&u=" + subscriberID;
+            
             sb.Replace("%USER_NAME%", record.User.DisplayName);
             sb.Replace("%USER_EMAIL%", record.EMailAddress);
-            sb.Replace("%URL%", hostURL);
+            sb.Replace("%URL%", responseUrl);
             sb.Replace("%ADMIN_ID%", adminID); // This is titled "Corporate Subscription ID" in the UI.
             sb.Replace("%SUB_ID%", subscriberID);
             string emailContent = sb.ToString();
 
-            EmailMessage email = new EmailMessage
-            {
-                To = new string[] { adminRecord.EMailAddress, "leaderanalytics@outlook.com" },
-                From = "leaderanalytics@outlook.com",
-                Subject = "Request for Vyntix Login Credentials",
-                Msg = emailContent,
-                IsHTML = true
-            };
-
-            var apiResult = await apiClient.PostAsync("api/Message/SendEMailMessage", new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json"));
+            MailMessage mail = new MailMessage();
+            mail.BodyEncoding = mail.SubjectEncoding = System.Text.Encoding.UTF8;
+            mail.IsBodyHtml = true;
+            mail.To.Add(adminRecord.EMailAddress);
+            mail.To.Add("leaderanalytics@outlook.com");
+            mail.To.Add("samspam92841@gmail.com");
+            mail.From = new MailAddress("leaderanalytics@outlook.com");
+            mail.Subject = "Request for Vyntix Login Credentials";
+            mail.Body = emailContent;
+            AttachLogoImage(mail);
+            emailClient.Send(mail);
+            
+            //var apiResult = await apiClient.PostAsync("api/Message/SendEMailMessage", new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json"));
             Log.Information("CreateInvoicedSubscription: A Corporate Subscription was created for User {userid}. The BillingID is {corpSubscriptionID}.", subscriberID, adminID);
+        }
+
+        private void AttachLogoImage(MailMessage mail)
+        {
+            LinkedResource image = new LinkedResource("ClientApp\\public\\VyntixLogo.png", "image/png");
+            image.ContentId = "VyntixLogo.png@71236720.91827344";
+            image.TransferEncoding = System.Net.Mime.TransferEncoding.Base64;
+            image.ContentType.Name = "VyntixLogo.png@71236720.91827344";
+            image.ContentLink = new Uri("cid:VyntixLogo.png@71236720.91827344");
+            AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mail.Body, System.Text.Encoding.UTF8, "text/html");
+            htmlView.LinkedResources.Add(image);
+            htmlView.TransferEncoding = System.Net.Mime.TransferEncoding.QuotedPrintable;
+            mail.AlternateViews.Add(htmlView);
+
+            //AlternateView plainView = AlternateView.CreateAlternateViewFromString("Please view as HTML-Mail.", System.Text.Encoding.UTF8, "text/plain");
+            //plainView.TransferEncoding = System.Net.Mime.TransferEncoding.QuotedPrintable;
+            //mail.AlternateViews.Add(plainView);
         }
 
         public async Task CreateDelegateSubscription(string adminID, string subscriberID)

@@ -20,16 +20,8 @@ using LeaderAnalytics.Vyntix.Web.Domain;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
-
-    // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/755
-    // https://docs.microsoft.com/en-us/answers/questions/65589/how-to-look-up-a-user-by-personal-email-address.html
-    // https://docs.microsoft.com/en-us/answers/questions/76716/request-for-documenatation-how-is-user-record-popu.html
-    // https://docs.microsoft.com/en-us/power-bi/admin/service-admin-alternate-email-address-for-power-bi
-    // https://docs.microsoft.com/en-us/answers/questions/161383/query-to-get-user-by-email-when-email-is-stored-in.html
-    // https://github.com/microsoftgraph/microsoft-graph-docs/issues/10672
-    // https://stackoverflow.com/questions/64959347/how-do-i-create-a-user-in-code-add-it-azure-ad-b2c-then-log-in-as-that-user-us
-    // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/846
-    // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/847
+    // user by email query bug:
+    // https://github.com/microsoftgraph/microsoft-graph-docs/issues/11094
 
     public class GraphService : IGraphService
     {

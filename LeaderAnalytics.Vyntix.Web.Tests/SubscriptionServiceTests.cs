@@ -34,9 +34,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             IGraphService graphService = (IGraphService)serviceProvider.GetService(typeof(IGraphService));
             UserRecord one = await graphService.GetUserRecordByID("1");
 
-
-
-            await subService.SendCorpSubscriptionApprovalEmail("1", "2", "https://localhost");
+            await subService.SendCorpSubscriptionApprovalEmail("1", "2", "https://localhost:5031");
         }
 
 

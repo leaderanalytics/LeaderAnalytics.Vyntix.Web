@@ -1,4 +1,5 @@
-﻿using LeaderAnalytics.Core.Azure;
+﻿using LeaderAnalytics.Core;
+using LeaderAnalytics.Core.Azure;
 using LeaderAnalytics.Vyntix.Web.Domain;
 using LeaderAnalytics.Vyntix.Web.Model;
 using LeaderAnalytics.Vyntix.Web.Services;
@@ -27,12 +28,15 @@ namespace LeaderAnalytics.Vyntix.Web
             if (environmentName == "Development")
                 configFilePath = config["AuthConfig"];
 
-            SubscriptionFilePathParameter subscriptionFilePath = new SubscriptionFilePathParameter() { Value = Path.Combine(configFilePath, $"subscriptions.{environmentName}.json") };
-            services.AddSingleton(subscriptionFilePath);
+            configFilePath = Path.Combine(configFilePath, $"appsettings.{environmentName}.json");
+            SubscriptionFilePathParameter subscriptionFilePathParameter = new SubscriptionFilePathParameter() { Value = Path.Combine(configFilePath, $"subscriptions.{environmentName}.json") };
+            ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = configFilePath };
+            services.AddSingleton(subscriptionFilePathParameter);
+            services.AddSingleton(configFilePathParameter);
 
             IConfiguration Configuration = new ConfigurationBuilder()
            .AddConfiguration(config)
-           .AddJsonFile(Path.Combine(configFilePath, $"appsettings.{environmentName}.json"), false)
+           .AddJsonFile(configFilePath, false)
            .Build();
 
             AzureADConfig azureConfig = AzureADConfig.ReadFromConfig(Configuration);
@@ -106,6 +110,7 @@ namespace LeaderAnalytics.Vyntix.Web
             services.AddSingleton<IGraphService>(graphService);
             services.AddSingleton(typeof(SessionCache));
             services.AddSingleton(typeof(SubscriptionService));
+            services.AddSingleton<EMailClient>(x => new EMailClient(x.GetService<ConfigFilePathParameter>().Value));
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
     }
