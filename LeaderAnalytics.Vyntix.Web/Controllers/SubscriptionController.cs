@@ -14,6 +14,8 @@ using System.Text.Json;
 
 using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
+using Microsoft.AspNetCore.Hosting;
+using LeaderAnalytics.Vyntix.Web.Domain;
 
 namespace LeaderAnalytics.Vyntix.Web.Controllers
 {
@@ -23,10 +25,12 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     {
         private SubscriptionService subscriptionService;
         private string Host => $"{this.Request.Scheme}://{this.Request.Host}";
+        private IHostingEnvironment env;
 
-        public SubscriptionController(SubscriptionService subscriptionService)
+        public SubscriptionController(SubscriptionService subscriptionService, IHostingEnvironment env)
         {
             this.subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
+            this.env = env;
         }
 
         [HttpGet]
@@ -105,9 +109,9 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CorpSubscriptionInfoResponse>> GetCorpSubscriptionInfo([FromBody] string userEmail)
+        public async Task<ActionResult<CorpSubscriptionInfoResponse>> GetCorpSubscriptionInfo([FromBody] string userID)
         {
-            CorpSubscriptionInfoResponse response = await subscriptionService.GetCorpSubscriptionInfo(userEmail);
+            CorpSubscriptionInfoResponse response = await subscriptionService.GetCorpSubscriptionInfo(userID);
             return response;
         }
 
@@ -119,9 +123,22 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
         }
         
         [HttpGet]
-        public void CorpCredentialApproval(string a, string u, bool o)
+        public async Task<IActionResult> CorpCredentialAction(string a, string u, bool o)
         {
-            int x = 1;
+            // o is the approval flag
+            bool success = true;
+
+            
+                success = (await subscriptionService.CreateCorporateSubscription(a, u, o)).Success;
+
+            return Redirect($"CorpCredentialConfirmation/{success.ToString()}");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CorpCredentialConfirmation()
+        {
+
+            return new PhysicalFileResult(env.ContentRootPath + "/StaticHTML/SubApprovalConfirmation.html", "text/html");
         }
     }
 }

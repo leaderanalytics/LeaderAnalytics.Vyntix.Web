@@ -20,7 +20,11 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
     [TestClass]
     public class SubscriptionServiceTests : BaseTest
     {
-        
+
+        // subscriber: samspam92841 @gmail.com //4ca22b1d-5299-4cae-ab35-f23ef0f59343
+        // admin email: samspam92842 @gmail // fe184e4e-0c7d-494f-9b07-fc3bd51eacba
+
+
         [TestMethod]
         public async Task SendCoporateSubscriptionApprovalEmail()
         {

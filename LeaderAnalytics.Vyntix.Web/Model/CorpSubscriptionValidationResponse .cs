@@ -6,9 +6,8 @@ using LeaderAnalytics.Vyntix.Web.Domain;
 
 namespace LeaderAnalytics.Vyntix.Web.Model
 {
-    public class CorpSubscriptionInfoResponse: AsyncResult
+    public class CorpSubscriptionValidationResponse: CorpSubscriptionInfoResponse
     {
-        public string AdminEmail { get; set; }
-        public SubscriptionPlan SubscriptionPlan { get; set; }
+        public string SubscriberEmail { get; set; }
     }
 }

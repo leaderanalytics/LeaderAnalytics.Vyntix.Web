@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using LeaderAnalytics.Vyntix.Web.Services;
 using LeaderAnalytics.Core.Azure;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.FileProviders;
 
 namespace LeaderAnalytics.Vyntix.Web
 {
@@ -53,7 +54,11 @@ namespace LeaderAnalytics.Vyntix.Web
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "StaticHTML")),
+                RequestPath = "/StaticHTML"
+            });
             app.UseSpaStaticFiles();
             app.UseRouting();
 

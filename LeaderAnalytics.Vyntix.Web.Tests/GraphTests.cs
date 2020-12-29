@@ -40,6 +40,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
         public async Task GetUserByIDTest()
         {
             string id = "761f6057-d861-4433-8462-fdec3eb0de95";
+            id = "fe184e4e-0c7d-494f-9b07-fc3bd51eacba";
             UserRecord record = (await graphService.GetUserRecordByID(id));
             Assert.IsNotNull(record);
         }

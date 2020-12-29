@@ -151,26 +151,14 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 plan = GetActiveSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID);
             else
             {
-                CorpSubscriptionInfoResponse corpResponse = await GetCorpSubscriptionInfo(order.CorpSubscriptionID);
+                CorpSubscriptionValidationResponse corpResponse = await ValidateCorpSubscription(order.CorpSubscriptionID, order.UserID);
 
-                if (corpResponse == null || string.IsNullOrEmpty(corpResponse.AdminEmail))
+                if (! corpResponse.Success)
                 {
-                    response.ErrorMessage = "Invalid Corporate Subscription ID.";
-                    return response;
-                }
-
-                if (corpResponse.SubscriptionPlan == null)
-                {
-                    response.ErrorMessage = "No active corporate subscription was found.";
+                    response.ErrorMessage = corpResponse.ErrorMessage;
                     return response;
                 }
                 plan = corpResponse.SubscriptionPlan;
-
-                if (order.UserEmail.Split('@')[1]?.ToLower() != corpResponse.AdminEmail.Split('@')[1]?.ToLower())
-                {
-                    response.ErrorMessage = "User email domain must match email domain of corporate admin.";
-                    return response;
-                }
             }
 
             if (plan == null)
@@ -531,29 +519,92 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         {
             if (string.IsNullOrEmpty(corpAdminUserID))
                 throw new ArgumentNullException(corpAdminUserID);
-            
-            UserRecord user = await graphService.GetUserRecordByID(corpAdminUserID);
-
-            if (user == null || ! user.IsCorporateAdmin)
-                return null;
 
             CorpSubscriptionInfoResponse response = new CorpSubscriptionInfoResponse();
+
+            UserRecord user = await graphService.GetUserRecordByID(corpAdminUserID);
+
+            if (user == null)
+            {
+                response.ErrorMessage = $"User with ID {corpAdminUserID} was not found.";
+                return response;
+            }
+            else if (!user.IsCorporateAdmin)
+            {
+                response.ErrorMessage = $"User with ID {corpAdminUserID} is not designated as a corporate admin.";
+                return response;
+            }
+
             response.AdminEmail = user.EMailAddress;
             Customer customer = await GetCustomerByEmailAddress(user.EMailAddress);
 
             if (customer == null)
+            {
+                response.ErrorMessage = $"A customer record was not found for email address {user.EMailAddress}";
                 return response;
+            }
 
             List<Model.Subscription> subs = await GetSubscriptionsForCustomer(customer);
-            
+
 
             if (subs?.Any() ?? false)
             {
                 Model.Subscription sub = subs.FirstOrDefault(x => x.IsActive);
 
                 if (sub != null)
-                    response.SubscriptionPlan = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == sub.PaymentProviderPlanID);
+                {
+                    var plan = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == sub.PaymentProviderPlanID);
+                    
+                    if (plan != null)
+                        response.SubscriptionPlan = plan;
+                    else
+                        response.ErrorMessage = $"An active subscription plan was not found for user {corpAdminUserID}";
+                }
+                else
+                    response.ErrorMessage = $"An active subscription plan was not found for user {corpAdminUserID}";
             }
+            else
+            {
+                response.ErrorMessage = $"No subscription plans found for user {corpAdminUserID}";
+            }
+            response.Success = string.IsNullOrEmpty(response.ErrorMessage);
+            return response;
+        }
+
+        public async Task<CorpSubscriptionValidationResponse> ValidateCorpSubscription(string corpAdminUserID, string subscriberUserID)
+        {
+            if (string.IsNullOrEmpty(corpAdminUserID))
+                throw new ArgumentNullException(nameof(corpAdminUserID));
+            if(string.IsNullOrEmpty(subscriberUserID))
+                throw new ArgumentNullException(nameof(subscriberUserID));
+
+            CorpSubscriptionValidationResponse response = new CorpSubscriptionValidationResponse();
+            CorpSubscriptionInfoResponse infoResponse = await GetCorpSubscriptionInfo(corpAdminUserID);
+
+            if (!infoResponse.Success)
+            {
+                response.ErrorMessage = infoResponse.ErrorMessage;
+                return response;
+            }
+
+            UserRecord subscriber = await graphService.GetUserRecordByID(subscriberUserID);
+
+            if (subscriber == null)
+            {
+                response.ErrorMessage = $"User with subscriberUserID {subscriberUserID} was not found.";
+                return response;
+            }
+            response.SubscriberEmail = subscriber.EMailAddress;
+            response.AdminEmail = infoResponse.AdminEmail;
+            response.SubscriptionPlan = infoResponse.SubscriptionPlan;
+
+            if (response.AdminEmail.Split('@')[1]?.ToLower() != response.SubscriberEmail.Split('@')[1]?.ToLower())
+            {
+                response.ErrorMessage = "Subscriber email domain must match email domain of corporate admin.";
+                return response;
+            }
+
+            response.Success = string.IsNullOrEmpty(response.ErrorMessage);
             return response;
         }
 
@@ -579,7 +630,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 throw new Exception($"User (admin) with ID {adminID} was not found.");
 
             StringBuilder sb = new StringBuilder();
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.SubApprovalEmailTemplate2.html"))
+            // Build Action property of file SubApprovalEmailTemplate.html must be "Embedded Resource"
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.StaticHTML.SubApprovalEmailTemplate.html"))
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
@@ -590,7 +642,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (sb.Length == 0)
                 throw new Exception("Error retrieving email template.");
 
-            string responseUrl = hostURL + "/Subscription/CorpCredentialApproval?a=" + adminID + "&u=" + subscriberID;
+            string responseUrl = $"{hostURL}/Subscription/CorpCredentialAction?a={adminID}&u={subscriberID}";
             
             sb.Replace("%USER_NAME%", record.User.DisplayName);
             sb.Replace("%USER_EMAIL%", record.EMailAddress);
@@ -626,10 +678,6 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             htmlView.LinkedResources.Add(image);
             htmlView.TransferEncoding = System.Net.Mime.TransferEncoding.QuotedPrintable;
             mail.AlternateViews.Add(htmlView);
-
-            //AlternateView plainView = AlternateView.CreateAlternateViewFromString("Please view as HTML-Mail.", System.Text.Encoding.UTF8, "text/plain");
-            //plainView.TransferEncoding = System.Net.Mime.TransferEncoding.QuotedPrintable;
-            //mail.AlternateViews.Add(plainView);
         }
 
         public async Task CreateDelegateSubscription(string adminID, string subscriberID)
@@ -644,5 +692,11 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public int GetTrialPeriodDays(SubscriptionOrder order) => (!string.IsNullOrEmpty(order.CorpSubscriptionID)) || (order.PriorSubscriptions?.Any() ?? false) || (order.SubscriptionPlan.Cost == 0) ? 0 : 30;
 
         public bool IsPrepaymentRequired(SubscriptionOrder order) => string.IsNullOrEmpty(order.CorpSubscriptionID) && GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
+
+        public async Task<AsyncResult<string>> CreateCorporateSubscription(string adminID, string subscriberID, bool isApproved)
+        {
+            AsyncResult<string> result = new AsyncResult<string>();
+            return result;
+        }
     }
 }

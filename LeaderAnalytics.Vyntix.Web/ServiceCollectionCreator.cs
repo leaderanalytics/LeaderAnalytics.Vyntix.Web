@@ -28,15 +28,14 @@ namespace LeaderAnalytics.Vyntix.Web
             if (environmentName == "Development")
                 configFilePath = config["AuthConfig"];
 
-            configFilePath = Path.Combine(configFilePath, $"appsettings.{environmentName}.json");
             SubscriptionFilePathParameter subscriptionFilePathParameter = new SubscriptionFilePathParameter() { Value = Path.Combine(configFilePath, $"subscriptions.{environmentName}.json") };
-            ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = configFilePath };
+            ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = Path.Combine(configFilePath, $"appsettings.{environmentName}.json") };
             services.AddSingleton(subscriptionFilePathParameter);
             services.AddSingleton(configFilePathParameter);
 
             IConfiguration Configuration = new ConfigurationBuilder()
            .AddConfiguration(config)
-           .AddJsonFile(configFilePath, false)
+           .AddJsonFile(configFilePathParameter.Value, false)
            .Build();
 
             AzureADConfig azureConfig = AzureADConfig.ReadFromConfig(Configuration);

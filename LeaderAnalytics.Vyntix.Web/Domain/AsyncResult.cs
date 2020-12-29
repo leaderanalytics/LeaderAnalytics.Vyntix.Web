@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LeaderAnalytics.Vyntix.Web
+namespace LeaderAnalytics.Vyntix.Web.Domain
 {
     public class AsyncResult
     {
