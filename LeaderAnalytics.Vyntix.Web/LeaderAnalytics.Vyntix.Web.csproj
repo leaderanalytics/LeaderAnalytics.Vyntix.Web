@@ -57,7 +57,7 @@
   </Target>
 
   <ItemGroup>
-    <None Remove="StaticHTML\SubApprovalConfirmation.html" />
+    <None Remove="StaticHTML\CorpSubNoticeEmailTemplate.html" />
     <None Remove="SubApprovalEmailTemplate2.html" />
   </ItemGroup>
   
@@ -80,8 +80,8 @@
     <Folder Include="ClientApp\src\Assets\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="StaticHTML\SubApprovalConfirmation.html" />
-    <EmbeddedResource Include="StaticHTML\SubApprovalEmailTemplate.html" />
+    <EmbeddedResource Include="StaticHTML\CorpSubNoticeEmailTemplate.html" />
+    <EmbeddedResource Include="StaticHTML\CorpSubRequestEmailTemplate.html" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ClientApp\public\VyntixLogo.png">

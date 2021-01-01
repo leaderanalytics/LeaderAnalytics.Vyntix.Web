@@ -90,6 +90,9 @@ namespace LeaderAnalytics.Vyntix.Web
             Stripe.StripeConfiguration.ApiKey = Configuration["StripeApiKey"];
             Stripe.StripeClient stripeClient = new Stripe.StripeClient(Stripe.StripeConfiguration.ApiKey);
             services.AddSingleton(stripeClient);
+            services.AddSingleton(typeof(Stripe.CustomerService));
+            services.AddSingleton(typeof(Stripe.SubscriptionService));
+            services.AddSingleton(typeof(Stripe.BillingPortal.SessionService));
 
             // Graph Credentials
             IConfigurationSection graphSection = Configuration.GetSection("AzureGraph");

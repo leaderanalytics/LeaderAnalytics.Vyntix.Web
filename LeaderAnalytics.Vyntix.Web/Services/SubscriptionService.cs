@@ -1,5 +1,4 @@
 ﻿using LeaderAnalytics.Vyntix.Web.Model;
-using Microsoft.AspNetCore.Http;
 using Stripe;
 using Stripe.Checkout;
 using System;
@@ -9,8 +8,6 @@ using System.Threading.Tasks;
 using Serilog;
 using System.Text.Json;
 using LeaderAnalytics.Core;
-using System.Security.Cryptography.X509Certificates;
-using System.Runtime.CompilerServices;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -22,10 +19,12 @@ using System.Net.Mail;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
-    public class SubscriptionService
+    public class SubscriptionService : ISubscriptionService
     {
         private IGraphService graphService;
-        private StripeClient stripeClient;
+        private Stripe.SubscriptionService stripeSubscriptionService;
+        private Stripe.CustomerService stripeCustomerService;
+        private Stripe.BillingPortal.SessionService stripeSessionService;
         private SessionCache sessionCache;
         private string subscriptionFile;
         private List<SubscriptionPlan> subscriptionPlans;
@@ -33,11 +32,13 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private IActionContextAccessor accessor;
         private EMailClient emailClient;
 
-        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, IGraphService graphService, StripeClient stripeClient, SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath, EMailClient eMailClient)
+        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, IGraphService graphService, Stripe.SubscriptionService stSubService, Stripe.CustomerService stCustomerService, Stripe.BillingPortal.SessionService stSessionService,  SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath, EMailClient eMailClient)
         {
             this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.graphService = graphService;
-            this.stripeClient = stripeClient;
+            this.stripeSubscriptionService = stSubService;
+            this.stripeCustomerService = stCustomerService;
+            this.stripeSessionService = stSessionService;
             this.sessionCache = sessionCache;
             this.subscriptionFile = subscriptionFilePath?.Value ?? throw new ArgumentNullException("subscriptionFilePath");
             this.emailClient = eMailClient;
@@ -70,13 +71,11 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public async Task<Customer> GetCustomerByEmailAddress(string customerEmail)
         {
-            CustomerService customerService = new CustomerService(stripeClient);
-            Stripe.SubscriptionService subscriptionService = new Stripe.SubscriptionService(stripeClient);
-            Customer customer = (await customerService.ListAsync(new CustomerListOptions { Email = customerEmail })).FirstOrDefault();
-            
+            Customer customer = (await stripeCustomerService.ListAsync(new CustomerListOptions { Email = customerEmail })).FirstOrDefault();
+
             if (customer != null)
-                customer.Subscriptions = await subscriptionService.ListAsync(new SubscriptionListOptions { Customer = customer.Id, Status = "all" });
-            
+                customer.Subscriptions = await stripeSubscriptionService.ListAsync(new SubscriptionListOptions { Customer = customer.Id, Status = "all" });
+
             return customer;
         }
 
@@ -93,10 +92,10 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 foreach (var stripeSub in customer.Subscriptions.Where(x => x != null))
                 {
                     // A subscription must have exactly one item.
-                    
+
                     if (stripeSub.Items == null || stripeSub.Items.Count() != 1)
                         throw new Exception($"Subscription with ID {stripeSub.Id} has an invalid number of items.  Customer email is {customer.Email}, Customer ID is {customer.Id}");
-                        
+
                     Stripe.SubscriptionItem stripeSubItem = stripeSub.Items.First();
 
                     if (stripeSubItem.Plan == null)
@@ -125,7 +124,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
-        public async Task<CreateSubscriptionResponse> ApproveSubscriptionOrder(SubscriptionOrder order) 
+        public async Task<CreateSubscriptionResponse> ApproveSubscriptionOrder(SubscriptionOrder order)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
@@ -153,7 +152,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             {
                 CorpSubscriptionValidationResponse corpResponse = await ValidateCorpSubscription(order.CorpSubscriptionID, order.UserID);
 
-                if (! corpResponse.Success)
+                if (!corpResponse.Success)
                 {
                     response.ErrorMessage = corpResponse.ErrorMessage;
                     return response;
@@ -169,7 +168,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             order.SubscriptionPlan = plan;
             Customer customer = await GetCustomerByEmailAddress(order.UserEmail);
-            
+
             if (customer != null)
             {
                 order.CustomerID = customer.Id;
@@ -177,12 +176,12 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             }
 
             // Do not allow creating a free sub if any other sub exists.  It is unnecessary and probably an error.
-            if(order.SubscriptionPlan.PlanDescription.StartsWith("Free non-business") && order.PriorSubscriptions.Any())
+            if (order.SubscriptionPlan.PlanDescription.StartsWith("Free non-business") && order.PriorSubscriptions.Any())
                 response.ErrorMessage = $"A Free non-business subscription can not be created because another subscription already exists.";
 
             return response;
         }
-        
+
         /// <summary>
         /// Entry point for subscription creation process.
         /// </summary>
@@ -194,7 +193,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (string.IsNullOrEmpty(hostURL))
                 throw new ArgumentNullException(nameof(hostURL));
 
-            if(order == null)
+            if (order == null)
                 throw new ArgumentNullException(nameof(order));
 
             CreateSubscriptionResponse response = new CreateSubscriptionResponse();
@@ -218,7 +217,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 response = await CreatePrepaidSubscription(order, hostURL);
             else
                 response = await CreateInvoicedSubscription(order, hostURL);
-            
+
             return response;
         }
 
@@ -231,7 +230,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private async Task<CreateSubscriptionResponse> CreatePrepaidSubscription(SubscriptionOrder order, string hostURL)
         {
             CreateSubscriptionResponse response = new CreateSubscriptionResponse();
-         
+
             // Create stripe session options
             SessionCreateOptions options = new SessionCreateOptions
             {
@@ -241,7 +240,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                     new SessionLineItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 }
                 },
                 Customer = order.CustomerID,
-                CustomerEmail = string.IsNullOrEmpty(order.CustomerID)? order.UserEmail : null,
+                CustomerEmail = string.IsNullOrEmpty(order.CustomerID) ? order.UserEmail : null,
                 Mode = "subscription",
                 SuccessUrl = hostURL + "/Subscription/ConfirmSubscription?session_id={CHECKOUT_SESSION_ID}",    // Called AFTER user submits payment
                 CancelUrl = hostURL + "/SubActivationFailure"
@@ -270,7 +269,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 Log.Error(response.ErrorMessage);
                 return response;
             }
-            
+
             Log.Information("CreateSession: Session {s} was created.", session.Id);
             return response;
         }
@@ -299,7 +298,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             // Get the session from Stripe --------------------------------
             Session stripeSession = null;
-            
+
             try
             {
                 stripeSession = await new SessionService().GetAsync(sessionID);
@@ -319,7 +318,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             Stripe.SubscriptionService subscriptionService = new Stripe.SubscriptionService();
             try
             {
-                 subscription = await subscriptionService.GetAsync(subscriptionID);
+                subscription = await subscriptionService.GetAsync(subscriptionID);
             }
             catch (Exception ex)
             {
@@ -355,7 +354,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
-        public async Task<CreateSubscriptionResponse> CreateInvoicedSubscription(SubscriptionOrder order, string hostURL) 
+        public async Task<CreateSubscriptionResponse> CreateInvoicedSubscription(SubscriptionOrder order, string hostURL)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
@@ -365,28 +364,27 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (!string.IsNullOrEmpty(order.CorpSubscriptionID))
             {
                 // We don't actually create the corporate subscription here - we send out an email so the corp admin can approve.
-                await SendCorpSubscriptionApprovalEmail(order.CorpSubscriptionID, order.UserID, hostURL);
+                await SendCorpSubscriptionRequestEmail(order.CorpSubscriptionID, order.UserID, hostURL);
                 return response;
             }
 
             Stripe.SubscriptionCreateOptions options = new Stripe.SubscriptionCreateOptions();
-            Stripe.SubscriptionService stripeSubService = new Stripe.SubscriptionService(stripeClient);
             int trialPeriodDays = GetTrialPeriodDays(order);
             options.Customer = order.CustomerID;
             // Do not auto-charge customers account if the cost of the subscription is greater than zero.
             options.CollectionMethod = order.SubscriptionPlan.Cost > 0 ? "send_invoice" : "charge_automatically";
-            
-            if(options.CollectionMethod == "send_invoice")
+
+            if (options.CollectionMethod == "send_invoice")
                 options.DaysUntilDue = 1; // Can not be zero. Can only be set if CollectionMethod is "send_invoice"
-            
+
             options.TrialPeriodDays = trialPeriodDays;
             options.Items = new List<SubscriptionItemOptions>(2);
             options.Items.Add(new SubscriptionItemOptions { Price = order.PaymentProviderPlanID, Quantity = 1 });
             options.CancelAtPeriodEnd = false;
-            
+
             try
             {
-                Stripe.Subscription sub = await stripeSubService.CreateAsync(options);
+                Stripe.Subscription sub = await stripeSubscriptionService.CreateAsync(options);
             }
             catch (Exception ex)
             {
@@ -394,7 +392,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 Log.Error("Error creating subscription. UserID: {u}, Ex: {e} ", order.UserID, ex.ToString());
             }
 
-            if(string.IsNullOrEmpty(response.ErrorMessage))
+            if (string.IsNullOrEmpty(response.ErrorMessage))
                 Log.Information("CreateInvoicedSubscription: An invoiced subscription was created for user {userid}.  The plan is {plan}.", order.UserID, order.PaymentProviderPlanID);
 
             return response;
@@ -403,12 +401,11 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task<Customer> CreateCustomer(string email)
         {
             Customer customer = await GetCustomerByEmailAddress(email);
-            
+
             if (customer != null)
                 return customer;
 
-            CustomerService customerService = new CustomerService(stripeClient);
-            await customerService.CreateAsync(new CustomerCreateOptions { Email = email });
+            await stripeCustomerService.CreateAsync(new CustomerCreateOptions { Email = email });
             return await GetCustomerByEmailAddress(email);
         }
 
@@ -423,8 +420,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return true;
         }
 
-        public async Task ExtendSubscription(List<string> customerIDs, int daysToExtend) 
-        { 
+        public async Task ExtendSubscription(List<string> customerIDs, int daysToExtend)
+        {
             // ToDo: Extend the subscription of each passed customerID by daysToExtend
             // May to use this if there is a site outage 
         }
@@ -432,7 +429,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task<AsyncResult<string>> ManageSubscriptions(string customerID, string hostUrl)
         {
             AsyncResult<string> result = new AsyncResult<string>();
-            Customer customer = await new CustomerService(stripeClient).GetAsync(customerID, new CustomerGetOptions {Expand = new List<string> { "subscriptions" } } );
+            Customer customer = await stripeCustomerService.GetAsync(customerID, new CustomerGetOptions { Expand = new List<string> { "subscriptions" } });
 
             if (customer == null)
                 throw new Exception($"Bad customerID: {customerID}");
@@ -450,13 +447,10 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 Customer = customerID,
                 ReturnUrl = hostUrl + (hostUrl.EndsWith('/') ? "" : "/") + "lsi/1"
             };
-            
-
-            var service = new Stripe.BillingPortal.SessionService(stripeClient);
 
             try
             {
-                var session = service.Create(options);
+                var session = stripeSessionService.Create(options);
                 result.Result = session.Url;
                 result.Success = true;
             }
@@ -472,7 +466,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         {
             if (string.IsNullOrEmpty(userEmail))
                 throw new ArgumentNullException(nameof(userEmail));
-            
+
             SubscriptionInfoResponse response = new SubscriptionInfoResponse();
 
             // Check to see if we are logging in under a corporate login.  
@@ -485,7 +479,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (userRecord != null)
             {
                 response.BillingID = userRecord.BillingID;
-                
+
                 if (!string.IsNullOrEmpty(response.BillingID)) // BillingID will be set if user is a corp user
                 {
                     UserRecord adminRecord = await graphService.GetUserRecordByID(response.BillingID);
@@ -496,7 +490,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                     subscriberEmail = adminRecord.EMailAddress;  // use the email address of the admin to look up subscription in stripe.
                 }
             }
-             
+
 
             // Create a customer if one does not exist.  Every email address in Azure should have a corresponding customer in Stripe.
             // In dev customer accounts get zapped so we need to recreate them here.
@@ -509,7 +503,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             if (customer.Subscriptions?.Any() ?? false)
             {
-                response.SubscriptionCount = customer.Subscriptions.Count(); 
+                response.SubscriptionCount = customer.Subscriptions.Count();
                 response.SubscriptionID = customer.Subscriptions.FirstOrDefault(x => x.Status == "active" || x.Status == "trialing")?.Items?.FirstOrDefault()?.Plan?.Id;
             }
             return response;
@@ -554,7 +548,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 if (sub != null)
                 {
                     var plan = GetSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == sub.PaymentProviderPlanID);
-                    
+
                     if (plan != null)
                         response.SubscriptionPlan = plan;
                     else
@@ -575,7 +569,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         {
             if (string.IsNullOrEmpty(corpAdminUserID))
                 throw new ArgumentNullException(nameof(corpAdminUserID));
-            if(string.IsNullOrEmpty(subscriberUserID))
+            if (string.IsNullOrEmpty(subscriberUserID))
                 throw new ArgumentNullException(nameof(subscriberUserID));
 
             CorpSubscriptionValidationResponse response = new CorpSubscriptionValidationResponse();
@@ -608,7 +602,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return response;
         }
 
-        public async Task SendCorpSubscriptionApprovalEmail(string adminID, string subscriberID, string hostURL)
+        public async Task SendCorpSubscriptionRequestEmail(string adminID, string subscriberID, string hostURL)
         {
             // https://www.campaignmonitor.com/dev-resources/guides/coding-html-emails/
             // https://stackoverflow.com/questions/32825779/gmail-not-showing-inline-images-cid-im-sending-with-system-net-mail
@@ -617,7 +611,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             if (string.IsNullOrEmpty(adminID))
                 throw new ArgumentNullException(nameof(adminID));
-            if(string.IsNullOrEmpty(subscriberID))
+            if (string.IsNullOrEmpty(subscriberID))
                 throw new ArgumentNullException(nameof(subscriberID));
 
             UserRecord record = await graphService.GetUserRecordByID(subscriberID);
@@ -631,7 +625,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             StringBuilder sb = new StringBuilder();
             // Build Action property of file SubApprovalEmailTemplate.html must be "Embedded Resource"
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.StaticHTML.SubApprovalEmailTemplate.html"))
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.StaticHTML.CorpSubRequestEmailTemplate.html"))
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
@@ -643,7 +637,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 throw new Exception("Error retrieving email template.");
 
             string responseUrl = $"{hostURL}/Subscription/CorpCredentialAction?a={adminID}&u={subscriberID}";
-            
+
             sb.Replace("%USER_NAME%", record.User.DisplayName);
             sb.Replace("%USER_EMAIL%", record.EMailAddress);
             sb.Replace("%URL%", responseUrl);
@@ -655,16 +649,14 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             mail.BodyEncoding = mail.SubjectEncoding = System.Text.Encoding.UTF8;
             mail.IsBodyHtml = true;
             mail.To.Add(adminRecord.EMailAddress);
-            mail.To.Add("leaderanalytics@outlook.com");
-            mail.To.Add("samspam92841@gmail.com");
+            mail.Bcc.Add("leaderanalytics@outlook.com");
             mail.From = new MailAddress("leaderanalytics@outlook.com");
-            mail.Subject = "Request for Vyntix Login Credentials";
+            mail.Subject = "Vyntix subscription request";
             mail.Body = emailContent;
             AttachLogoImage(mail);
             emailClient.Send(mail);
-            
-            //var apiResult = await apiClient.PostAsync("api/Message/SendEMailMessage", new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json"));
-            Log.Information("CreateInvoicedSubscription: A Corporate Subscription was created for User {userid}. The BillingID is {corpSubscriptionID}.", subscriberID, adminID);
+
+            Log.Information("SendCorpSubscriptionRequestEmail: A Corporate Subscription was emailed for User {userid}. The BillingID is {corpSubscriptionID}.", subscriberID, adminID);
         }
 
         private void AttachLogoImage(MailMessage mail)
@@ -693,10 +685,78 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public bool IsPrepaymentRequired(SubscriptionOrder order) => string.IsNullOrEmpty(order.CorpSubscriptionID) && GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
 
-        public async Task<AsyncResult<string>> CreateCorporateSubscription(string adminID, string subscriberID, bool isApproved)
+        public async Task<AsyncResult> CreateCorporateSubscription(string adminID, string subscriberID, bool isApproved, string hostURL, bool sendConfirmation = true)
         {
-            AsyncResult<string> result = new AsyncResult<string>();
+            AsyncResult result = new AsyncResult();
+            CorpSubscriptionValidationResponse validationResponse = new CorpSubscriptionValidationResponse();
+            string msg = null;
+
+            if (isApproved)
+                validationResponse = await ValidateCorpSubscription(adminID, subscriberID);
+
+            if (validationResponse.Success)
+            {
+                // Create the subscription by updating the BillingID field on the MSGraph User table. Thats it.
+                UserRecord user = await graphService.GetUserRecordByID(subscriberID);
+                user.BillingID = adminID;
+                await graphService.UpdateUser(user);
+                Log.Information("Corporate subscription was created for subscriber {u}, adminID is {a},", subscriberID, adminID);
+            }
+            else if (isApproved)
+            {
+                // The request was approved but validation failed.  Let the user know.
+                msg = $"Your request for login credentials was approved, however the subscription validation process failed.";
+
+                if (!string.IsNullOrEmpty(validationResponse.ErrorMessage))
+                    msg += $"  The error message is: {validationResponse.ErrorMessage}";
+
+                Log.Error("Corporate subscription was approved however validation failed.  Error message is: {e}", msg);
+            }
+
+            if (sendConfirmation && !string.IsNullOrEmpty(validationResponse.SubscriberEmail))
+                SendCorpSubscriptionNotice(validationResponse.SubscriberEmail, isApproved, msg, hostURL);
+
+            result.Success = true;
             return result;
+        }
+
+
+        public void SendCorpSubscriptionNotice(string subscriberEmail, bool isApproved, string msg2, string hostURL)
+        {
+            StringBuilder sb = new StringBuilder();
+            // Build Action property of file SubApprovalEmailTemplate.html must be "Embedded Resource"
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeaderAnalytics.Vyntix.Web.StaticHTML.CorpSubNoticeEmailTemplate.html"))
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    sb.Append(reader.ReadToEnd());
+                }
+            }
+
+            if (sb.Length == 0)
+                throw new Exception("Error retrieving email template.");
+
+            string msg1 = "";
+
+            if (isApproved)
+                msg1 = $"Your request to access a corporate Vyntix subscription has been approved.  You can login <a href='{hostURL}' target='_blank'>here</a> to begin using the subscription.";
+            else
+                msg1 = "Your request to access a corporate Vyntix subscription has been declined.  Please contact your company administrator for more information.";
+
+            sb.Replace("%MSG1%", msg1);
+            sb.Replace("%MSG2%", msg2);
+            string emailContent = sb.ToString();
+
+            MailMessage mail = new MailMessage();
+            mail.BodyEncoding = mail.SubjectEncoding = System.Text.Encoding.UTF8;
+            mail.IsBodyHtml = true;
+            mail.To.Add(subscriberEmail);
+            mail.Bcc.Add("leaderanalytics@outlook.com");
+            mail.From = new MailAddress("leaderanalytics@outlook.com");
+            mail.Subject = "Vyntix subscription request";
+            mail.Body = emailContent;
+            AttachLogoImage(mail);
+            emailClient.Send(mail);
         }
     }
 }

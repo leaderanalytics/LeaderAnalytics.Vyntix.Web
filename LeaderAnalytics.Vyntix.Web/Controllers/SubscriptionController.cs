@@ -121,22 +121,21 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             var request = Request;
             Log.Information(msg);
         }
-        
+
+
+        /// <summary>
+        /// Admin user is redirected here from an Email notice when Approving or Declining a request for login credentials under a corporate subscription.
+        /// Called from StaticHTML/SubApprovalEmailTemplate.html
+        /// </summary>
+        /// <param name="a">Admin user ID</param>
+        /// <param name="u">Subscriber user ID</param>
+        /// <param name="o">IsApproved flag</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> CorpCredentialAction(string a, string u, bool o)
         {
             // o is the approval flag
-            bool success = true;
-
-            
-                success = (await subscriptionService.CreateCorporateSubscription(a, u, o)).Success;
-
-            return Redirect($"CorpCredentialConfirmation/{success.ToString()}");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CorpCredentialConfirmation()
-        {
+            AsyncResult result = await subscriptionService.CreateCorporateSubscription(a, u, o, Host);
 
             return new PhysicalFileResult(env.ContentRootPath + "/StaticHTML/SubApprovalConfirmation.html", "text/html");
         }
