@@ -18,6 +18,7 @@ import ScrollToTop from './Components/ScrollToTop';
 import Privacy from './Components/Privacy';
 import Terms from './Components/Terms';
 import AppInsights from './Services/AppInsights';
+import CorpSubAllocation from './Components/CorpSubAllocation';
 
 // This is a callback for stripe that tells us to reload subscription info:
 // path="/lsi/:id"
@@ -40,12 +41,13 @@ function App() {
                     <Route exact path="/downloads" component={Downloads} />
                     <Route exact path="/subactivationsuccess" component={SubActivationSuccess} />
                     <Route exact path="/subactivationfailure" component={SubActivationFailure} />
-                    <Route exact path="/subconfirmation" component={SubConfirmation} />
+                    <Route exact path="/subconfirmation" component={SubConfirmation} /> 
                     <Route exact path="/subscriptions" component={Subscriptions} />
                     <Route exact path="/subsignin" component={SubSignIn} />
                     <Route exact path="/subplans" component={SubPlans} />
                     <Route exact path="/privacy" component={Privacy} />
                     <Route exact path="/terms" component={Terms} />
+                    <Route exact path="/corpsuballocation/:a/:s/:o" component={CorpSubAllocation} />
                     <Route path="*" component={Home} />
                 </Switch>
                 <Footer/>

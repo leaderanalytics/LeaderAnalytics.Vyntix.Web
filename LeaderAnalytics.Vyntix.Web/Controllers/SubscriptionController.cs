@@ -124,20 +124,21 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
 
 
         /// <summary>
-        /// Admin user is redirected here from an Email notice when Approving or Declining a request for login credentials under a corporate subscription.
-        /// Called from StaticHTML/SubApprovalEmailTemplate.html
+        /// 
         /// </summary>
-        /// <param name="a">Admin user ID</param>
-        /// <param name="u">Subscriber user ID</param>
-        /// <param name="o">IsApproved flag</param>
+        /// <param name="adminID">Admin user ID</param>
+        /// <param name="subscriberID">Subscriber user ID</param>
+        /// <param name="isApproved">IsApproved flag</param>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<IActionResult> CorpCredentialAction(string a, string u, bool o)
+        [HttpPost]
+        public async Task<ActionResult> CorpSubAllocation(CorpSubscriptionAllocationRequest request) 
         {
-            // o is the approval flag
-            AsyncResult result = await subscriptionService.CreateCorporateSubscription(a, u, o, Host);
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
-            return new PhysicalFileResult(env.ContentRootPath + "/StaticHTML/SubApprovalConfirmation.html", "text/html");
+            AsyncResult result = await subscriptionService.ModifyCorporateSubscription(request.AdminID, request.SubscriberID, request.IsApproved, Host);
+            string msg = (result.Success ? "Subscription allocation was performed successfully. " : "Subscription allocation was not successful. " ) + result.ErrorMessage;
+            return new JsonResult(msg);
         }
     }
 }

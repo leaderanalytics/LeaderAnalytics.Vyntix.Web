@@ -593,10 +593,17 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             response.SubscriptionPlan = infoResponse.SubscriptionPlan;
 
             if (response.AdminEmail.Split('@')[1]?.ToLower() != response.SubscriberEmail.Split('@')[1]?.ToLower())
-            {
                 response.ErrorMessage = "Subscriber email domain must match email domain of corporate admin.";
-                return response;
-            }
+            
+            // Caller may be requesting to cancel an allocation.  Make sure the calling admin is the same as the admin who first granted the subscription:
+
+            else if (!string.IsNullOrEmpty(subscriber.BillingID) && subscriber.BillingID != corpAdminUserID)
+                response.ErrorMessage = "The subscriber has already been allocated a corporate subscription. The ID of the administrator requesting a change does not match the ID of the administrator that originally granted the allocation.";
+
+            // Admin cannot allocate a subscription to themself.  This may result in circular calls in the UI.
+
+            else if (corpAdminUserID.ToLower() == subscriberUserID.ToLower())
+                response.ErrorMessage = "Subscription cannot be allocated to Administrator.";
 
             response.Success = string.IsNullOrEmpty(response.ErrorMessage);
             return response;
@@ -636,7 +643,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             if (sb.Length == 0)
                 throw new Exception("Error retrieving email template.");
 
-            string responseUrl = $"{hostURL}/Subscription/CorpCredentialAction?a={adminID}&u={subscriberID}";
+            string responseUrl = $"{hostURL}/CorpSubAllocation/{adminID}/{subscriberID}"; // isapproved is hard coded in the html template
 
             sb.Replace("%USER_NAME%", record.User.DisplayName);
             sb.Replace("%USER_EMAIL%", record.EMailAddress);
@@ -685,32 +692,31 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public bool IsPrepaymentRequired(SubscriptionOrder order) => string.IsNullOrEmpty(order.CorpSubscriptionID) && GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
 
-        public async Task<AsyncResult> CreateCorporateSubscription(string adminID, string subscriberID, bool isApproved, string hostURL, bool sendConfirmation = true)
+        public async Task<AsyncResult> ModifyCorporateSubscription(string adminID, string subscriberID, bool isApproved, string hostURL, bool sendConfirmation = true)
         {
-            AsyncResult result = new AsyncResult();
-            CorpSubscriptionValidationResponse validationResponse = new CorpSubscriptionValidationResponse();
-            string msg = null;
+            // Note that calling this method with isApproved = false has the effect of removing a subscription from a user.
 
-            if (isApproved)
-                validationResponse = await ValidateCorpSubscription(adminID, subscriberID);
+            string msg = null;
+            AsyncResult result = new AsyncResult();
+            CorpSubscriptionValidationResponse validationResponse = await ValidateCorpSubscription(adminID, subscriberID);
 
             if (validationResponse.Success)
             {
-                // Create the subscription by updating the BillingID field on the MSGraph User table. Thats it.
                 UserRecord user = await graphService.GetUserRecordByID(subscriberID);
-                user.BillingID = adminID;
+                // Create or remove the subscription by updating the BillingID field on the MSGraph User table. Thats it.
+                user.BillingID = isApproved ? adminID : null;
                 await graphService.UpdateUser(user);
-                Log.Information("Corporate subscription was created for subscriber {u}, adminID is {a},", subscriberID, adminID);
+                Log.Information("Corporate subscription was modified for subscriber {u}, adminID is {a}, action is {b}", subscriberID, adminID, isApproved ? "Create" : "Delete");
             }
-            else if (isApproved)
+            else 
             {
-                // The request was approved but validation failed.  Let the user know.
-                msg = $"Your request for login credentials was approved, however the subscription validation process failed.";
+                // Validation failed.  Let the user know.
+                msg = $"The subscription validation process failed.";
 
                 if (!string.IsNullOrEmpty(validationResponse.ErrorMessage))
                     msg += $"  The error message is: {validationResponse.ErrorMessage}";
 
-                Log.Error("Corporate subscription was approved however validation failed.  Error message is: {e}", msg);
+                Log.Error("ModifyCorporateSubscription validation failed.  Error message is: {e}", msg);
             }
 
             if (sendConfirmation && !string.IsNullOrEmpty(validationResponse.SubscriberEmail))
@@ -719,7 +725,6 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             result.Success = true;
             return result;
         }
-
 
         public void SendCorpSubscriptionNotice(string subscriberEmail, bool isApproved, string msg2, string hostURL)
         {

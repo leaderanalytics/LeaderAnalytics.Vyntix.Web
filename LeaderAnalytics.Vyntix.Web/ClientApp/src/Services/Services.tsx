@@ -275,6 +275,22 @@ export const EditProfile = async (appState: AppState): Promise<string> => {
     var errorMsg = await MSAL.editProfile();
     return errorMsg;
 }
+
+export const HandleCorpSubAllocation = async (adminID: string, subsriberID: string, isApproved: boolean): Promise<string> => {
+
+    const url = AppConfig.host + 'subscription/CorpSubAllocation';
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({ AdminID: adminID, SubscriberID: subsriberID, IsApproved: isApproved })
+    });
+    const msg = await response.json() as string;
+    return msg;
+}
+
 const DeserializeSubscriptionPlan = (json: any): SubscriptionPlan | null =>
 {
     if (IsNullOrEmpty(json))
@@ -291,6 +307,8 @@ const DeserializeSubscriptionPlan = (json: any): SubscriptionPlan | null =>
     s.StartDate = json.startDate;
     return s;
 }
+
+
 
 //export const GetUserRecord = async (userID: string): Promise<UserRecord> => {
 

@@ -68,7 +68,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             IServiceProvider serviceProvider = Container.BuildServiceProvider();
             SubscriptionService subService = (SubscriptionService)serviceProvider.GetService(typeof(SubscriptionService));
             IGraphService graphService = (IGraphService)serviceProvider.GetService(typeof(IGraphService));
-            AsyncResult result = await subService.CreateCorporateSubscription("1", "2", true, LOCALHOST, false);
+            AsyncResult result = await subService.ModifyCorporateSubscription("1", "2", true, LOCALHOST, false);
             Assert.IsTrue(result.Success);
             Assert.AreEqual("1", this.updatedBillingID);
         }
