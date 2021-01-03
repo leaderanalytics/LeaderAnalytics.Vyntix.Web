@@ -55,7 +55,7 @@ function SubConfirmation() {
     };
 
     useEffect(() => {
-        // Check if customer will get directed to payment processor upon confirming their subscription
+        // Check if user will be directed to payment processor upon confirming their subscription.
         // This will happen if the sub is not eligible for a trial period and is not free.
 
         fetch('/subscription/IsPrepaymentRequired', {
@@ -103,7 +103,7 @@ function SubConfirmation() {
                 stripe?.redirectToCheckout({ sessionId: approval.sessionID });
             }
             else {
-                // We are done.  Customer has created a subscription with a trial period
+                // We are done.  User has created a subscription with a trial period
                 // or a free subscription.
                 AppInsights.LogEvent("Checkout without payment completed");
                 history.push("/SubActivationSuccess");

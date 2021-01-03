@@ -28,6 +28,6 @@ namespace LeaderAnalytics.Vyntix.Web.Domain
         Task<AsyncResult<string>> ManageSubscriptions(string customerID, string hostUrl);
         void SendCorpSubscriptionNotice(string subscriberEmail, bool isApproved, string msg2, string hostURL);
         Task SendCorpSubscriptionRequestEmail(string adminID, string subscriberID, string hostURL);
-        Task<CorpSubscriptionValidationResponse> ValidateCorpSubscription(string corpAdminUserID, string subscriberUserID);
+        Task<CorpSubscriptionValidationResponse> ValidateCorpSubscription(string corpAdminUserID, string subscriberUserID, bool isApproved);
     }
 }

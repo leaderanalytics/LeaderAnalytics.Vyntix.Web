@@ -12,10 +12,13 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
     {
         protected GraphClientCredentials GraphClientCredentials { get; private set; }
         protected IServiceCollection Container { get; set; }
-        
+        protected IServiceProvider serviceProvider { get; set; }
+
         public BaseTest()
         {
             BuildContainer();
+            CreateMocks();
+            serviceProvider = Container.BuildServiceProvider();
         }
 
         protected GraphClientCredentials GetGraphCredentials()
@@ -36,11 +39,15 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             return GraphClientCredentials;
         }
 
-        protected void BuildContainer()
+        protected virtual void BuildContainer()
         {
             Container = new ServiceCollection();
             IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
             new ServiceCollectionCreator().ConfigureServices(Container, config, "Development");
+        }
+
+        protected virtual void CreateMocks()
+        { 
         }
     }
 }

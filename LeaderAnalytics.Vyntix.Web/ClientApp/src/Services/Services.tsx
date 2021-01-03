@@ -220,7 +220,6 @@ export const GetSubscriptionInfo = async (appState: AppState) => {
     SaveAppState(appState);
 }
 
-
 export const GetCorpSubscriptionInfo = async (corpSubscriptionID: string): Promise<CorpSubscriptionInfo> => {
 
     if (IsNullOrEmpty(corpSubscriptionID))

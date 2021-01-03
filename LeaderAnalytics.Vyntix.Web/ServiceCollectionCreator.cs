@@ -38,8 +38,9 @@ namespace LeaderAnalytics.Vyntix.Web
            .AddJsonFile(configFilePathParameter.Value, false)
            .Build();
 
-            AzureADConfig azureConfig = AzureADConfig.ReadFromConfig(Configuration);
-            services.AddSingleton(azureConfig);
+            ClientCredentialsHelper helper = new ClientCredentialsHelper(AzureADConfig.ReadFromConfig(Configuration));
+            services.AddSingleton(helper.AuthorizedClient());
+
             IActionContextAccessor accessor = new ActionContextAccessor();
             services.AddSingleton<IActionContextAccessor>(accessor);
 
@@ -112,6 +113,7 @@ namespace LeaderAnalytics.Vyntix.Web
             services.AddSingleton<IGraphService>(graphService);
             services.AddSingleton(typeof(SessionCache));
             services.AddSingleton(typeof(SubscriptionService));
+            services.AddSingleton<ISubscriptionService>(x => (ISubscriptionService)x.GetService(typeof(SubscriptionService)));
             services.AddSingleton<EMailClient>(x => new EMailClient(x.GetService<ConfigFilePathParameter>().Value));
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace LeaderAnalytics.Vyntix.Web.Model
 {
-    public class CreateSubscriptionResponse
+    public class CreateSubscriptionResponse : Domain.AsyncResult
     {
         public string SessionID { get; set; }
-        public string ErrorMessage { get; set; }
+        public string SubscriptionID { get; set; }
     }
 }

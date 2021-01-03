@@ -20,19 +20,14 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
     [ApiController]
     public class EMailController : Controller
     {
-        private static HttpClient apiClient;
+        private HttpClient apiClient;
         private IActionContextAccessor accessor;
         
 
-        public EMailController(AzureADConfig config, IActionContextAccessor accessor)
+        public EMailController(HttpClient apiClient, IActionContextAccessor accessor)
         {
             this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
-
-            if (apiClient == null)
-            {
-                ClientCredentialsHelper helper = new ClientCredentialsHelper(config);
-                apiClient = helper.AuthorizedClient();
-            }
+            this.apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
         }
 
 

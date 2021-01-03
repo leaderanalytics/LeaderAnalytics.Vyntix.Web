@@ -28,11 +28,11 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private SessionCache sessionCache;
         private string subscriptionFile;
         private List<SubscriptionPlan> subscriptionPlans;
-        private static HttpClient apiClient;
+        private HttpClient apiClient;
         private IActionContextAccessor accessor;
         private EMailClient emailClient;
 
-        public SubscriptionService(AzureADConfig config, IActionContextAccessor accessor, IGraphService graphService, Stripe.SubscriptionService stSubService, Stripe.CustomerService stCustomerService, Stripe.BillingPortal.SessionService stSessionService,  SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath, EMailClient eMailClient)
+        public SubscriptionService(HttpClient apiClient, IActionContextAccessor accessor, IGraphService graphService, Stripe.SubscriptionService stSubService, Stripe.CustomerService stCustomerService, Stripe.BillingPortal.SessionService stSessionService,  SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath, EMailClient eMailClient)
         {
             this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.graphService = graphService;
@@ -43,12 +43,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             this.subscriptionFile = subscriptionFilePath?.Value ?? throw new ArgumentNullException("subscriptionFilePath");
             this.emailClient = eMailClient;
             subscriptionPlans = new List<SubscriptionPlan>();
-
-            if (apiClient == null)
-            {
-                ClientCredentialsHelper helper = new ClientCredentialsHelper(config);
-                apiClient = helper.AuthorizedClient();
-            }
+            this.apiClient = apiClient;
         }
 
         public List<SubscriptionPlan> GetActiveSubscriptionPlans() => GetSubscriptionPlans().Where(x => x.IsCurrent()).ToList();
@@ -65,6 +60,12 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             if (subscriptionPlans == null || !subscriptionPlans.Any())
                 throw new Exception($"Subscription File {subscriptionFile} was not parsed correctly.  No subscription plans were found.");
+
+            // Make sure exactly one Free non-business plan exists
+            int freePlanCount = subscriptionPlans.Count(x => x.PlanDescription == Constants.FREE_PLAN_DESC);
+
+            if (freePlanCount != 1)
+                throw new Exception("One subscription plan must exist with a PlanDescription matching the value of Constants.FREE_PLAN_DESC");
 
             return subscriptionPlans;
         }
@@ -150,7 +151,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 plan = GetActiveSubscriptionPlans().FirstOrDefault(x => x.PaymentProviderPlanID == order.PaymentProviderPlanID);
             else
             {
-                CorpSubscriptionValidationResponse corpResponse = await ValidateCorpSubscription(order.CorpSubscriptionID, order.UserID);
+                CorpSubscriptionValidationResponse corpResponse = await ValidateCorpSubscription(order.CorpSubscriptionID, order.UserID, true);
 
                 if (!corpResponse.Success)
                 {
@@ -169,16 +170,21 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             order.SubscriptionPlan = plan;
             Customer customer = await GetCustomerByEmailAddress(order.UserEmail);
 
-            if (customer != null)
+            if (customer == null)
+            {
+                response.ErrorMessage = $"A Customer with email address {order.UserEmail} was not found in Stripe.";
+                return response;
+            }
+            else
             {
                 order.CustomerID = customer.Id;
                 order.PriorSubscriptions = await GetSubscriptionsForCustomer(customer);
             }
 
             // Do not allow creating a free sub if any other sub exists.  It is unnecessary and probably an error.
-            if (order.SubscriptionPlan.PlanDescription.StartsWith("Free non-business") && order.PriorSubscriptions.Any())
+            if (order.SubscriptionPlan.PlanDescription == Constants.FREE_PLAN_DESC && order.PriorSubscriptions.Any())
                 response.ErrorMessage = $"A Free non-business subscription can not be created because another subscription already exists.";
-
+            
             return response;
         }
 
@@ -210,8 +216,6 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             if (!string.IsNullOrEmpty(response.ErrorMessage))
                 return response;
-
-            int trialPeriodDays = GetTrialPeriodDays(order);
 
             if (IsPrepaymentRequired(order))
                 response = await CreatePrepaidSubscription(order, hostURL);
@@ -385,6 +389,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             try
             {
                 Stripe.Subscription sub = await stripeSubscriptionService.CreateAsync(options);
+                response.SubscriptionID = sub.Id;
             }
             catch (Exception ex)
             {
@@ -394,7 +399,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             if (string.IsNullOrEmpty(response.ErrorMessage))
                 Log.Information("CreateInvoicedSubscription: An invoiced subscription was created for user {userid}.  The plan is {plan}.", order.UserID, order.PaymentProviderPlanID);
-
+            
+            response.Success = string.IsNullOrEmpty(response.ErrorMessage);
             return response;
         }
 
@@ -411,13 +417,11 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public async Task<bool> DeleteCustomer(string customerID)
         {
-
             if (string.IsNullOrEmpty(customerID))
                 throw new ArgumentNullException(nameof(customerID));
-
-            CustomerService customerService = new CustomerService();
-            await customerService.DeleteAsync(customerID);
-            return true;
+            
+            Customer c = await stripeCustomerService.DeleteAsync(customerID);
+            return c != null;
         }
 
         public async Task ExtendSubscription(List<string> customerIDs, int daysToExtend)
@@ -512,7 +516,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task<CorpSubscriptionInfoResponse> GetCorpSubscriptionInfo(string corpAdminUserID)
         {
             if (string.IsNullOrEmpty(corpAdminUserID))
-                throw new ArgumentNullException(corpAdminUserID);
+                throw new ArgumentNullException(nameof(corpAdminUserID));
 
             CorpSubscriptionInfoResponse response = new CorpSubscriptionInfoResponse();
 
@@ -565,7 +569,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return response;
         }
 
-        public async Task<CorpSubscriptionValidationResponse> ValidateCorpSubscription(string corpAdminUserID, string subscriberUserID)
+        public async Task<CorpSubscriptionValidationResponse> ValidateCorpSubscription(string corpAdminUserID, string subscriberUserID, bool isApproved)
         {
             if (string.IsNullOrEmpty(corpAdminUserID))
                 throw new ArgumentNullException(nameof(corpAdminUserID));
@@ -588,23 +592,29 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 response.ErrorMessage = $"User with subscriberUserID {subscriberUserID} was not found.";
                 return response;
             }
-            response.SubscriberEmail = subscriber.EMailAddress;
-            response.AdminEmail = infoResponse.AdminEmail;
-            response.SubscriptionPlan = infoResponse.SubscriptionPlan;
 
-            if (response.AdminEmail.Split('@')[1]?.ToLower() != response.SubscriberEmail.Split('@')[1]?.ToLower())
+            if (infoResponse.AdminEmail.Split('@')[1]?.ToLower() != subscriber.EMailAddress.Split('@')[1]?.ToLower())
                 response.ErrorMessage = "Subscriber email domain must match email domain of corporate admin.";
             
             // Caller may be requesting to cancel an allocation.  Make sure the calling admin is the same as the admin who first granted the subscription:
 
-            else if (!string.IsNullOrEmpty(subscriber.BillingID) && subscriber.BillingID != corpAdminUserID)
+            else if (isApproved && !string.IsNullOrEmpty(subscriber.BillingID) && subscriber.BillingID != corpAdminUserID)
                 response.ErrorMessage = "The subscriber has already been allocated a corporate subscription. The ID of the administrator requesting a change does not match the ID of the administrator that originally granted the allocation.";
+
+            else if (isApproved && !string.IsNullOrEmpty(subscriber.BillingID))
+                response.ErrorMessage = "The subscriber has already been allocated a corporate subscription. Un-allocate the existing subscription before attempting to allocate a new one.";
+
+            else if (! isApproved && string.IsNullOrEmpty(subscriber.BillingID))
+                response.ErrorMessage = "The subscriber has no corporate subscription allocation to remove.";
 
             // Admin cannot allocate a subscription to themself.  This may result in circular calls in the UI.
 
             else if (corpAdminUserID.ToLower() == subscriberUserID.ToLower())
                 response.ErrorMessage = "Subscription cannot be allocated to Administrator.";
 
+            response.SubscriberEmail = subscriber.EMailAddress;
+            response.AdminEmail = infoResponse.AdminEmail;
+            response.SubscriptionPlan = infoResponse.SubscriptionPlan;
             response.Success = string.IsNullOrEmpty(response.ErrorMessage);
             return response;
         }
@@ -698,7 +708,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
             string msg = null;
             AsyncResult result = new AsyncResult();
-            CorpSubscriptionValidationResponse validationResponse = await ValidateCorpSubscription(adminID, subscriberID);
+            CorpSubscriptionValidationResponse validationResponse = await ValidateCorpSubscription(adminID, subscriberID, isApproved);
 
             if (validationResponse.Success)
             {
