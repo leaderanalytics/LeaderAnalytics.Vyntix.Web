@@ -136,9 +136,8 @@ namespace LeaderAnalytics.Vyntix.Web.Controllers
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            AsyncResult result = await subscriptionService.ModifyCorporateSubscription(request.AdminID, request.SubscriberID, request.IsApproved, Host);
-            string msg = (result.Success ? "Subscription allocation was performed successfully. " : "Subscription allocation was not successful. " ) + result.ErrorMessage;
-            return new JsonResult(msg);
+            AsyncResult result = await subscriptionService.AllocateCorporateSubscription(request.AdminID, request.SubscriberID, request.IsApproved, Host);
+            return new JsonResult(result);
         }
     }
 }

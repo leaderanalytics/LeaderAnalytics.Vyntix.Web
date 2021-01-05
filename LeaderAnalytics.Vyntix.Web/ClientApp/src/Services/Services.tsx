@@ -286,8 +286,8 @@ export const HandleCorpSubAllocation = async (adminID: string, subsriberID: stri
         },
         body: JSON.stringify({ AdminID: adminID, SubscriberID: subsriberID, IsApproved: isApproved })
     });
-    const msg = await response.json() as string;
-    return msg;
+    const result = await response.json() as any;
+    return result.errorMessage;
 }
 
 const DeserializeSubscriptionPlan = (json: any): SubscriptionPlan | null =>

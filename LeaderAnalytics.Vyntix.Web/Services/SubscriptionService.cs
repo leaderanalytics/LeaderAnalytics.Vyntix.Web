@@ -275,6 +275,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             }
 
             Log.Information("CreateSession: Session {s} was created.", session.Id);
+            response.Success = string.IsNullOrEmpty(response.ErrorMessage);
             return response;
         }
 
@@ -702,7 +703,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public bool IsPrepaymentRequired(SubscriptionOrder order) => string.IsNullOrEmpty(order.CorpSubscriptionID) && GetTrialPeriodDays(order) == 0 && order.SubscriptionPlan.Cost > 0;
 
-        public async Task<AsyncResult> ModifyCorporateSubscription(string adminID, string subscriberID, bool isApproved, string hostURL, bool sendConfirmation = true)
+        public async Task<AsyncResult> AllocateCorporateSubscription(string adminID, string subscriberID, bool isApproved, string hostURL, bool sendConfirmation = true)
         {
             // Note that calling this method with isApproved = false has the effect of removing a subscription from a user.
 
@@ -717,6 +718,8 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                 user.BillingID = isApproved ? adminID : null;
                 await graphService.UpdateUser(user);
                 Log.Information("Corporate subscription was modified for subscriber {u}, adminID is {a}, action is {b}", subscriberID, adminID, isApproved ? "Create" : "Delete");
+                result.ErrorMessage = $"Subscription was successfully allocated to {(string.IsNullOrEmpty(user.User.DisplayName) ? user.EMailAddress : user.User.DisplayName)}.";
+                result.Success = true;
             }
             else 
             {
@@ -727,12 +730,13 @@ namespace LeaderAnalytics.Vyntix.Web.Services
                     msg += $"  The error message is: {validationResponse.ErrorMessage}";
 
                 Log.Error("ModifyCorporateSubscription validation failed.  Error message is: {e}", msg);
+                result.ErrorMessage = msg;
+                result.Success = false;
             }
 
             if (sendConfirmation && !string.IsNullOrEmpty(validationResponse.SubscriberEmail))
                 SendCorpSubscriptionNotice(validationResponse.SubscriberEmail, isApproved, msg, hostURL);
-
-            result.Success = true;
+            
             return result;
         }
 

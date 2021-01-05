@@ -7,8 +7,9 @@ namespace LeaderAnalytics.Vyntix.Web.Model
 {
     public class UserRecord // Named to not conflict with Graph.User
     {
+        private string _email;
         public User User { get; set; }
-        
+
         public string BillingID 
         {
             get 
@@ -95,12 +96,17 @@ namespace LeaderAnalytics.Vyntix.Web.Model
         public string EMailAddress
         {
             get {
-                
-                if ((User?.Identities ?? null) == null)
-                    return null;
 
-                string email = User.Identities.FirstOrDefault(x => x.SignInType == "emailAddress")?.IssuerAssignedId;
-                return email;
+                if (!string.IsNullOrEmpty(_email))
+                    return _email;
+
+                if ((User?.Identities ?? null) != null)
+                    _email = User.Identities.FirstOrDefault(x => x.SignInType == "emailAddress")?.IssuerAssignedId;
+
+                if (string.IsNullOrEmpty(_email))
+                    _email = User?.OtherMails?.FirstOrDefault();
+
+                return _email;
             }
         }
 

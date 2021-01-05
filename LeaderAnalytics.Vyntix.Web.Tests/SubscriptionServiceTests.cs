@@ -26,17 +26,19 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
     [TestClass]
     public class SubscriptionServiceTests : BaseTest
     {
-        // subscriber: samspam92841@gmail.com //4ca22b1d-5299-4cae-ab35-f23ef0f59343
+        // subscriber: samspam92841@gmail.com //a00afd9b-af51-4206-bd9f-2621343bc70d
         // admin email: samspam92842@gmail // fe184e4e-0c7d-494f-9b07-fc3bd51eacba
         private const string user1email = "samspam92841@gmail.com";
         private const string user2email = "samspam92842@gmail.com";
         private string updatedBillingID;
 
+        /// <summary>
+        /// Create a free subscription for a user with no prior subscriptions.
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
-        public async Task Create_free_subscription()
+        public async Task Create_free_subscription_for_first_time_subscriber()
         {
-            // Create a free subscription for a user with no prior subscriptions.
-
             await RecreateStripeCustomers();
             ISubscriptionService subService = (ISubscriptionService)serviceProvider.GetService(typeof(ISubscriptionService));
             IGraphService graphService = (IGraphService)serviceProvider.GetService(typeof(IGraphService));
@@ -56,7 +58,107 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             Assert.IsNull(response.ErrorMessage);
             Assert.IsTrue(response.Success);
             Assert.IsNotNull(response.SubscriptionID);
+            Stripe.Customer customer = await subService.GetCustomerByEmailAddress(subscriber.EMailAddress); // Customer object includes subscriptions
+            Assert.IsNotNull(customer);
+            List<Model.Subscription> subs = await subService.GetSubscriptionsForCustomer(customer);
+            Assert.AreEqual(1, subs.Count);
+            Model.Subscription sub = subs.First();
+            Assert.AreEqual("active", sub.Status);
+            Assert.AreEqual(freePlan.PaymentProviderPlanID, sub.PaymentProviderPlanID);
         }
+
+        /// <summary>
+        /// Create a paid subscription for a user with no prior subscriptions.  
+        /// This will be an invoiced subscription since the user has a free trial period.
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task Create_paid_subscription_for_first_time_subscriber()
+        {
+            await RecreateStripeCustomers();
+            ISubscriptionService subService = (ISubscriptionService)serviceProvider.GetService(typeof(ISubscriptionService));
+            IGraphService graphService = (IGraphService)serviceProvider.GetService(typeof(IGraphService));
+            UserRecord subscriber = await graphService.GetUserRecordByID("1");
+            Assert.IsNotNull(subscriber);
+            SubscriptionPlan subPlan = subService.GetSubscriptionPlans().First(x => x.PlanDescription != Domain.Constants.FREE_PLAN_DESC); // Get first paid plan
+            Assert.IsNotNull(subPlan);
+
+            SubscriptionOrder order = new SubscriptionOrder
+            {
+                UserEmail = subscriber.EMailAddress,
+                UserID = subscriber.User.Id,
+                PaymentProviderPlanID = subPlan.PaymentProviderPlanID
+            };
+            CreateSubscriptionResponse response = await subService.CreateSubscription(order, Domain.Constants.LOCALHOST);
+            Assert.IsNotNull(response);
+            Assert.IsNull(response.ErrorMessage);
+            Assert.IsTrue(response.Success);
+            Assert.IsNotNull(response.SubscriptionID);
+            Stripe.Customer customer = await subService.GetCustomerByEmailAddress(subscriber.EMailAddress); // Customer object includes subscriptions
+            Assert.IsNotNull(customer);
+            List<Model.Subscription> subs = await subService.GetSubscriptionsForCustomer(customer);
+            Assert.AreEqual(1, subs.Count);
+            Model.Subscription sub = subs.First();
+            Assert.AreEqual("trialing", sub.Status);
+            Assert.AreEqual(subPlan.PaymentProviderPlanID, sub.PaymentProviderPlanID);
+        }
+
+        /// <summary>
+        /// Create a second paid subscription while the free one is still active.
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task Create_paid_subscription_as_upgrade_from_free()
+        {
+            // Create the free subscription
+            await Create_free_subscription_for_first_time_subscriber();
+
+            // Create a second paid subscription while the free one is still active.
+            ISubscriptionService subService = (ISubscriptionService)serviceProvider.GetService(typeof(ISubscriptionService));
+            IGraphService graphService = (IGraphService)serviceProvider.GetService(typeof(IGraphService));
+            UserRecord subscriber = await graphService.GetUserRecordByID("1");
+            Assert.IsNotNull(subscriber);
+            SubscriptionPlan subPlan = subService.GetSubscriptionPlans().First(x => x.PlanDescription != Domain.Constants.FREE_PLAN_DESC); // Get first paid plan
+            Assert.IsNotNull(subPlan);
+
+            SubscriptionOrder order = new SubscriptionOrder
+            {
+                UserEmail = subscriber.EMailAddress,
+                UserID = subscriber.User.Id,
+                PaymentProviderPlanID = subPlan.PaymentProviderPlanID
+            };
+            CreateSubscriptionResponse response = await subService.CreateSubscription(order, Domain.Constants.LOCALHOST);
+            Assert.IsNotNull(response);
+            Assert.IsNull(response.ErrorMessage);
+            Assert.IsTrue(response.Success);
+            Assert.IsNotNull(response.SessionID); // We don't have a subscription yet - the user has to log in and pay for it to create it.
+            
+            // Create a payment just as the customer would do using Stripe checkout
+            Stripe.Checkout.SessionService sessionService = new Stripe.Checkout.SessionService();
+            Stripe.Checkout.Session session = await sessionService.GetAsync(response.SessionID);
+            Assert.IsNotNull(session);
+
+            // Create a payment session
+            
+            Stripe.PaymentIntent paymentIntent = new Stripe.PaymentIntent();
+            paymentIntent.Amount = session.AmountTotal.Value;
+            paymentIntent.Currency = "usd";
+
+            //Stripe.Card
+            Stripe.PaymentIntentService paymentIntentService = new Stripe.PaymentIntentService();
+            //paymentIntentService.CreateAsync
+
+            Stripe.Customer customer = await subService.GetCustomerByEmailAddress(subscriber.EMailAddress); // Customer object includes subscriptions
+            Assert.IsNotNull(customer);
+            List<Model.Subscription> subs = await subService.GetSubscriptionsForCustomer(customer);
+            Assert.AreEqual(2, subs.Count);
+            Model.Subscription sub = subs.Last();
+            Assert.AreEqual("trialing", sub.Status);
+            Assert.AreEqual(subPlan.PaymentProviderPlanID, sub.PaymentProviderPlanID);
+        }
+
+
+
 
         [TestMethod]
         public async Task Send_coporate_subscription_request_email()
@@ -88,7 +190,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             this.updatedBillingID = null;
             SubscriptionService subService = (SubscriptionService)serviceProvider.GetService(typeof(SubscriptionService));
             IGraphService graphService = (IGraphService)serviceProvider.GetService(typeof(IGraphService));
-            AsyncResult result = await subService.ModifyCorporateSubscription("1", "2", true, Domain.Constants.LOCALHOST, false);
+            AsyncResult result = await subService.AllocateCorporateSubscription("1", "2", true, Domain.Constants.LOCALHOST, false);
             Assert.IsTrue(result.Success);
             Assert.AreEqual("1", this.updatedBillingID);
         }

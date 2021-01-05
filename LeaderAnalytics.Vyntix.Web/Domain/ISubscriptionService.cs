@@ -10,7 +10,7 @@ namespace LeaderAnalytics.Vyntix.Web.Domain
     {
         Task<CreateSubscriptionResponse> ApproveSubscriptionOrder(SubscriptionOrder order);
         Task<string> ConfirmSubscription(string sessionID);
-        Task<AsyncResult> ModifyCorporateSubscription(string adminID, string subscriberID, bool isApproved, string hostURL, bool sendConfirmation = true);
+        Task<AsyncResult> AllocateCorporateSubscription(string adminID, string subscriberID, bool isApproved, string hostURL, bool sendConfirmation = true);
         Task<Customer> CreateCustomer(string email);
         Task CreateDelegateSubscription(string adminID, string subscriberID);
         Task<CreateSubscriptionResponse> CreateInvoicedSubscription(SubscriptionOrder order, string hostURL);

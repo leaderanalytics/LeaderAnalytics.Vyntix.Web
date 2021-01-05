@@ -181,12 +181,16 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         public async Task UpdateUser(UserRecord user)
         {
             User graphUser = user.User;
-
-            var result = await client.Users[graphUser.Id]
-            .Request()
-            .UpdateAsync(graphUser);
-
+            await UpdateUser(graphUser);
         }
+
+        public async Task UpdateUser(User user)
+        {
+            var result = await client.Users[user.Id]
+            .Request()
+            .UpdateAsync(user);
+        }
+
 
         public async Task<User> CreateUser(UserRecord userRecord)
         {

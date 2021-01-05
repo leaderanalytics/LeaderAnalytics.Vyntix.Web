@@ -16,7 +16,10 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 {
     [TestClass]
     public class Tests : BaseTest
-    {
+    {   
+        // Can not save unmodified user record:
+        // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/868
+
         private GraphService graphService;
 
         [TestInitialize]
@@ -65,20 +68,28 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
         [TestMethod]
         public async Task UpdateUserTest()
         {
-            string userID = "4ca22b1d-5299-4cae-ab35-f23ef0f59343";
+            string userID = "3f81ce01-ad56-4b79-899a-994b48a97c98";
             User user = (await graphService.FindUser(userID)).First();
             UserRecord record = new UserRecord(user);
             record.BillingID = null;
             record.IsBanned = false;
             record.SuspendedUntil = null;
-            record.IsCorporateAdmin = false;
+            record.IsCorporateAdmin = true;
+            string x = record.EMailAddress;
             await graphService.UpdateUser(record);
             record = await graphService.GetUserRecordByID(userID);
         }
 
-        
 
-        
+        [TestMethod]
+        public async Task UpdateUserTest2()
+        {
+            string userID = "a00afd9b-af51-4206-bd9f-2621343bc70d";
+            User user = (await graphService.FindUser(userID)).First();
+            await graphService.UpdateUser(user);
+        }
+
+
 
         [TestMethod]
         public async Task DeleteUserTest()
