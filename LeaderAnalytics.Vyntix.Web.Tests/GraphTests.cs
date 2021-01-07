@@ -16,10 +16,10 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 {
     [TestClass]
     public class Tests : BaseTest
-    {   
+    {
         // Can not save unmodified user record:
         // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/868
-
+        // https://github.com/stripe/stripe-dotnet/issues/2270
         private GraphService graphService;
 
         [TestInitialize]
