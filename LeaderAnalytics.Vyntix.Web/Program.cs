@@ -22,7 +22,7 @@ namespace LeaderAnalytics.Vyntix.Web
             else
                 logRoot = "..\\..\\serilog\\Vyntix.Web\\log";   // Create logs in D:\home\serilog
 
-
+            // Note UseSerilog() in CreateHostBuilder below.
             Log.Logger = new LoggerConfiguration()
                .WriteTo.File(logRoot, rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
                .CreateLogger();

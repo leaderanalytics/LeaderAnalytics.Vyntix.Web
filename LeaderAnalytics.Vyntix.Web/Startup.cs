@@ -54,11 +54,13 @@ namespace LeaderAnalytics.Vyntix.Web
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "StaticHTML")),
-                RequestPath = "/StaticHTML"
-            });
+
+            // Don't need this since files in StatHTML are stored as embedded resources in the assembly.  Saving this this for reference.
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "StaticHTML")),
+            //    RequestPath = "/StaticHTML"
+            //});
             app.UseSpaStaticFiles();
             app.UseRouting();
 
