@@ -20,7 +20,7 @@ namespace LeaderAnalytics.Vyntix.Web
             if (env == "Development")
                 logRoot = "c:\\serilog\\Vyntix.Web\\log";
             else
-                logRoot = "..\\..\\serilog\\Vyntix.Web\\log";   // Create logs in D:\home\serilog
+                logRoot = "..\\..\\LogFiles\\Vyntix.Web\\log";   // Create logs in D:\home\serilog
 
             // Note UseSerilog() in CreateHostBuilder below.
             Log.Logger = new LoggerConfiguration()
