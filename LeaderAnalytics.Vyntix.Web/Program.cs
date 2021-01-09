@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 
 namespace LeaderAnalytics.Vyntix.Web
 {
@@ -22,10 +23,15 @@ namespace LeaderAnalytics.Vyntix.Web
             else
                 logRoot = "..\\..\\LogFiles\\Vyntix.Web\\log";   // Create logs in D:\home\LogFiles
 
+            // https://docs.microsoft.com/en-us/answers/questions/224685/app-service-log-files-are-not-being-flushed-to-dis.html
+
             // Note UseSerilog() in CreateHostBuilder below.
             Log.Logger = new LoggerConfiguration()
-               .WriteTo.File(logRoot, rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information, buffered:true)
-               .CreateLogger();
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(logRoot, rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information, buffered:true)
+                .CreateLogger();
             
             try
             {
