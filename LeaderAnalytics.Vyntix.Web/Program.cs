@@ -20,13 +20,13 @@ namespace LeaderAnalytics.Vyntix.Web
             if (env == "Development")
                 logRoot = "c:\\serilog\\Vyntix.Web\\log";
             else
-                logRoot = "..\\..\\LogFiles\\Vyntix.Web\\log";   // Create logs in D:\home\serilog
+                logRoot = "..\\..\\LogFiles\\Vyntix.Web\\log";   // Create logs in D:\home\LogFiles
 
             // Note UseSerilog() in CreateHostBuilder below.
             Log.Logger = new LoggerConfiguration()
-               .WriteTo.File(logRoot, rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+               .WriteTo.File(logRoot, rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information, buffered:true)
                .CreateLogger();
-
+            
             try
             {
                 Log.Information("Vyntix.Web - Program.Main started.");
@@ -40,6 +40,7 @@ namespace LeaderAnalytics.Vyntix.Web
             finally
             {
                 Log.CloseAndFlush();
+                System.Threading.Thread.Sleep(2000);
             }
         }
 
