@@ -16,6 +16,7 @@ namespace LeaderAnalytics.Vyntix.Web.Domain
         Task<UserRecord> GetUserByEmailAddress(string email);
         Task<UserRecord> GetUserRecordByID(string id);
         Task UpdateUser(UserRecord user);
+        Task UpdateUser(User user);
         Task<bool> VerifyUser(string userID);
     }
 }

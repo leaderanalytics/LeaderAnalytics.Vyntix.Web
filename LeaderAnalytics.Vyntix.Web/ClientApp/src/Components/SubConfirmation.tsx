@@ -141,14 +141,14 @@ function SubConfirmation() {
                     <div className="rmt2">
                         <input className="mr-2 subscribeCheckbox" type="checkbox" onChange={handleSelectionChange} id="chkTerms"></input>
                         <span>
-                            I have read, I understand, and I agree to the <Link to="/Terms" target="_blank" ><span>Vyntix Terms of Use</span></Link>.
+                            I agree to the <Link to="/Terms" target="_blank" ><span>Vyntix Terms of Use</span></Link>.
                         </span>
                     </div>
 
                     <div className="rmt2"  >
                         <input className="mr-2 subscribeCheckbox" type="checkbox" onChange={handleSelectionChange} id="chkPrivacy"></input>
                         <span>
-                            I have read, I understand, and I agree to the <Link to="/Privacy" target="_blank" ><span>Vyntix Privacy Policy</span></Link>.
+                            I agree to the <Link to="/Privacy" target="_blank" ><span>Vyntix Privacy Policy</span></Link>.
                         </span>
                     </div>
 

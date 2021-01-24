@@ -5,20 +5,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Autofac;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LeaderAnalytics.Vyntix.Web.Tests
 {
     public class BaseTest
     {
         protected GraphClientCredentials GraphClientCredentials { get; private set; }
-        protected IServiceCollection Container { get; set; }
-        protected IServiceProvider serviceProvider { get; set; }
-
+        protected ContainerBuilder ContainerBuilder { get; set; }
+        protected IContainer Container { get; set; }
+        
         public BaseTest()
         {
-            BuildContainer();
-            CreateMocks();
-            serviceProvider = Container.BuildServiceProvider();
+        
         }
 
         protected GraphClientCredentials GetGraphCredentials()
@@ -38,16 +38,30 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
             return GraphClientCredentials;
         }
-
-        protected virtual void BuildContainer()
+        
+        protected virtual void Setup()
         {
-            Container = new ServiceCollection();
-            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
-            new ServiceCollectionCreator().ConfigureServices(Container, config, "Development");
+            ContainerBuilder = new ContainerBuilder();
+            CreateContainer();
+            CreateMocks();
+            Container = ContainerBuilder.Build();
         }
 
+
         protected virtual void CreateMocks()
-        { 
+        {
+            
+        }
+
+        protected virtual void CreateContainer()
+        {
+            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+            new AutofacModule().ConfigureServices(ContainerBuilder, config, "Development");
+        }
+
+        protected ILifetimeScope GetLifetimeScope()
+        {
+            return Container.BeginLifetimeScope();
         }
     }
 }

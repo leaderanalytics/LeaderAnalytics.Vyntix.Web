@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace LeaderAnalytics.Vyntix.Web.Tests
 {
     
-    public abstract class StripeBase
+    public abstract class StripeBase : BaseTest
     {
         protected IConfiguration Configuration { get; private set; }
         protected ServiceProvider Container { get; private set; }

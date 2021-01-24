@@ -32,7 +32,16 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private IActionContextAccessor accessor;
         private EMailClient emailClient;
 
-        public SubscriptionService(HttpClient apiClient, IActionContextAccessor accessor, IGraphService graphService, Stripe.SubscriptionService stSubService, Stripe.CustomerService stCustomerService, Stripe.BillingPortal.SessionService stSessionService,  SessionCache sessionCache, SubscriptionFilePathParameter subscriptionFilePath, EMailClient eMailClient)
+        public SubscriptionService(
+            HttpClient apiClient, 
+            IActionContextAccessor accessor, 
+            IGraphService graphService, 
+            Stripe.SubscriptionService stSubService, 
+            Stripe.CustomerService stCustomerService, 
+            Stripe.BillingPortal.SessionService stSessionService,  
+            SessionCache sessionCache, 
+            SubscriptionFilePathParameter subscriptionFilePath, 
+            EMailClient eMailClient)
         {
             this.accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
             this.graphService = graphService;
@@ -359,7 +368,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
-        public async Task<CreateSubscriptionResponse> CreateInvoicedSubscription(SubscriptionOrder order, string hostURL)
+        private async Task<CreateSubscriptionResponse> CreateInvoicedSubscription(SubscriptionOrder order, string hostURL)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));

@@ -19,25 +19,86 @@ using LeaderAnalytics.Vyntix.Web.Services;
 using LeaderAnalytics.Core.Azure;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.FileProviders;
+using Autofac;
+using LeaderAnalytics.Vyntix.Web.Domain;
 
 namespace LeaderAnalytics.Vyntix.Web
 {
     public class Startup
     {
-        private IConfiguration configuration { get; }
+        private IConfiguration config;
         private IWebHostEnvironment environment;
         private const string CORS_Origins = "CORS_Origins";
 
         public Startup(IWebHostEnvironment env, IConfiguration config)
         {
             environment = env;
-            configuration = config;
+            this.config = config;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            new ServiceCollectionCreator().ConfigureServices(services, configuration, environment.EnvironmentName);
+            string configFilePath = string.Empty;
+            
+            if (environment.EnvironmentName == "Development")
+                configFilePath = config["AuthConfig"];
+
+            string appsettingsFilePath = Path.Combine(configFilePath, $"appsettings.{environment.EnvironmentName}.json");
+            string subscriptionsFilePath = Path.Combine(configFilePath, $"subscriptions.{environment.EnvironmentName}.json");
+
+            config = new ConfigurationBuilder()
+                .AddConfiguration(config)
+                .AddJsonFile(appsettingsFilePath, false)
+                .Build();
+
+            SubscriptionFilePathParameter subscriptionFilePathParameter = new SubscriptionFilePathParameter() { Value = subscriptionsFilePath };
+            ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = appsettingsFilePath };
+            services.AddSingleton(subscriptionFilePathParameter);
+            services.AddSingleton(configFilePathParameter);
+
+            // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
+            services.AddMicrosoftIdentityWebAppAuthentication(config, "AzureADB2C");
+
+            services.AddControllersWithViews()
+                .AddMicrosoftIdentityUI();
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
+
+            //Configuring appsettings section AzureAdB2C, into IOptions
+            services.AddOptions();
+            services.Configure<OpenIdConnectOptions>(config.GetSection("AzureADB2C"));
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "CORS_Origins", builder =>
+                {
+                    builder
+                    .WithOrigins(new string[]
+                    {
+                        "http://www.vyntix.com",
+                        "https://www.vyntix.com",
+                        "http://vyntix.com",
+                        "https://vyntix.com",
+                        "http://localhost",
+                        "http://dev.vyntix.com",
+                        "http://vyntix.azurewebsites.net",
+                        "https://vyntix.azurewebsites.net",
+                        "http://localhost:5032",
+                        "https://localhost:5031",
+                        "https://vyntix-staging.azurewebsites.net",
+                        "https://billing.stripe.com",
+                        "http://billing.stripe.com"
+                    })
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
+            services.AddApplicationInsightsTelemetry(config["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -90,6 +151,13 @@ namespace LeaderAnalytics.Vyntix.Web
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // Autofac
+            new AutofacModule().ConfigureServices(builder, config, environment.EnvironmentName);
+            // Don't build the container; that gets done for you.
         }
     }
 }

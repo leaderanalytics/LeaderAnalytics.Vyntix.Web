@@ -11,30 +11,34 @@ using Microsoft.Identity.Client;
 using Microsoft.Graph.Auth;
 using System.Linq;
 using System;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using LeaderAnalytics.Vyntix.Web.Domain;
+using Autofac;
 
 namespace LeaderAnalytics.Vyntix.Web.Tests
 {
     [TestClass]
-    public class Tests : BaseTest
+    public class GraphTests : BaseTest
     {
         // Can not save unmodified user record:
         // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/868
         // https://github.com/stripe/stripe-dotnet/issues/2270
-        private GraphService graphService;
-
-        [TestInitialize]
-        public void Setup()
+        private IGraphService graphService;
+        private User user1;
+        
+        public GraphTests()
         {
-            graphService = new GraphService(GetGraphCredentials());
-            
+            Setup();
+            graphService = Container.Resolve<IGraphService>();
+            user1 = (graphService.GetAllUsers().Result.First());
         }
 
         [TestMethod]
         public async Task VerifyUsersTest()
         {
-            string userID = "7aee9e27-4767-4479-a9f3-a1816e3a2b24";
-            userID = "9188040d-6c67-4c5b-b112-36a304b66dad";
-            bool isValid = await graphService.VerifyUser(userID);
+            bool isValid = await graphService.VerifyUser(user1.Id);
             Assert.IsTrue(isValid);
         }
 
@@ -42,9 +46,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
         [TestMethod]
         public async Task GetUserByIDTest()
         {
-            string id = "761f6057-d861-4433-8462-fdec3eb0de95";
-            id = "fe184e4e-0c7d-494f-9b07-fc3bd51eacba";
-            UserRecord record = (await graphService.GetUserRecordByID(id));
+            UserRecord record = (await graphService.GetUserRecordByID(user1.Id));
             Assert.IsNotNull(record);
         }
 
@@ -82,14 +84,66 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
 
         [TestMethod]
-        public async Task UpdateUserTest2()
+        public async Task UpdateUserTest_federated_user()
         {
-            string userID = "a00afd9b-af51-4206-bd9f-2621343bc70d";
-            User user = (await graphService.FindUser(userID)).First();
-            await graphService.UpdateUser(user);
+            // https://stackoverflow.com/questions/61051028/how-to-update-identities-collection-for-existing-b2c-user-using-microsoft-graph
+
+            User user = (await graphService.GetAllUsers()).FirstOrDefault(x => x.Identities.Any(i => i.SignInType == "federated"));
+            
+            if (user == null)
+                return;
+
+            //user.Identities = user.Identities.Append(new ObjectIdentity { 
+            //    SignInType = "federated",
+            //    Issuer = "LeaderAnalytics.com",
+            //    IssuerAssignedId = Guid.NewGuid().ToString()
+            //});
+
+            
+            user.DisplayName = "Bob";
+            await graphService.UpdateUser(user); // Fails
         }
 
 
+        [TestMethod]
+        public async Task UpdateUserTest_NOT_a_federated_user()
+        {
+            string userID = "33c2780f-b5c6-41d5-bd03-98668c36b0d8"; // not a federated user
+            await UpdateUser(userID);
+        }
+
+        
+        private async Task UpdateUser(string userID)
+        {
+            User user = (await graphService.FindUser(userID)).First();
+            await graphService.UpdateUser(user); // No change, no error.
+
+            if (user.AdditionalData == null)
+                user.AdditionalData = new Dictionary<string, object>();
+
+            // Set a user attribute and an extended attribute and update
+            // both at the same time
+            user.DisplayName = "Bob";
+            user.AdditionalData[UserAttributes.BillingID] = "ABC";
+            await graphService.UpdateUser(user);
+            // Get the user again
+            user = (await graphService.FindUser(userID)).First();
+            // Verify the change
+            Assert.IsNotNull(user.AdditionalData);
+            Assert.AreEqual("Bob", user.DisplayName);
+            Assert.AreEqual("ABC", user.AdditionalData[UserAttributes.BillingID]);
+
+            // Set a user attribute and an extended attribute and update
+            // both at the same time
+            user.AdditionalData[UserAttributes.BillingID] = null;
+            user.DisplayName = "Sam";
+            await graphService.UpdateUser(user);
+            // Get the user again
+            user = (await graphService.FindUser(userID)).First();
+            // Verify the change
+            Assert.IsNull(user.AdditionalData); // Nothing to retrieve
+            Assert.AreEqual("Sam", user.DisplayName);
+        }
 
         [TestMethod]
         public async Task DeleteUserTest()
@@ -98,16 +152,15 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
         }
 
-
-      
-
-        
-
         [TestMethod]
         public async Task CreateUserTest()
         {
-            // MUST use this EXACT syntax.  See https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/850
             string myDomain = "LeaderAnalytics.onmicrosoft.com";
+            string emailAddress = "jsmith@yahoo.com";
+            UserRecord userRecord = await graphService.GetUserByEmailAddress(emailAddress);
+
+            if (userRecord != null)
+                await graphService.DeleteUser(userRecord.User.Id);
 
             var user = new User { DisplayName = "John Smith" };
             user.Identities = new List<ObjectIdentity>()
@@ -116,7 +169,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
                     {
                         SignInType = "emailAddress",
                         Issuer = myDomain,
-                        IssuerAssignedId = "jsmith@yahoo.com"
+                        IssuerAssignedId = emailAddress
                     }
             };
 
@@ -127,36 +180,10 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             };
             user.PasswordPolicies = "DisablePasswordExpiration";
             user.AccountEnabled = true;
-            User addedUser = await graphService.CreateUser(user); // Passes
+            User addedUser = await graphService.CreateUser(user);
+            Assert.IsNotNull(addedUser);
+            await graphService.DeleteUser(addedUser.Id);
         }
-
-        [TestMethod]
-        public async Task CreateUserTest2()
-        {
-            string myDomain = "LeaderAnalytics.onmicrosoft.com";
-
-            var user = new User { DisplayName = "John Smith" };
-            user.Identities = new List<ObjectIdentity>();
-
-            user.Identities = user.Identities.Append(
-                    new ObjectIdentity
-                    {
-                        SignInType = "emailAddress",
-                        Issuer = myDomain,
-                        IssuerAssignedId = "jsmith@yahoo.com"
-                    });
-
-            user.PasswordProfile = new PasswordProfile
-            {
-                Password = "ABC12345!!",
-                ForceChangePasswordNextSignIn = false
-            };
-            user.PasswordPolicies = "DisablePasswordExpiration";
-            user.AccountEnabled = true;
-            User addedUser = await graphService.CreateUser(user); // Passes
-        }
-
-
 
         [TestMethod]
         public async Task GetDelegatedUsersTest()
@@ -182,10 +209,15 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
         [TestMethod]
         public async Task CreateUserSchemaExtension() 
         {
+
+
+            return;
+
+
             // https://old.reddit.com/r/dotnet/comments/jud07a/why_a_two_hour_job_in_azure_took_two_days_and_i/
 
             // This method results in "Internal server error".
-            // See thse two links: 
+            // See these two links: 
             // links to SO issue below https://github.com/microsoftgraph/microsoft-graph-docs/issues/6647
             // internal server error https://stackoverflow.com/questions/59395423/graph-api-adding-schema-extension-using-net-core-3-1
 
@@ -274,9 +306,86 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             }
         }
 
-      
+
+        [TestMethod]
+        public async Task UpdateUserExtendedPropertyUsingMSGraphAPI()
+        {
+            string userID = "a00afd9b-af51-4206-bd9f-2621343bc70d";
+            User user = (await graphService.FindUser(userID)).First();
+            await graphService.UpdateUser(user);
+        }
+
+
+        [TestMethod]
+        public async Task UpdateUserExtendedPropertyUsingAzureADGraphAPI()
+        {
+            // This test uses the deprecated Azure AD Graph API
+            // https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-graph-api
+            // https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-directory-schema-extensions
+            // https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/868
+            // https://github.com/microsoftgraph/microsoft-graph-explorer-api/issues/413
+
+            // Construct an authentication request
+            HttpClient httpClient = new HttpClient();
+            string tenantID = "f9087985-90e5-479d-9edf-9ef5ce5b4123";
+            string clientID = "6814437e-2d8a-4953-b73e-063330d31dfc";     // client ID of Manangement App for Microsoft Graph
+            string clientSecret = "facx5m_32vRLGFPSP-6KQP7T~oJY.44Rj_";
+            string authContent = $"grant_type=client_credentials&client_id={clientID}&client_secret={clientSecret}&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default";
+            HttpRequestMessage authRequest = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"https://login.microsoftonline.com/{tenantID}/oauth2/token"),
+                Content = new StringContent(authContent, Encoding.UTF8, "application/x-www-form-urlencoded")
+            };
+
+            // Send the auth request and extract the token
+            HttpResponseMessage authResponse = await httpClient.SendAsync(authRequest);
+            string json = await authResponse.Content.ReadAsStringAsync();
+            var jobject = (JObject)JsonConvert.DeserializeObject(json);
+            string token = ((JValue)jobject["access_token"]).ToString();
+            Assert.IsNotNull(token);
+
+            // Construct a request to get a user
+            string userID = "a880b5ac-d3cc-4e7c-89a1-123b1ad3bdc5"; // A federated user
+            string resource_path = "users/" + userID;
+            string apiUrl = $"https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/{resource_path}?api-version=1.6";
+            HttpRequestMessage request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(apiUrl)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await httpClient.SendAsync(request);
+            json = await response.Content.ReadAsStringAsync();
+            Assert.AreEqual("OK", response.StatusCode.ToString());
+
+
+            // Construct a request to update a user
+            string api_version = "api-version=1.6";
+            string requestContent = "{" + $"\"{UserAttributes.IsCorporateAdmin}\"" + ":" + "true" + "}";
+            apiUrl = $"https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/{resource_path}?api-version=1.6";
+            request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = new Uri(apiUrl),
+                Content = new StringContent(requestContent, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            // Send the update request
+            response = await httpClient.SendAsync(request);
+            json = await response.Content.ReadAsStringAsync();
+            Assert.AreEqual("NoContent", response.StatusCode.ToString()); 
+
+            // Get the user again make sure it was updated.
+            apiUrl = $"https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/{resource_path}?api-version=1.6";
+            request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(apiUrl)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            response = await httpClient.SendAsync(request);
+            json = await response.Content.ReadAsStringAsync(); 
+        }
     }
-
-
-    
 }

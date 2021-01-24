@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using Autofac.Extensions.DependencyInjection;
 
 namespace LeaderAnalytics.Vyntix.Web
 {
@@ -56,6 +57,6 @@ namespace LeaderAnalytics.Vyntix.Web
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
-            });
+            }).UseServiceProviderFactory(new AutofacServiceProviderFactory());
     }
 }

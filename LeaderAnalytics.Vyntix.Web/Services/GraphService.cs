@@ -27,14 +27,14 @@ namespace LeaderAnalytics.Vyntix.Web.Services
     {
         private GraphServiceClient client;
         private const string _endpoint = "https://graph.microsoft.com/beta";
-        private const string _ADendpoint = "https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/users?api-version=1.6";
-        private string _accessToken;
+        private const string _ADendpoint = "https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/users?api-version=1.6"; // Deprecated Azure AD endpoint
         private string USER_FIELDS = $"id, userprincipalname, mail, displayname, mailnickname, accountenabled, identities, othermails, {UserAttributes.BillingID}, {UserAttributes.IsBanned}, {UserAttributes.IsCorporateAdmin}, {UserAttributes.IsOptIn}, {UserAttributes.PaymentProviderCustomerID}, {UserAttributes.SuspendedUntil}";
+        private HttpClient httpClient;
 
-        public GraphService(GraphClientCredentials credentials)
+        public GraphService(Func<string,GraphClientCredentials> credentialsFactory, HttpClient httpClient)
         {
-            this.client = CreateGraphServiceClient(credentials ?? throw new ArgumentNullException("credentials"));
-            _accessToken = GetToken(credentials).GetAwaiter().GetResult();
+            this.client = CreateGraphServiceClient(credentialsFactory(Domain.Constants.MS_GRAPH_CREDENTIALS));
+            this.httpClient = httpClient;
         }
 
         public async Task<List<User>> FindUser(string id)
@@ -191,6 +191,15 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             .UpdateAsync(user);
         }
 
+        public async Task UpdateExtensionProperties(UserRecord userRecord)
+        {
+            User user = userRecord.User;
+            var result = await client.Users[user.Id]
+            .Request()
+            .UpdateAsync(user);
+        }
+
+        
 
         public async Task<User> CreateUser(UserRecord userRecord)
         {
@@ -250,37 +259,12 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             GraphServiceClient client = new GraphServiceClient(new ClientCredentialProvider(ccab));
             return client;
         }
+        
 
-        private async Task<string> GetToken(GraphClientCredentials credentials)
+        private async Task<HttpClient> CreateAuthToken()
         {
-            var ccab = ConfidentialClientApplicationBuilder
-                .Create(credentials.ClientID)
-                .WithClientSecret(credentials.ClientSecret)
-                .WithTenantId(credentials.TenantID)
-                .Build();
-
-            //var tokenResult = ccab.AcquireTokenForClient(new List<string> { "https://graph.microsoft.com/.default" });
-            var tokenResult = ccab.AcquireTokenForClient(new List<string> { "https://graph.windows.net/.default" });
-            var token = await tokenResult.ExecuteAsync();
-            return token.AccessToken;
-        }
-
-        private async Task<Stream> GetFromGraph(string action)
-        {
-            using (var request = new HttpRequestMessage(HttpMethod.Get, _endpoint + action))
-            {
-                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-                var client = new HttpClient();
-                var response = await client.SendAsync(request);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var stuff = await response.Content.ReadAsStreamAsync();
-                    return stuff;
-                }
-                return Stream.Null;
-            }
+            
+            return httpClient;
         }
     }
 }
