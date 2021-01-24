@@ -15,19 +15,21 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
         protected GraphClientCredentials GraphClientCredentials { get; private set; }
         protected ContainerBuilder ContainerBuilder { get; set; }
         protected IContainer Container { get; set; }
-        
+        protected IConfiguration Configuration { get; set; }
+        protected IServiceCollection ServiceCollection { get; set; }
+        protected ServiceRegistrar registrar { get; set; }
+
+
         public BaseTest()
         {
-        
+            ServiceCollection = new ServiceCollection();
+            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            registrar = new ServiceRegistrar(config, "Development");
+            registrar.ConfigureServices(ServiceCollection);
         }
 
         protected GraphClientCredentials GetGraphCredentials()
         {
-            string configFilePath = "C:\\Users\\sam\\OneDrive\\LeaderAnalytics\\Config\\Vyntix.Web";
-            IConfiguration Configuration = new ConfigurationBuilder()
-                .AddJsonFile(Path.Combine(configFilePath, $"appsettings.Development.json"), false)
-                .Build();
-
             IConfigurationSection graphSection = Configuration.GetSection("AzureGraph");
             GraphClientCredentials = new GraphClientCredentials
             {
@@ -41,7 +43,6 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
         
         protected virtual void Setup()
         {
-            ContainerBuilder = new ContainerBuilder();
             CreateContainer();
             CreateMocks();
             Container = ContainerBuilder.Build();
@@ -55,8 +56,8 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
         protected virtual void CreateContainer()
         {
-            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
-            new AutofacModule().ConfigureServices(ContainerBuilder, config, "Development");
+            ContainerBuilder = new ContainerBuilder();
+            new AutofacModule().ConfigureServices(ContainerBuilder, registrar);
         }
 
         protected ILifetimeScope GetLifetimeScope()

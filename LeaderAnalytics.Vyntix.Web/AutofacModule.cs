@@ -23,8 +23,20 @@ namespace LeaderAnalytics.Vyntix.Web
     public class AutofacModule
     {
 
-        public void ConfigureServices(ContainerBuilder builder, IConfiguration config, string environmentName)
+        public void ConfigureServices(ContainerBuilder builder, ServiceRegistrar registrar)
         {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (registrar == null)
+                throw new ArgumentNullException(nameof(registrar));
+
+            IConfiguration config = registrar.BuildConfiguration();
+            string subscriptionsFilePath = Path.Combine(registrar.AppSettingsFilePath, $"subscriptions.{registrar.EnvironmentName}.json");
+            SubscriptionFilePathParameter subscriptionFilePathParameter = new SubscriptionFilePathParameter() { Value = subscriptionsFilePath };
+            ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = registrar.AppSettingsFileName };
+            builder.RegisterInstance(subscriptionFilePathParameter).SingleInstance();
+            builder.RegisterInstance(configFilePathParameter).SingleInstance();
+
             ClientCredentialsHelper helper = new ClientCredentialsHelper(AzureADConfig.ReadFromConfig(config));
             builder.RegisterInstance<HttpClient>(helper.AuthorizedClient()).SingleInstance(); // Registers HttpClient that is injected into EMailController
 

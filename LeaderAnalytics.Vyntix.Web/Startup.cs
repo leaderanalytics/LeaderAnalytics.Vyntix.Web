@@ -29,6 +29,7 @@ namespace LeaderAnalytics.Vyntix.Web
         private IConfiguration config;
         private IWebHostEnvironment environment;
         private const string CORS_Origins = "CORS_Origins";
+        private ServiceRegistrar registrar;
 
         public Startup(IWebHostEnvironment env, IConfiguration config)
         {
@@ -39,66 +40,8 @@ namespace LeaderAnalytics.Vyntix.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string configFilePath = string.Empty;
-            
-            if (environment.EnvironmentName == "Development")
-                configFilePath = config["AuthConfig"];
-
-            string appsettingsFilePath = Path.Combine(configFilePath, $"appsettings.{environment.EnvironmentName}.json");
-            string subscriptionsFilePath = Path.Combine(configFilePath, $"subscriptions.{environment.EnvironmentName}.json");
-
-            config = new ConfigurationBuilder()
-                .AddConfiguration(config)
-                .AddJsonFile(appsettingsFilePath, false)
-                .Build();
-
-            SubscriptionFilePathParameter subscriptionFilePathParameter = new SubscriptionFilePathParameter() { Value = subscriptionsFilePath };
-            ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = appsettingsFilePath };
-            services.AddSingleton(subscriptionFilePathParameter);
-            services.AddSingleton(configFilePathParameter);
-
-            // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
-            services.AddMicrosoftIdentityWebAppAuthentication(config, "AzureADB2C");
-
-            services.AddControllersWithViews()
-                .AddMicrosoftIdentityUI();
-
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/build";
-            });
-
-            //Configuring appsettings section AzureAdB2C, into IOptions
-            services.AddOptions();
-            services.Configure<OpenIdConnectOptions>(config.GetSection("AzureADB2C"));
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: "CORS_Origins", builder =>
-                {
-                    builder
-                    .WithOrigins(new string[]
-                    {
-                        "http://www.vyntix.com",
-                        "https://www.vyntix.com",
-                        "http://vyntix.com",
-                        "https://vyntix.com",
-                        "http://localhost",
-                        "http://dev.vyntix.com",
-                        "http://vyntix.azurewebsites.net",
-                        "https://vyntix.azurewebsites.net",
-                        "http://localhost:5032",
-                        "https://localhost:5031",
-                        "https://vyntix-staging.azurewebsites.net",
-                        "https://billing.stripe.com",
-                        "http://billing.stripe.com"
-                    })
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-                });
-            });
-            services.AddApplicationInsightsTelemetry(config["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+            registrar = new ServiceRegistrar(config, environment.EnvironmentName);
+            registrar.ConfigureServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -156,7 +99,7 @@ namespace LeaderAnalytics.Vyntix.Web
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // Autofac
-            new AutofacModule().ConfigureServices(builder, config, environment.EnvironmentName);
+            new AutofacModule().ConfigureServices(builder, registrar);
             // Don't build the container; that gets done for you.
         }
     }
