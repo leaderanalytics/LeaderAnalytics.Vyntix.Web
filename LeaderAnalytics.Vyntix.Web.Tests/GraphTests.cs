@@ -67,52 +67,81 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             Assert.IsNotNull(users);
         }
 
-        [TestMethod]
-        public async Task UpdateUserTest()
-        {
-            string userID = "3f81ce01-ad56-4b79-899a-994b48a97c98";
-            User user = (await graphService.FindUser(userID)).First();
-            UserRecord record = new UserRecord(user);
-            record.BillingID = null;
-            record.IsBanned = false;
-            record.SuspendedUntil = null;
-            record.IsCorporateAdmin = true;
-            string x = record.EMailAddress;
-            await graphService.UpdateUser(record);
-            record = await graphService.GetUserRecordByID(userID);
-        }
-
 
         [TestMethod]
         public async Task UpdateUserTest_federated_user()
         {
             // https://stackoverflow.com/questions/61051028/how-to-update-identities-collection-for-existing-b2c-user-using-microsoft-graph
 
-            User user = (await graphService.GetAllUsers()).FirstOrDefault(x => x.Identities.Any(i => i.SignInType == "federated"));
+            string userID = "a880b5ac-d3cc-4e7c-89a1-123b1ad3bdc5";
+            UserRecord userRecord = await graphService.GetUserRecordByID(userID);
+            User user = userRecord.User;
+            var users = (await graphService.GetAllUsers()).ToList();
             
             if (user == null)
                 return;
 
-            //user.Identities = user.Identities.Append(new ObjectIdentity { 
-            //    SignInType = "federated",
-            //    Issuer = "LeaderAnalytics.com",
-            //    IssuerAssignedId = Guid.NewGuid().ToString()
-            //});
 
+            // Construct an authentication request
+            HttpClient httpClient = new HttpClient();
+            string tenantID = "f9087985-90e5-479d-9edf-9ef5ce5b4123";
+            string clientID = "6814437e-2d8a-4953-b73e-063330d31dfc";     // client ID of Manangement App for Microsoft Graph
+            string clientSecret = "facx5m_32vRLGFPSP-6KQP7T~oJY.44Rj_";
+            string authContent = $"grant_type=client_credentials&client_id={clientID}&client_secret={clientSecret}&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default";
+            string api_version = "api-version=1.6";
+
+            HttpRequestMessage authRequest = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"https://login.microsoftonline.com/{tenantID}/oauth2/token"),
+                Content = new StringContent(authContent, Encoding.UTF8, "application/x-www-form-urlencoded")
+            };
+
+            // Send the auth request and extract the token
+            HttpResponseMessage authResponse = await httpClient.SendAsync(authRequest);
+            string json = await authResponse.Content.ReadAsStringAsync();
+            var jobject = (JObject)JsonConvert.DeserializeObject(json);
+            string token = ((JValue)jobject["access_token"]).ToString();
+            Assert.IsNotNull(token);
+
+
+            // Get a user
+            string resource_path = "users/" + user.Id;
+            string apiUrl = $"https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/{resource_path}?{api_version}";
+            HttpRequestMessage request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(apiUrl)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await httpClient.SendAsync(request);
+            json = await response.Content.ReadAsStringAsync();
+            Assert.AreEqual("OK", response.StatusCode.ToString());
+
+            // Construct a request to update a user
             
-            user.DisplayName = "Bob";
-            await graphService.UpdateUser(user); // Fails
+            resource_path = "users/" + user.Id;
+            string requestContent =  "{" + $"\"userIdentities\"" + ":[" + JsonConvert.SerializeObject(new 
+            {
+                issuer = "LeaderAnalytics.com",
+                issuerUserId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString()))
+            
+            }) + "]}"; 
+            apiUrl = $"https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/{resource_path}?{api_version}";
+            request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = new Uri(apiUrl),
+                Content = new StringContent(requestContent, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            // Send the update request
+            response = await httpClient.SendAsync(request);
+            json = await response.Content.ReadAsStringAsync();
+            Assert.AreEqual("NoContent", response.StatusCode.ToString());
         }
 
 
-        [TestMethod]
-        public async Task UpdateUserTest_NOT_a_federated_user()
-        {
-            string userID = "33c2780f-b5c6-41d5-bd03-98668c36b0d8"; // not a federated user
-            await UpdateUser(userID);
-        }
-
-        
         private async Task UpdateUser(string userID)
         {
             User user = (await graphService.FindUser(userID)).First();
@@ -308,11 +337,26 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
 
 
         [TestMethod]
-        public async Task UpdateUserExtendedPropertyUsingMSGraphAPI()
+        public async Task SetAdminFlagTest()
         {
-            string userID = "a00afd9b-af51-4206-bd9f-2621343bc70d";
-            User user = (await graphService.FindUser(userID)).First();
-            await graphService.UpdateUser(user);
+            // This test sets the IsCorporateAdmin flag for a federated user (IsLocalAccount = false)
+            // and a non-federated user (IsLocalAccount = true).
+            List<User> users = await graphService.GetAllUsers();
+            string federatedUserID = users.FirstOrDefault(x => x.CreationType == "LocalAccount")?.Id;
+            string nonFederatedUserID = users.FirstOrDefault(x => x.CreationType != "LocalAccount")?.Id;
+            Assert.IsNotNull(federatedUserID);
+            Assert.IsNotNull(nonFederatedUserID);
+            UserRecord[] userRecords = new UserRecord[2] { await graphService.GetUserRecordByID(federatedUserID), await graphService.GetUserRecordByID(nonFederatedUserID) };
+            
+            foreach (UserRecord userRecord in userRecords)
+            {
+                bool originalSetting = userRecord.IsCorporateAdmin;
+                bool newSetting = !originalSetting;
+                await graphService.SetAdminFlag(userRecord, newSetting);
+                UserRecord updatedUser = await graphService.GetUserRecordByID(userRecord.User.Id);
+                Assert.AreEqual(newSetting, updatedUser.IsCorporateAdmin);
+                await graphService.SetAdminFlag(userRecord, originalSetting);
+            }
         }
 
 

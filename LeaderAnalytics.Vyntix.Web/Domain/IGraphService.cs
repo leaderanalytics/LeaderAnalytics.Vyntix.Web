@@ -18,5 +18,6 @@ namespace LeaderAnalytics.Vyntix.Web.Domain
         Task UpdateUser(UserRecord user);
         Task UpdateUser(User user);
         Task<bool> VerifyUser(string userID);
+        Task SetAdminFlag(UserRecord userRecord, bool isAdmin);
     }
 }

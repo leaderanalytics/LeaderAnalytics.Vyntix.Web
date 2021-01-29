@@ -102,11 +102,29 @@ namespace LeaderAnalytics.Vyntix.Web.Model
 
                 if ((User?.Identities ?? null) != null)
                     _email = User.Identities.FirstOrDefault(x => x.SignInType == "emailAddress")?.IssuerAssignedId;
-
+                
                 if (string.IsNullOrEmpty(_email))
                     _email = User?.OtherMails?.FirstOrDefault();
 
                 return _email;
+            }
+        }
+
+        public bool IsLocalAccount
+        {
+            // https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0
+            //
+            // creationType String  
+            //
+            // Indicates whether the user account was created as a regular school or work account(null), 
+            // an external account(Invitation), 
+            // a local account for an Azure Active Directory B2C tenant(LocalAccount) 
+            // or self - service sign - up using email verification (EmailVerified). Read - only.
+
+            // 
+            get
+            {
+                return User.CreationType == "LocalAccount";
             }
         }
 

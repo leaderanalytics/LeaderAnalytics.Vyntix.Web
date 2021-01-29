@@ -38,7 +38,8 @@ namespace LeaderAnalytics.Vyntix.Web
             builder.RegisterInstance(configFilePathParameter).SingleInstance();
 
             ClientCredentialsHelper helper = new ClientCredentialsHelper(AzureADConfig.ReadFromConfig(config));
-            builder.RegisterInstance<HttpClient>(helper.AuthorizedClient()).SingleInstance(); // Registers HttpClient that is injected into EMailController
+            builder.RegisterInstance<HttpClient>(helper.AuthorizedClient()).SingleInstance(); // Registers HttpClient that is injected into EMailController - do not use for GraphService
+            builder.Register<Func<HttpClient>>(c => () => new HttpClient()).SingleInstance();
 
             // Stripe
             Stripe.StripeConfiguration.ApiKey = config["StripeApiKey"];

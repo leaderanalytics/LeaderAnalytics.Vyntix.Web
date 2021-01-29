@@ -17,6 +17,9 @@ using System.Text.Unicode;
 using System.Text;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using LeaderAnalytics.Vyntix.Web.Domain;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Net;
 
 namespace LeaderAnalytics.Vyntix.Web.Services
 {
@@ -25,16 +28,24 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
     public class GraphService : IGraphService
     {
+        private GraphClientCredentials graphClientCredentials;
         private GraphServiceClient client;
         private const string _endpoint = "https://graph.microsoft.com/beta";
-        private const string _ADendpoint = "https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/users?api-version=1.6"; // Deprecated Azure AD endpoint
+        
         private string USER_FIELDS = $"id, userprincipalname, mail, displayname, mailnickname, accountenabled, identities, othermails, {UserAttributes.BillingID}, {UserAttributes.IsBanned}, {UserAttributes.IsCorporateAdmin}, {UserAttributes.IsOptIn}, {UserAttributes.PaymentProviderCustomerID}, {UserAttributes.SuspendedUntil}";
-        private HttpClient httpClient;
 
-        public GraphService(Func<string,GraphClientCredentials> credentialsFactory, HttpClient httpClient)
+        // Deprecated Azure AD endpoint ------------------------------------------------------------------------------
+        private const string _Azure_AD_Endpoint = "https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/users?api-version=1.6"; 
+        private HttpClient AzureADGraphClient;
+        // Deprecated Azure AD endpoint ------------------------------------------------------------------------------
+
+
+
+        public GraphService(Func<string,GraphClientCredentials> credentialsFactory, Func<HttpClient> httpClientFactory)
         {
-            this.client = CreateGraphServiceClient(credentialsFactory(Domain.Constants.MS_GRAPH_CREDENTIALS));
-            this.httpClient = httpClient;
+            graphClientCredentials = credentialsFactory(Domain.Constants.MS_GRAPH_CREDENTIALS);
+            this.client = CreateGraphServiceClient(graphClientCredentials);  // MS Graph endpoint
+            this.AzureADGraphClient = httpClientFactory();                   // Azure AD endpoint
         }
 
         public async Task<List<User>> FindUser(string id)
@@ -180,6 +191,9 @@ namespace LeaderAnalytics.Vyntix.Web.Services
 
         public async Task UpdateUser(UserRecord user)
         {
+            if (! user.IsLocalAccount)
+                throw new Exception("CreationType must be LocalAccount");
+
             User graphUser = user.User;
             await UpdateUser(graphUser);
         }
@@ -248,6 +262,40 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             return records;
         }
 
+        public async Task SetAdminFlag(UserRecord userRecord, bool isAdmin)
+        {
+            if (userRecord == null || userRecord.User == null)
+                throw new ArgumentNullException(nameof(userRecord));
+
+            if (userRecord.IsLocalAccount)
+            {
+                userRecord.IsCorporateAdmin = isAdmin;
+                await UpdateUser(userRecord);
+            }
+            else
+            {
+
+                HttpClient azureADClient = await CreateAzureADGraphClient();
+                string api_version = "api-version=1.6";
+                string resource_path = "users/" + userRecord.User.Id;
+                string requestContent = "{" + $"\"{UserAttributes.IsCorporateAdmin}\"" + ":" + (isAdmin ? "true" : "false") + "}";
+                
+                string apiUrl = $"https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/{resource_path}?{api_version}";
+
+                HttpRequestMessage request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Patch,
+                    RequestUri = new Uri(apiUrl),
+                    Content = new StringContent(requestContent, Encoding.UTF8, "application/json")
+                };
+                
+                // Send the update request
+                HttpResponseMessage response = await azureADClient.SendAsync(request);
+                if (response.StatusCode.ToString() != "NoContent")
+                    throw new Exception($"Attempt to set Admin Flag on user {userRecord.User.Id} failed.  The status code is: {response.StatusCode.ToString()}");
+            }
+        }
+
         private GraphServiceClient CreateGraphServiceClient(GraphClientCredentials credentials)
         {
             var ccab = ConfidentialClientApplicationBuilder
@@ -259,12 +307,27 @@ namespace LeaderAnalytics.Vyntix.Web.Services
             GraphServiceClient client = new GraphServiceClient(new ClientCredentialProvider(ccab));
             return client;
         }
+                       
         
-
-        private async Task<HttpClient> CreateAuthToken()
+        /// <summary>
+        /// Creates an HttpClient for calling the deprecated Azure AD Graph endpoint
+        /// </summary>
+        /// <returns></returns>
+        private async Task<HttpClient> CreateAzureADGraphClient()
         {
-            
-            return httpClient;
+            string authContent = $"grant_type=client_credentials&client_id={graphClientCredentials.ClientID}&client_secret={graphClientCredentials.ClientSecret}&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default";
+            HttpRequestMessage authRequest = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"https://login.microsoftonline.com/{graphClientCredentials.TenantID}/oauth2/token"),
+                Content = new StringContent(authContent, Encoding.UTF8, "application/x-www-form-urlencoded")
+            };
+            HttpResponseMessage authResponse = await AzureADGraphClient.SendAsync(authRequest);
+            string json = await authResponse.Content.ReadAsStringAsync();
+            var jobject = (JObject)JsonConvert.DeserializeObject(json);
+            string token = ((JValue)jobject["access_token"]).ToString();
+            AzureADGraphClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            return AzureADGraphClient;
         }
     }
 }
