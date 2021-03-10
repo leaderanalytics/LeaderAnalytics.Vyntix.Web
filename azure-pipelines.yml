@@ -35,6 +35,12 @@ steps:
     command: install
     workingDir: LeaderAnalytics.Vyntix.Web/ClientApp
 
+task: Npm@1
+  displayName: 'npm build'
+  inputs:
+    command: run build
+    workingDir: LeaderAnalytics.Vyntix.Web/ClientApp
+
 - task: VSBuild@1
   displayName: 'Build solution'
   inputs:
