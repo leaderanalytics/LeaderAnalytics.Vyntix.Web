@@ -25,7 +25,7 @@ steps:
   inputs:
     command: 'restore'
     feedsToUse: 'select'
-    vstsFeed: 'LeaderAnalytics.Core/CoreArtifacts'
+    vstsFeed: 'LeaderAnalytics.Core/LeaderAnalyticsFeed'
     includeNuGetOrg: true
 
 - task: Npm@1
