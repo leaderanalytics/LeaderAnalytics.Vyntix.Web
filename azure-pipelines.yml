@@ -25,14 +25,19 @@ steps:
   inputs:
     command: 'restore'
     feedsToUse: 'select'
-    vstsFeed: 'LeaderAnalytics.Core/CoreArtifacts'
+    vstsFeed: 'LeaderAnalyticsFeed'
     includeNuGetOrg: true
-     
 
 - task: Npm@1
   displayName: 'npm install'
   inputs:
     command: install
+    workingDir: LeaderAnalytics.Vyntix.Web/ClientApp
+
+- task: Npm@1
+  displayName: 'npm build'
+  inputs:
+    customCommand: run build
     workingDir: LeaderAnalytics.Vyntix.Web/ClientApp
 
 - task: VSBuild@1
