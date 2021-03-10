@@ -32,7 +32,7 @@ namespace LeaderAnalytics.Vyntix.Web.Services
         private GraphServiceClient client;
         private const string _endpoint = "https://graph.microsoft.com/beta";
         
-        private string USER_FIELDS = $"id, userprincipalname, mail, displayname, mailnickname, accountenabled, identities, othermails, {UserAttributes.BillingID}, {UserAttributes.IsBanned}, {UserAttributes.IsCorporateAdmin}, {UserAttributes.IsOptIn}, {UserAttributes.PaymentProviderCustomerID}, {UserAttributes.SuspendedUntil}";
+        private string USER_FIELDS = $"id, userprincipalname, mail, displayname, mailnickname, accountenabled, identities, othermails, creationtype, {UserAttributes.BillingID}, {UserAttributes.IsBanned}, {UserAttributes.IsCorporateAdmin}, {UserAttributes.IsOptIn}, {UserAttributes.PaymentProviderCustomerID}, {UserAttributes.SuspendedUntil}";
 
         // Deprecated Azure AD endpoint ------------------------------------------------------------------------------
         private const string _Azure_AD_Endpoint = "https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/users?api-version=1.6"; 

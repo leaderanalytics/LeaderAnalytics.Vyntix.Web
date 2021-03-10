@@ -353,8 +353,9 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
                 bool originalSetting = userRecord.IsCorporateAdmin;
                 bool newSetting = !originalSetting;
                 await graphService.SetAdminFlag(userRecord, newSetting);
+                await Task.Delay(100); // Test will intermittently fail if we don't give the server a chance to catch up
                 UserRecord updatedUser = await graphService.GetUserRecordByID(userRecord.User.Id);
-                Assert.AreEqual(newSetting, updatedUser.IsCorporateAdmin);
+                Assert.AreEqual(newSetting, updatedUser.IsCorporateAdmin, $"UserID: {updatedUser.User.Id}");
                 await graphService.SetAdminFlag(userRecord, originalSetting);
             }
         }

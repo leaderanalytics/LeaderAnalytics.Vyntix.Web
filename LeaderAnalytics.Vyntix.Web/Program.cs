@@ -26,7 +26,6 @@ namespace LeaderAnalytics.Vyntix.Web
 
             // https://docs.microsoft.com/en-us/answers/questions/224685/app-service-log-files-are-not-being-flushed-to-dis.html
 
-            // Note UseSerilog() in CreateHostBuilder below.
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
