@@ -27,7 +27,6 @@ steps:
     feedsToUse: 'select'
     vstsFeed: 'LeaderAnalytics.Core/CoreArtifacts'
     includeNuGetOrg: true
-     
 
 - task: Npm@1
   displayName: 'npm install'
