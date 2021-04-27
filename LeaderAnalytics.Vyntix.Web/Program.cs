@@ -37,7 +37,6 @@ namespace LeaderAnalytics.Vyntix.Web
             {
                 Log.Information("Vyntix.Web - Program.Main started.");
                 Log.Information("Environment is: {env}", env);
-                throw new Exception($"******************** This exception should be logged *********************");
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
