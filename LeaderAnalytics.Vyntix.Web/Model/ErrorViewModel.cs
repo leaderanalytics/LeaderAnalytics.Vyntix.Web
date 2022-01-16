@@ -1,11 +1,8 @@
-using System;
+namespace LeaderAnalytics.Vyntix.Web.Model;
 
-namespace LeaderAnalytics.Vyntix.Web.Model
+public class ErrorViewModel
 {
-    public class ErrorViewModel
-    {
-        public string RequestId { get; set; }
+    public string RequestId { get; set; }
 
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-    }
+    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 }

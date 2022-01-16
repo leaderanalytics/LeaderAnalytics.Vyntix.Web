@@ -1,97 +1,85 @@
-﻿using LeaderAnalytics.Vyntix.Web.Domain;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿namespace LeaderAnalytics.Vyntix.Web;
 
-namespace LeaderAnalytics.Vyntix.Web
+public class ServiceRegistrar
 {
-    public class ServiceRegistrar
+    private bool isBuilt;
+    private string _appSettingsFilePath;
+    private string _appSettingsFileName;
+    protected IConfiguration config;
+    public readonly string EnvironmentName;
+
+
+    public ServiceRegistrar(IConfiguration config, string environmentName)
     {
-        private bool isBuilt;
-        private string _appSettingsFilePath;
-        private string _appSettingsFileName;
-        protected IConfiguration config;
-        public readonly string EnvironmentName;
-        
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
+        this.EnvironmentName = environmentName ?? throw new ArgumentNullException(nameof(environmentName));
+    }
 
-        public ServiceRegistrar(IConfiguration config, string environmentName)
+    public string AppSettingsFilePath
+    {
+        get
         {
-            this.config = config ?? throw new ArgumentNullException(nameof(config));
-            this.EnvironmentName = environmentName ?? throw new ArgumentNullException(nameof(environmentName));
-        }
-
-        public string AppSettingsFilePath 
-        {
-            get 
-            {
-                if (!string.IsNullOrEmpty(_appSettingsFilePath))
-                    return _appSettingsFilePath;
-
-                _appSettingsFilePath = EnvironmentName == "Development" ? config["AuthConfig"] : string.Empty;
+            if (!string.IsNullOrEmpty(_appSettingsFilePath))
                 return _appSettingsFilePath;
-            } 
+
+            _appSettingsFilePath = EnvironmentName == "Development" ? config["AuthConfig"] : string.Empty;
+            return _appSettingsFilePath;
         }
+    }
 
-        public string AppSettingsFileName
+    public string AppSettingsFileName
+    {
+        get
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(_appSettingsFileName))
-                    return _appSettingsFileName;
-
-                _appSettingsFileName = Path.Combine(AppSettingsFilePath, $"appsettings.{EnvironmentName}.json");
+            if (!string.IsNullOrEmpty(_appSettingsFileName))
                 return _appSettingsFileName;
-            }
+
+            _appSettingsFileName = Path.Combine(AppSettingsFilePath, $"appsettings.{EnvironmentName}.json");
+            return _appSettingsFileName;
         }
+    }
 
-        public IConfiguration BuildConfiguration()
-        {
-            if (isBuilt)
-                return config;
-            
-            isBuilt = true;
-
-            config = new ConfigurationBuilder()
-                .AddConfiguration(config)
-                .AddJsonFile(AppSettingsFileName, false)
-                .Build();
-
+    public IConfiguration BuildConfiguration()
+    {
+        if (isBuilt)
             return config;
-        }
 
-        public void ConfigureServices(IServiceCollection services)
+        isBuilt = true;
+
+        config = new ConfigurationBuilder()
+            .AddConfiguration(config)
+            .AddJsonFile(AppSettingsFileName, false)
+            .Build();
+
+        return config;
+    }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        BuildConfiguration();
+        // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
+        services.AddMicrosoftIdentityWebAppAuthentication(config, "AzureADB2C");
+
+        services.AddControllersWithViews()
+            .AddMicrosoftIdentityUI();
+
+        // In production, the React files will be served from this directory
+        services.AddSpaStaticFiles(configuration =>
         {
-            BuildConfiguration();
-            // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
-            services.AddMicrosoftIdentityWebAppAuthentication(config, "AzureADB2C");
+            configuration.RootPath = "ClientApp/build";
+        });
 
-            services.AddControllersWithViews()
-                .AddMicrosoftIdentityUI();
+        //Configuring appsettings section AzureAdB2C, into IOptions
+        services.AddOptions();
+        services.Configure<OpenIdConnectOptions>(config.GetSection("AzureADB2C"));
 
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
+        services.AddCors(options =>
+        {
+            options.AddPolicy(name: "CORS_Origins", builder =>
             {
-                configuration.RootPath = "ClientApp/build";
-            });
-
-            //Configuring appsettings section AzureAdB2C, into IOptions
-            services.AddOptions();
-            services.Configure<OpenIdConnectOptions>(config.GetSection("AzureADB2C"));
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: "CORS_Origins", builder =>
+                builder
+                .WithOrigins(new string[]
                 {
-                    builder
-                    .WithOrigins(new string[]
-                    {
                         "http://www.vyntix.com",
                         "https://www.vyntix.com",
                         "http://vyntix.com",
@@ -105,12 +93,11 @@ namespace LeaderAnalytics.Vyntix.Web
                         "https://vyntix-staging.azurewebsites.net",
                         "https://billing.stripe.com",
                         "http://billing.stripe.com"
-                    })
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-                });
+                })
+                .AllowAnyHeader()
+                .AllowAnyMethod();
             });
-            services.AddApplicationInsightsTelemetry(config["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-        }
+        });
+        services.AddApplicationInsightsTelemetry(config["APPINSIGHTS_INSTRUMENTATIONKEY"]);
     }
 }

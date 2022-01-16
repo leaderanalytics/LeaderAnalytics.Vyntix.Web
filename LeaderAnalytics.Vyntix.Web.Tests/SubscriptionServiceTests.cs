@@ -1,29 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using LeaderAnalytics.Vyntix.Web.Model;
-using LeaderAnalytics.Vyntix.Web.Services;
-using System.Threading.Tasks;
-using Microsoft.Graph;
-using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.Identity.Client;
-using Microsoft.Graph.Auth;
-using System.Linq;
-using System;
-using Moq;
-using Microsoft.Extensions.DependencyInjection;
-using LeaderAnalytics.Vyntix.Web.Domain;
-using System.Threading;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using Moq.Protected;
-using Autofac;
-using Stripe;
-
-namespace LeaderAnalytics.Vyntix.Web.Tests
+﻿namespace LeaderAnalytics.Vyntix.Web.Tests
 {
     [TestClass]
     public class SubscriptionServiceTests : BaseTest
@@ -301,7 +276,7 @@ namespace LeaderAnalytics.Vyntix.Web.Tests
             
             // HttpContext
 
-            Mock<ConnectionInfo> connectionInfoMock = new Mock<ConnectionInfo>();
+            Mock<Microsoft.AspNetCore.Http.ConnectionInfo> connectionInfoMock = new Mock<Microsoft.AspNetCore.Http.ConnectionInfo>();
             connectionInfoMock.Setup(x => x.RemoteIpAddress).Returns(new System.Net.IPAddress(0x2414188f));
             
 
