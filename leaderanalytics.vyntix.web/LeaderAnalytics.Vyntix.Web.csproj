@@ -55,6 +55,10 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <None Remove="ClientApp\src\Services\AuthModule.ts" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />

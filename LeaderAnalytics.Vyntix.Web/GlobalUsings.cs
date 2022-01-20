@@ -26,3 +26,4 @@ global using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 global using Microsoft.Identity.Web;
 global using Microsoft.Identity.Web.UI;
 global using System.Collections.Concurrent;
+global using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;

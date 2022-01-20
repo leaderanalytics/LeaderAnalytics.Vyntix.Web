@@ -4,11 +4,13 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import './App.scss';
 import './Assets/fonts/entsans.ttf';
-//import '../node_modules/bootstrap/dist/js/bootstrap.min.js';
+import { PublicClientApplication } from "@azure/msal-browser";
+import { msalConfig } from "./msalconfig";
 
+export const msalInstance = new PublicClientApplication(msalConfig);
 ReactDOM.render(
-  <React.StrictMode>
-        <App />
+    <React.StrictMode>
+        <App pca={msalInstance} />
   </React.StrictMode>,
   document.getElementById('root')
 );

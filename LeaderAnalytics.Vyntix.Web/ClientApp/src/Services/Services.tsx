@@ -6,16 +6,18 @@ import AppConfig from '../appconfig';
 import ContactRequest from '../Model/ContactRequest';
 import AsyncResult from '../Model/AsyncResult';
 import AppInsights from './AppInsights';
-import { AuthModule } from './AuthModule';
+import { useMsal } from '@azure/msal-react';
 import { AccountInfo } from "@azure/msal-browser";
 import UserRecord from "../Model/UserRecord";
+import { loginRequest } from "../msalconfig";
+import { msalInstance } from '../index';
 
 
 
-const MSAL = new AuthModule();
 
 // Get active subscription plans
 export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
+    const { instance } = useMsal();
     const url = AppConfig.host + 'Subscription/GetActiveSubscriptionPlans';
     const response = await fetch(url);
     const json = await response.json();
@@ -39,9 +41,10 @@ export const SignIn = async (appState: AppState): Promise<string> => {
     var msg: string = '';
 
     try {
-        const response = await MSAL.login('loginPopup');
+        
+        const response = await msalInstance.loginPopup(loginRequest);
 
-        if (response.uniqueId.length > 1 && response.account.username.length > 1)
+        if (response.uniqueId.length > 1 && (response?.account?.username?.length ?? 0) > 1)
         {
             // Get claims.  See Azure AD B2C -> User flows -> B2C_1_susi -> Application claims
             const claims: any = response.idTokenClaims;
@@ -62,10 +65,10 @@ export const SignIn = async (appState: AppState): Promise<string> => {
             if (IsNullOrEmpty(msg)) {
 
                 // Success
-
-                appState.UserName = response.account.name ?? "";
+                
+                appState.UserName = response.account?.name ?? "";
                 appState.UserID = response.uniqueId;
-                appState.UserEmail = response.account.username;
+                appState.UserEmail = response.account?.username ?? "";
                 appState.ID_Token = response.idToken;
                 appState.AccessToken = response.accessToken;
                 appState.BillingID = claims.extension_BillingID;
@@ -93,7 +96,8 @@ export const SignIn = async (appState: AppState): Promise<string> => {
 
 export const SignOut = (appState: AppState) => {
     AppInsights.LogEvent("Sign Out", { "email": appState.UserEmail });
-    MSAL.logout();
+    const { instance } = useMsal();
+    instance.logout();
     appState.UserName = "";
     appState.UserID = "";
     appState.UserEmail = "";
@@ -262,7 +266,7 @@ export const Log = async (msg: string) => {
 
 export const ChangePassword = async (appState: AppState): Promise<string> =>
 {
-    var errorMsg = await MSAL.resetPassword();
+    var errorMsg = ""; //await MSAL.resetPassword();
 
     if (IsNullOrEmpty(errorMsg))
         await SignOut(appState);
@@ -271,7 +275,8 @@ export const ChangePassword = async (appState: AppState): Promise<string> =>
 }
 
 export const EditProfile = async (appState: AppState): Promise<string> => {
-    var errorMsg = await MSAL.editProfile();
+    // https://github.com/Azure-Samples/ms-identity-javascript-react-tutorial/issues/40
+    var errorMsg = await msalInstance.acquireTokenPopup //.editProfile();
     return errorMsg;
 }
 

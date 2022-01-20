@@ -19,18 +19,25 @@ import Privacy from './Components/Privacy';
 import Terms from './Components/Terms';
 import AppInsights from './Services/AppInsights';
 import CorpSubAllocation from './Components/CorpSubAllocation';
-
+import { MsalProvider } from "@azure/msal-react";
+import { IPublicClientApplication } from "@azure/msal-browser";
 // This is a callback for stripe that tells us to reload subscription info:
 // path="/lsi/:id"
 //
 
-function App() {
+type AppProps = {
+    pca: IPublicClientApplication
+};
+
+
+function App({ pca }: AppProps) {
     AppInsights.Init(); // Must call before initializing AppState.
     AppInsights.LogEvent("Application Start");
     const appState: AppState = GetAppState();
     return (
         <GlobalContext.Provider value={appState}>
             <Router>
+                <MsalProvider instance={ pca }>
                 <ScrollToTop />
                 <TopNav />
                 <Switch>
@@ -50,7 +57,8 @@ function App() {
                     <Route exact path="/corpsuballocation/:a/:s/:o" component={CorpSubAllocation} />
                     <Route path="*" component={Home} />
                 </Switch>
-                <Footer/>
+                <Footer />
+                </MsalProvider>
             </Router>
         </GlobalContext.Provider>
   );

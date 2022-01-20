@@ -1,55 +1,21 @@
 //----------------------------------------------------------------------
-    // This file is copied from src/Config at build time.   See .csproj file
-    //----------------------------------------------------------------------
-/**
- * Config object to be passed to MSAL on creation.
- * For a full list of msal.js configuration parameters,
- * visit https://azuread.github.io/microsoft-authentication-library-for-js/docs/msal/modules/_configuration_.html
- * */
-import { Configuration, LogLevel } from "@azure/msal-browser";
+// This file is copied from src/Config at build time.   See .csproj file
+//----------------------------------------------------------------------
 
-export const POLICIES = {
-    authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/",
-    userFlows: {
-        signUpSignIn: "B2C_1_susi",
-        forgotPassword: "B2C_1_password_reset",
-        editProfile: "B2C_1_edit_profile"
-    }
-}
 
-const MSAL_CONFIG: Configuration = {
+export const msalConfig = {
     auth: {
         clientId: "7f892e9e-97d5-42fb-a553-f9d585d6742b",
-        authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/B2C_1_susi",
-        redirectUri: "https://localhost:5031/",
-        knownAuthorities: ["leaderanalytics.b2clogin.com"]
-    },
-    cache: {
-        cacheLocation: "sessionStorage", // This configures where your cache will be stored
-        storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
-    },
-    system: {
-        loggerOptions: {
-            loggerCallback: (level: LogLevel, message: string, containsPii: boolean) => {
-                if (containsPii) {
-                    return;
-                }
-                switch (level) {
-                    case LogLevel.Error:
-                        console.error(message);
-                        return;
-                    case LogLevel.Info:
-                        console.info(message);
-                        return;
-                    case LogLevel.Verbose:
-                        console.debug(message);
-                        return;
-                    case LogLevel.Warning:
-                        console.warn(message);
-                        return;
-                }
-            }
-        }
+        authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/B2C_1_susi2",
+        knownAuthorities: ["https://leaderanalytics.b2clogin.com"],
+        redirectUri: "https://localhost:5031",
+        postLogoutRedirectUri: "https://localhost:5031"
     }
 };
-export default MSAL_CONFIG;
+
+// Scopes you add here will be prompted for consent during login
+export const loginRequest = {
+    scopes: ['https://LeaderAnalytics.onmicrosoft.com/eb373a05-0053-49c4-aba1-a7630fedfef7/read',
+        'https://LeaderAnalytics.onmicrosoft.com/eb373a05-0053-49c4-aba1-a7630fedfef7/Write',
+        'https://LeaderAnalytics.onmicrosoft.com/eb373a05-0053-49c4-aba1-a7630fedfef7/access_as_user']
+};

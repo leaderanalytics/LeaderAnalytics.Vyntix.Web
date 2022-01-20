@@ -50,3 +50,6 @@ Add input on Business subscription page
 Add logic on subconfirmation to send email
 Add text on sub activation success to indicate an email has been sent to corp admin.
 
+https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/2772
+https://github.com/AzureAD/microsoft-authentication-library-for-js.git
+https://github.com/Azure-Samples/ms-identity-javascript-react-tutorial/blob/main/1-Authentication/2-sign-in-b2c/README.md
