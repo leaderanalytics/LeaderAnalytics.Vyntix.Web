@@ -55,6 +55,8 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
+
+  
   
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
