@@ -178,7 +178,7 @@ export class AuthModule {
                     await this.resetPassword();
                 }
                 else {
-                    AppInsights.LogException(ex);
+                    AppInsights.LogException(ex as Error);
                     throw ex;
                 }
             }
@@ -206,7 +206,7 @@ export class AuthModule {
             response = await this.myMSALObj.loginPopup(request);
         }
         catch (ex) {
-            AppInsights.LogException(ex);
+            AppInsights.LogException(ex as Error);
             errorMsg = "The attempt to change the password was not successful.";
         }
         return errorMsg;
@@ -222,7 +222,7 @@ export class AuthModule {
             response = await this.myMSALObj.loginPopup(request);
         }
         catch (ex) {
-            AppInsights.LogException(ex);
+            AppInsights.LogException(ex as Error);
             errorMsg = "The attempt to edit the profile was not successful.";
         }
         return errorMsg;
