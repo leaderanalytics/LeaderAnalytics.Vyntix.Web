@@ -55,13 +55,7 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
-  <ItemGroup>
-    <None Remove="ClientApp\src\Services\AuthModule.ts" />
-  </ItemGroup>
-
-  
-  
+   
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
@@ -86,9 +80,6 @@
   <ItemGroup>
     <EmbeddedResource Include="StaticHTML\CorpSubNoticeEmailTemplate.html" />
     <EmbeddedResource Include="StaticHTML\CorpSubRequestEmailTemplate.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\src\Services\AuthModule.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.json">
