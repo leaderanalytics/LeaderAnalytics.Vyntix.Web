@@ -16,9 +16,12 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
-  displayName: 'Install NuGet'
 
+- task: UseDotNet@2
+  displayName: 'Use dotnet 6'
+  inputs:
+    packageType: 'sdk'
+    version: '6.x'
 
 - task: DotNetCoreCLI@2
   displayName: 'DotNet Restore NuGet packages'
