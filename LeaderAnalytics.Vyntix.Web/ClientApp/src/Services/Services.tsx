@@ -6,12 +6,13 @@ import AppConfig from '../appconfig';
 import ContactRequest from '../Model/ContactRequest';
 import AsyncResult from '../Model/AsyncResult';
 import AppInsights from './AppInsights';
+import { AuthModule } from './AuthModule';
 import { useMsal } from '@azure/msal-react';
 import { AccountInfo, PopupRequest } from "@azure/msal-browser";
 import UserRecord from "../Model/UserRecord";
 import { loginRequest } from "../msalconfig";
 import { msalInstance } from '../index';
-
+const MSAL = new AuthModule();
 
 
 
@@ -96,8 +97,7 @@ export const SignIn = async (appState: AppState): Promise<string> => {
 
 export const SignOut = (appState: AppState) => {
     AppInsights.LogEvent("Sign Out", { "email": appState.UserEmail });
-    const { instance } = useMsal();
-    instance.logout();
+    msalInstance.logout();
     appState.UserName = "";
     appState.UserID = "";
     appState.UserEmail = "";
@@ -245,7 +245,6 @@ export const GetCorpSubscriptionInfo = async (corpSubscriptionID: string): Promi
     return info;
 }
 
-
 export const IsNullOrEmpty = (s: string): boolean => { return s === null || typeof s === 'undefined' || s.length === 0 };
 
 export const Log = async (msg: string) => {
@@ -266,7 +265,7 @@ export const Log = async (msg: string) => {
 
 export const ChangePassword = async (appState: AppState): Promise<string> =>
 {
-    var errorMsg = ""; //await MSAL.resetPassword();
+    var errorMsg = await MSAL.resetPassword();
 
     if (IsNullOrEmpty(errorMsg))
         await SignOut(appState);
@@ -278,10 +277,7 @@ export const ChangePassword = async (appState: AppState): Promise<string> =>
 
 export const EditProfile = async (appState: AppState): Promise<string> => {
     // https://github.com/Azure-Samples/ms-identity-javascript-react-tutorial/issues/40
-    var errorMsg: string = "";
-    
-
-
+    var errorMsg = await MSAL.editProfile();
     return errorMsg;
 }
 
