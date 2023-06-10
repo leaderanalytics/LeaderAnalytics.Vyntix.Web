@@ -98,7 +98,7 @@ const TopNav = () => {
 
                     {isSignedIn ?
                         <ButtonGroup>
-                            <DropdownButton as={ButtonGroup} title="Profile" id="profileButton" alignRight className={`${hasActiveSub ? "green-border" : "trans-border"}`}>
+                            <DropdownButton as={ButtonGroup} title="Profile" id="profileButton"   className={`${hasActiveSub ? "green-border" : "trans-border"}`}>
                                 <Dropdown.Item eventKey="1" className="rh6" onClick={() => SignOut(appState)} >Sign Out</Dropdown.Item>
                                 <Dropdown.Item eventKey="2" className="rh6" disabled={!hasAnySub} onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
                                 <Dropdown.Item eventKey="3" className="rh6" onClick={LocalChangePassword} >Change Password</Dropdown.Item>
