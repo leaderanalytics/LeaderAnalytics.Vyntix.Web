@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { useContext, useEffect } from 'react';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Button } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
 import { SignIn } from '../Services/Services';
@@ -18,11 +18,11 @@ function SubSignIn() {
     var [isSignedIn, setisSignedIn] = useState(appState.UserID != null && appState.UserID.length > 1);
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
     const [errorMsg, setErrorMsg] = useState('');
-    const history = useHistory();
+    const navigate = useNavigate();
 
     // Make sure user has selected a subscription.  Redirect to home if not.
     if (appState.SubscriptionPlan == null)
-        history.push("/Home");
+        navigate("/Home");
 
     // The SignIn method in the Nav component calls the method that is assigned to appState.SignInCallback.
     // We want the user to navigate to SubConfirmation when they log in using the SignIn button on the Nav component.
@@ -52,7 +52,7 @@ function SubSignIn() {
     const SignInCallback = (isSignedIn: boolean) => {
 
         if(isSignedIn)
-            history.push("/SubConfirmation");
+            navigate("/SubConfirmation");
     }
   
     return (
@@ -77,7 +77,7 @@ function SubSignIn() {
                 </div>
 
                 <div>
-                    <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
+                    <Button onClick={() => navigate("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
                         <div className="rh6">
                             <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
                             <div>Back to Subscriptions</div>

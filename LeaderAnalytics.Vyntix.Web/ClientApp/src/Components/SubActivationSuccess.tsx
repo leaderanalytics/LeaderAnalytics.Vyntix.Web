@@ -1,6 +1,6 @@
 ﻿import React, { useContext, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBirthdayCake, faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -12,7 +12,7 @@ import AppInsights from '../Services/AppInsights';
 function SubActivationSuccess() {
     AppInsights.LogPageView("SubActivationSuccess");
     const appState: AppState = useContext(GlobalContext);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [status, setstatus] = useState("");
     const [isActive, setIsActive] = useState(false);
 
@@ -35,7 +35,7 @@ function SubActivationSuccess() {
     },[1]);
 
     const clickHandler = () => {
-        history.push("/Downloads");
+        navigate("/Downloads");
     }
 
     return (

@@ -1,5 +1,5 @@
 ﻿import React, { useContext } from 'react';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Button } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,14 +10,14 @@ import AppInsights from '../Services/AppInsights';
 
 function SubActivationFailure() {
     const appState: AppState = GetAppState();
-    const history = useHistory();
+    const navigate = useNavigate();
     const msg = appState.Message;
     AppInsights.LogEvent("SubActivationFailure", { "ErrorMessage": msg });
     appState.Message = '';
     SaveAppState(appState);
 
     const clickHandler = () => {
-        history.push("/Subscriptions");
+        navigate("/Subscriptions");
     }
     return (
         <div className="content-root container-fluid dark-bg" >

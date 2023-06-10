@@ -28,9 +28,9 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="0" className="faq-header" onClick={() => CardClick('0')}>
+                    <Accordion.Item as={Card.Header} eventKey="0" className="faq-header" onClick={() => CardClick('0')}>
                         <span className="rh5">When will Vyntix be released?</span>
-                    </Accordion.Toggle>
+                    </Accordion.Item>
                     <Accordion.Collapse eventKey="0">
                         <Card.Body>
                             <span className="rh6">
@@ -45,9 +45,9 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="1" className="faq-header" onClick={() => CardClick('1')}>
+                    <Accordion.Item as={Card.Header} eventKey="1" className="faq-header" onClick={() => CardClick('1')}>
                         <span className="rh5">What will the monthly cost for a subscription be?</span>
-                    </Accordion.Toggle>
+                    </Accordion.Item>
                     <Accordion.Collapse eventKey="1">
                         <Card.Body>
                             <span className="rh6">For the lowest tier (individuals and very small organizations) the monthly cost will be about the same as the cost for lunch for one person.  
@@ -60,9 +60,9 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="2" className="faq-header" onClick={(e) => CardClick('2')}>
+                    <Accordion.Item as={Card.Header} eventKey="2" className="faq-header" onClick={(e) => CardClick('2')}>
                         <span className="rh5">Will Vyntix support data providers other than FRED?</span>
-                    </Accordion.Toggle>
+                    </Accordion.Item>
                     <Accordion.Collapse eventKey="2">
                         <Card.Body>
                             <span className="rh6">Yes, we will support data providers as is feasable and as requested by our subscribers.
@@ -74,9 +74,9 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="3" className="faq-header" onClick={() => CardClick('3')}>
+                    <Accordion.Item as={Card.Header} eventKey="3" className="faq-header" onClick={() => CardClick('3')}>
                         <span className="rh5">What are the differences beween the subscription plans?</span>
-                    </Accordion.Toggle>
+                    </Accordion.Item>
                     <Accordion.Collapse eventKey="3">
                         <Card.Body>
                             <span className="rh6">There is only one subscription plan.  It is priced differently based on the company size of the subscriber.</span>
@@ -86,9 +86,9 @@ function Documentation() {
 
 
                 <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="4" className="faq-header" onClick={() => CardClick('4')}>
+                    <Accordion.Item as={Card.Header} eventKey="4" className="faq-header" onClick={() => CardClick('4')}>
                         <span className="rh5">Does my Vyntix subscription include the cost of data?</span>
-                    </Accordion.Toggle>
+                    </Accordion.Item>
                     <Accordion.Collapse eventKey="4">
                         <Card.Body>
                             <span className="rh6">No.  At the time of this writng Vyntix only supports FRED - which is free to the general public.  In the future support may be added

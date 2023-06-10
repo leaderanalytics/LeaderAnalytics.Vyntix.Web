@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { useContext } from 'react';
 import { useParams } from 'react-router';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Container, Image, Row, Col } from 'react-bootstrap';
 import { GlobalContext, AppState } from '../AppState';
 import { GetSubscriptionInfo } from '../Services/Services';
@@ -16,7 +16,7 @@ import AppInsights from '../Services/AppInsights';
 
 function Home() {
     AppInsights.LogPageView("Home");
-    const history = useHistory();
+    const navigate = useNavigate();
     const appState: AppState = useContext(GlobalContext);
     const userName = appState.UserName;
     const { id } = useParams() as any;
@@ -29,7 +29,8 @@ function Home() {
             // See also /Services/Services.tx - ManageSubscription
 
             await GetSubscriptionInfo(appState);
-            history.push("/"); // get rid of /lsi/1
+            
+            navigate("/"); // get rid of /lsi/1
         }
     })
 

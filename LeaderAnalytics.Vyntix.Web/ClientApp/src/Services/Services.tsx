@@ -18,7 +18,6 @@ const MSAL = new AuthModule();
 
 // Get active subscription plans
 export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
-    const { instance } = useMsal();
     const url = AppConfig.host + 'Subscription/GetActiveSubscriptionPlans';
     const response = await fetch(url);
     const json = await response.json();
@@ -27,7 +26,7 @@ export const GetSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
     for (let i = 0; i < json.length; i++) {
         const p = DeserializeSubscriptionPlan(json[i]);
 
-        if (p !== null)
+        if (p)
             result.push(p);
     }
     return result;

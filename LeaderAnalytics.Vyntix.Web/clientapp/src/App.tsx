@@ -10,7 +10,7 @@ import SubConfirmation from './Components/SubConfirmation';
 import SubActivationSuccess from './Components/SubActivationSuccess';
 import SubActivationFailure from './Components/SubActivationFailure';
 import { GetAppState } from './Services/Services';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { AppState, GlobalContext } from './AppState';
 import Documentation from './Components/Documentation';
 import Downloads from './Components/Downloads';
@@ -40,23 +40,23 @@ function App({ pca }: AppProps) {
                 <MsalProvider instance={ pca }>
                 <ScrollToTop />
                 <TopNav />
-                <Switch>
-                    <Route exact path="/" component={Home} />
-                    <Route exact path="/lsi/:id" component={Home} />
-                    <Route exact path="/contact" component={Contact} />
-                    <Route exact path="/documentation" component={Documentation} />
-                    <Route exact path="/downloads" component={Downloads} />
-                    <Route exact path="/subactivationsuccess" component={SubActivationSuccess} />
-                    <Route exact path="/subactivationfailure" component={SubActivationFailure} />
-                    <Route exact path="/subconfirmation" component={SubConfirmation} /> 
-                    <Route exact path="/subscriptions" component={Subscriptions} />
-                    <Route exact path="/subsignin" component={SubSignIn} />
-                    <Route exact path="/subplans" component={SubPlans} />
-                    <Route exact path="/privacy" component={Privacy} />
-                    <Route exact path="/terms" component={Terms} />
-                    <Route exact path="/corpsuballocation/:a/:s/:o" component={CorpSubAllocation} />
-                    <Route path="*" component={Home} />
-                </Switch>
+                    <Routes>
+                        <Route path="/" element={<Home/>} />
+                        <Route path="/lsi/:id" element={<Home/>} />
+                        <Route path="/contact" element={<Contact/>} />
+                        <Route path="/documentation" element={<Documentation/>} />
+                        <Route path="/downloads" element={<Downloads/>} />
+                        <Route path="/subactivationsuccess" element={<SubActivationSuccess/>} />
+                        <Route path="/subactivationfailure" element={<SubActivationFailure/>} />
+                        <Route path="/subconfirmation" element={<SubConfirmation/>} /> 
+                        <Route path="/subscriptions" element={<Subscriptions/>} />
+                        <Route path="/subsignin" element={<SubSignIn/>} />
+                        <Route path="/subplans" element={<SubPlans/>} />
+                        <Route path="/privacy" element={<Privacy/>} />
+                        <Route path="/terms" element={<Terms/>} />
+                        <Route path="/corpsuballocation/:a/:s/:o" element={<CorpSubAllocation/>} />
+                        <Route path="*" element={<Home/>} />
+                </Routes>
                 <Footer />
                 </MsalProvider>
             </Router>

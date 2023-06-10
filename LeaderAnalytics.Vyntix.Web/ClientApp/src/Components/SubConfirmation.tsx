@@ -1,7 +1,7 @@
 ﻿import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { GlobalContext, AppState } from '../AppState';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {Image, Button } from 'react-bootstrap';
 import AppConfig  from '../appconfig';
 import { loadStripe } from '@stripe/stripe-js';
@@ -17,7 +17,7 @@ import AppInsights from '../Services/AppInsights';
 
 function SubConfirmation() {
     AppInsights.LogPageView("SubConfirmation");
-    const history = useHistory();
+    const navigate = useNavigate();
     const appState: AppState = GetAppState();
     const orderTotal = appState.SubscriptionPlan?.Cost ?? 0;
     const [termsChecked, setTermsChecked] = useState(false);
@@ -32,7 +32,7 @@ function SubConfirmation() {
 
     // Make sure user is signed in and has a valid subscription.  Redirect to home if not.
     if (IsNullOrEmpty(appState.CustomerID) || appState.SubscriptionPlan == null)
-        history.push("/Home");
+        navigate("/Home");
 
     const handleSelectionChange = (event: any) => {
         if (event.target.id === "chkTerms")
@@ -106,13 +106,13 @@ function SubConfirmation() {
                 // We are done.  User has created a subscription with a trial period
                 // or a free subscription.
                 AppInsights.LogEvent("Checkout without payment completed");
-                history.push("/SubActivationSuccess");
+                navigate("/SubActivationSuccess");
             }
         }
         else {
             // Approval error
             AppInsights.LogEvent("Checkout Order Rejected", {"ErrorMessage": approval.errorMessage});
-            setDialogProps(new DialogProps(approval.errorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); history.push("/"); }));
+            setDialogProps(new DialogProps(approval.errorMessage, DialogType.Error, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); navigate("/"); }));
         }
     }
     useEffect(() => setCanCreateSubscription(termsChecked && privacyChecked && (captcha?.length ?? 0) > 0));
@@ -166,7 +166,7 @@ function SubConfirmation() {
                 </div>
                 <div className="rmt3 center-content">
 
-                    <Button onClick={() => history.push("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
+                    <Button onClick={() => navigate("/Subscriptions")} className="iconButton rmt1 rmb1 rmr2" >
                         <div className="rh6">
                             <FontAwesomeIcon className="rh4 rmr1" icon={faArrowCircleLeft} />
                             <div>Subscriptions</div>
