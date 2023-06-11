@@ -328,3 +328,4 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/LeaderAnalytics.Vyntix.Web/clientapp/package-lock.json
