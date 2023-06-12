@@ -56,7 +56,7 @@ public class GraphTests : BaseTest
 
         string userID = "a880b5ac-d3cc-4e7c-89a1-123b1ad3bdc5";
         UserRecord userRecord = await graphService.GetUserRecordByID(userID);
-        User user = userRecord.User;
+        User user = userRecord.GraphUser();
         var users = (await graphService.GetAllUsers()).ToList();
 
         if (user == null)
@@ -170,7 +170,7 @@ public class GraphTests : BaseTest
         UserRecord userRecord = await graphService.GetUserByEmailAddress(emailAddress);
 
         if (userRecord != null)
-            await graphService.DeleteUser(userRecord.User.Id);
+            await graphService.DeleteUser(userRecord.GraphUser().Id);
 
         var user = new User { DisplayName = "John Smith" };
         user.Identities = new List<ObjectIdentity>()
@@ -335,8 +335,8 @@ public class GraphTests : BaseTest
             bool newSetting = !originalSetting;
             await graphService.SetAdminFlag(userRecord, newSetting);
             await Task.Delay(100); // Test will intermittently fail if we don't give the server a chance to catch up
-            UserRecord updatedUser = await graphService.GetUserRecordByID(userRecord.User.Id);
-            Assert.AreEqual(newSetting, updatedUser.IsCorporateAdmin, $"UserID: {updatedUser.User.Id}");
+            UserRecord updatedUser = await graphService.GetUserRecordByID(userRecord.GraphUser().Id);
+            Assert.AreEqual(newSetting, updatedUser.IsCorporateAdmin, $"UserID: {updatedUser.GraphUser().Id}");
             await graphService.SetAdminFlag(userRecord, originalSetting);
         }
     }

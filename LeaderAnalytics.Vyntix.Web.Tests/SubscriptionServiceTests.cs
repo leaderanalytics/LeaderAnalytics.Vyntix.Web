@@ -75,7 +75,7 @@
             SubscriptionOrder order = new SubscriptionOrder
             {
                 UserEmail = subscriber.EMailAddress,
-                UserID = subscriber.User.Id,
+                UserID = subscriber.GraphUser().Id,
                 PaymentProviderPlanID = freePlan.PaymentProviderPlanID
             };
             CreateSubscriptionResponse response = await subService.CreateSubscription(order, Domain.Constants.LOCALHOST);
@@ -111,7 +111,7 @@
             SubscriptionOrder order = new SubscriptionOrder
             {
                 UserEmail = subscriber.EMailAddress,
-                UserID = subscriber.User.Id,
+                UserID = subscriber.GraphUser().Id,
                 PaymentProviderPlanID = subPlan.PaymentProviderPlanID
             };
             CreateSubscriptionResponse response = await subService.CreateSubscription(order, Domain.Constants.LOCALHOST);
@@ -149,7 +149,7 @@
             SubscriptionOrder order = new SubscriptionOrder
             {
                 UserEmail = subscriber.EMailAddress,
-                UserID = subscriber.User.Id,
+                UserID = subscriber.GraphUser().Id,
                 PaymentProviderPlanID = subPlan.PaymentProviderPlanID
             };
             CreateSubscriptionResponse response = await subService.CreateSubscription(order, Domain.Constants.LOCALHOST);
@@ -247,21 +247,20 @@
             await subService.CreateCustomer(user2email);
         }
 
-
-
-
         protected override void CreateMocks()
         {
             base.CreateMocks();
+            
+            User adminGraphUser = new();
+            adminGraphUser.Id = "1";
+            adminGraphUser.Identities = new List<ObjectIdentity>() { new ObjectIdentity { IssuerAssignedId = user1email, SignInType = "emailAddress" } };
+            UserRecord admin = new UserRecord(adminGraphUser) { IsCorporateAdmin = true };
 
-            UserRecord admin = new UserRecord { IsCorporateAdmin = true};
-            admin.User.Id = "1";
-            admin.User.Identities = admin.User.Identities.Append(new ObjectIdentity { IssuerAssignedId = user1email, SignInType = "emailAddress" });
-
-            UserRecord subscriber = new UserRecord { IsCorporateAdmin = false };
-            subscriber.User.Id = "2";
-            subscriber.User.Identities = subscriber.User.Identities.Append(new ObjectIdentity { IssuerAssignedId = user2email, SignInType = "emailAddress" });
-            subscriber.User.DisplayName = "Bob Smith";
+            User graphSubscriber = new();
+            graphSubscriber.Id = "2";
+            graphSubscriber.Identities = new List<ObjectIdentity>() { new ObjectIdentity { IssuerAssignedId = user2email, SignInType = "emailAddress" } };
+            graphSubscriber.DisplayName = "Bob Smith";
+            UserRecord subscriber = new UserRecord(graphSubscriber) { IsCorporateAdmin = false };
 
             Mock<IGraphService> graphServiceMock = new Mock<IGraphService>();
             graphServiceMock.Setup(x => x.GetUserRecordByID(It.Is<string>(b => b == "1"))).ReturnsAsync(admin);

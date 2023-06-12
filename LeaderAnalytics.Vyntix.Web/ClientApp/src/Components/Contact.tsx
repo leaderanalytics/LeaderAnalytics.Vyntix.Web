@@ -136,7 +136,7 @@ function Contact() {
                             </div>
 
 
-                            <div className="form-group col-md-6 rmt2 d-flex flex-column justify-content-end">
+                            <div className="d-flex justify-content-center">
                                 <Button type="submit" className="iconButton"  >
                                     <div className="rh6">
                                         <div>Send Message</div>

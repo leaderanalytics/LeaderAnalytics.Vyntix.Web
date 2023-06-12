@@ -15,8 +15,6 @@ global using Stripe;
 global using LeaderAnalytics.Core;
 global using Microsoft.Identity.Client;
 global using Microsoft.Graph.Auth;
-global using Newtonsoft.Json.Linq;
-global using Newtonsoft.Json;
 global using Stripe.Checkout;
 global using System.Reflection;
 global using System.Net.Mail;
