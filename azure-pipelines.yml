@@ -40,12 +40,12 @@ steps:
   displayName: Install specific version of npm
 
 - script: |
-    cd Blog/ClientApp
+    cd LeaderAnalytics.Vyntix.Web\ClientApp
     npm --version
   displayName: 'verify npm version'
 
 - script: |
-    cd Blog/ClientApp
+    cd LeaderAnalytics.Vyntix.Web\ClientApp
     npm install
   displayName: 'npm install'
 
