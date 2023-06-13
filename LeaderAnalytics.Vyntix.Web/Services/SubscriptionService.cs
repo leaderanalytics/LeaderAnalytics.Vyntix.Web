@@ -480,7 +480,7 @@ public class SubscriptionService : ISubscriptionService
                 UserRecord adminRecord = await graphService.GetUserRecordByID(response.BillingID);
 
                 if (adminRecord == null)
-                    throw new Exception($"Could not load admin user record with ID {response.BillingID}.  The referencing user ID is {userRecord.User.Id}");
+                    throw new Exception($"Could not load admin user record with ID {response.BillingID}.  The referencing user ID is {userRecord.GraphUser().Id}");
 
                 subscriberEmail = adminRecord.EMailAddress;  // use the email address of the admin to look up subscription in stripe.
             }
@@ -646,7 +646,7 @@ public class SubscriptionService : ISubscriptionService
 
         string responseUrl = $"{hostURL}/CorpSubAllocation/{adminID}/{subscriberID}"; // isapproved is hard coded in the html template
 
-        sb.Replace("%USER_NAME%", record.User.DisplayName);
+        sb.Replace("%USER_NAME%", record.GraphUser().DisplayName);
         sb.Replace("%USER_EMAIL%", record.EMailAddress);
         sb.Replace("%URL%", responseUrl);
         sb.Replace("%ADMIN_ID%", adminID); // This is titled "Corporate Subscription ID" in the UI.
@@ -708,7 +708,7 @@ public class SubscriptionService : ISubscriptionService
             user.BillingID = isApproved ? adminID : null;
             await graphService.UpdateUser(user);
             Log.Information("Corporate subscription was modified for subscriber {u}, adminID is {a}, action is {b}", subscriberID, adminID, isApproved ? "Create" : "Delete");
-            result.ErrorMessage = $"Subscription was successfully allocated to {(string.IsNullOrEmpty(user.User.DisplayName) ? user.EMailAddress : user.User.DisplayName)}.";
+            result.ErrorMessage = $"Subscription was successfully allocated to {(string.IsNullOrEmpty(user.GraphUser().DisplayName) ? user.EMailAddress : user.GraphUser().DisplayName)}.";
             result.Success = true;
         }
         else

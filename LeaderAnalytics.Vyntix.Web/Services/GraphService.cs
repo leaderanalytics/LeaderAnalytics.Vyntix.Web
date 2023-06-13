@@ -1,4 +1,6 @@
-﻿namespace LeaderAnalytics.Vyntix.Web.Services;
+﻿using System.Text.Json.Nodes;
+
+namespace LeaderAnalytics.Vyntix.Web.Services;
 
 // user by email query bug:
 // https://github.com/microsoftgraph/microsoft-graph-docs/issues/11094
@@ -171,7 +173,7 @@ public class GraphService : IGraphService
         if (!user.IsLocalAccount)
             throw new Exception("CreationType must be LocalAccount");
 
-        User graphUser = user.User;
+        User graphUser = user.GraphUser();
         await UpdateUser(graphUser);
     }
 
@@ -184,7 +186,7 @@ public class GraphService : IGraphService
 
     public async Task UpdateExtensionProperties(UserRecord userRecord)
     {
-        User user = userRecord.User;
+        User user = userRecord.GraphUser();
         var result = await client.Users[user.Id]
         .Request()
         .UpdateAsync(user);
@@ -194,7 +196,7 @@ public class GraphService : IGraphService
 
     public async Task<User> CreateUser(UserRecord userRecord)
     {
-        User user = userRecord?.User ?? throw new ArgumentNullException("userRecord");
+        User user = userRecord?.GraphUser() ?? throw new ArgumentNullException("userRecord");
         return await CreateUser(user);
     }
 
@@ -241,8 +243,14 @@ public class GraphService : IGraphService
 
     public async Task SetAdminFlag(UserRecord userRecord, bool isAdmin)
     {
-        if (userRecord == null || userRecord.User == null)
+        if (userRecord is null)
             throw new ArgumentNullException(nameof(userRecord));
+
+        User graphUser = userRecord.GraphUser();
+
+        if (graphUser is null)
+            throw new Exception("Graph user is null.");
+
 
         if (userRecord.IsLocalAccount)
         {
@@ -254,7 +262,7 @@ public class GraphService : IGraphService
 
             HttpClient azureADClient = await CreateAzureADGraphClient();
             string api_version = "api-version=1.6";
-            string resource_path = "users/" + userRecord.User.Id;
+            string resource_path = "users/" + graphUser.Id;
             string requestContent = "{" + $"\"{UserAttributes.IsCorporateAdmin}\"" + ":" + (isAdmin ? "true" : "false") + "}";
 
             string apiUrl = $"https://graph.windows.net/LeaderAnalytics.onmicrosoft.com/{resource_path}?{api_version}";
@@ -269,7 +277,7 @@ public class GraphService : IGraphService
             // Send the update request
             HttpResponseMessage response = await azureADClient.SendAsync(request);
             if (response.StatusCode.ToString() != "NoContent")
-                throw new Exception($"Attempt to set Admin Flag on user {userRecord.User.Id} failed.  The status code is: {response.StatusCode.ToString()}");
+                throw new Exception($"Attempt to set Admin Flag on user {graphUser.Id} failed.  The status code is: {response.StatusCode.ToString()}");
         }
     }
 
@@ -301,8 +309,8 @@ public class GraphService : IGraphService
         };
         HttpResponseMessage authResponse = await AzureADGraphClient.SendAsync(authRequest);
         string json = await authResponse.Content.ReadAsStringAsync();
-        var jobject = (JObject)JsonConvert.DeserializeObject(json);
-        string token = ((JValue)jobject["access_token"]).ToString();
+        var node = JsonNode.Parse(json);
+        string token = (string)node["access_token"];
         AzureADGraphClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
         return AzureADGraphClient;
     }

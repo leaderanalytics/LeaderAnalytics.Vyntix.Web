@@ -1,5 +1,5 @@
 ﻿import React, { useState, useContext,useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch, Link, NavLink, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, NavLink, useLocation } from 'react-router-dom';
 import { useAsyncEffect } from 'use-async-effect';
 import { GlobalContext, AppState } from '../AppState';
 import { SignIn, SignOut, ManageSubscription, ChangePassword, EditProfile, IsNullOrEmpty } from '../Services/Services';
@@ -90,7 +90,7 @@ const TopNav = () => {
             </Navbar.Toggle>
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="nav-fill w-100">
-                    <Nav.Link className="rh6" as={NavLink} to="/" href="/" exact eventKey="1" ><FontAwesomeIcon icon={faHome} className="nav-toggle nav-icon" />Home</Nav.Link>
+                    <Nav.Link className="rh6" as={NavLink} to="/" href="/" eventKey="1" ><FontAwesomeIcon icon={faHome} className="nav-toggle nav-icon" />Home</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Subscriptions" href="/Subscriptions" eventKey="2"><FontAwesomeIcon icon={faKey} className="nav-toggle nav-icon" />Subscribe</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Documentation" href="/Documentation" eventKey="3"><FontAwesomeIcon icon={faBook} className="nav-toggle nav-icon" />Documentation</Nav.Link>
                     <Nav.Link className="rh6" as={NavLink} to="/Downloads" href="/Downloads" eventKey="4"><FontAwesomeIcon icon={faDownload} className="nav-toggle nav-icon" />Downloads</Nav.Link>
@@ -98,7 +98,7 @@ const TopNav = () => {
 
                     {isSignedIn ?
                         <ButtonGroup>
-                            <DropdownButton as={ButtonGroup} title="Profile" id="profileButton" alignRight className={`${hasActiveSub ? "green-border" : "trans-border"}`}>
+                            <DropdownButton as={ButtonGroup} title="Profile" id="profileButton"   className={`${hasActiveSub ? "green-border" : "trans-border"}`}>
                                 <Dropdown.Item eventKey="1" className="rh6" onClick={() => SignOut(appState)} >Sign Out</Dropdown.Item>
                                 <Dropdown.Item eventKey="2" className="rh6" disabled={!hasAnySub} onClick={LocalManageSubscription}>Manage Subscription</Dropdown.Item>
                                 <Dropdown.Item eventKey="3" className="rh6" onClick={LocalChangePassword} >Change Password</Dropdown.Item>
@@ -107,7 +107,7 @@ const TopNav = () => {
                             </DropdownButton>
                         </ButtonGroup>
                         :
-                        <Nav.Link className="rh6" to="/zz" href="/zz" active={ false } as={NavLink} onClick={LocalSignIn} eventKey="7" exact><FontAwesomeIcon icon={faSignInAlt} className="nav-toggle nav-icon" />Sign in</Nav.Link>
+                        <Nav.Link className="rh6" to="/zz" href="/zz" active={ false } as={NavLink} onClick={LocalSignIn} eventKey="7"><FontAwesomeIcon icon={faSignInAlt} className="nav-toggle nav-icon" />Sign in</Nav.Link>
                     }
                 </Nav>
             </Navbar.Collapse>

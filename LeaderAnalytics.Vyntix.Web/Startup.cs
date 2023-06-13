@@ -4,7 +4,6 @@ public class Startup
 {
     private IConfiguration config;
     private IWebHostEnvironment environment;
-    private const string CORS_Origins = "CORS_Origins";
     private ServiceRegistrar registrar;
 
     public Startup(IWebHostEnvironment env, IConfiguration config)
@@ -46,9 +45,22 @@ public class Startup
 
         // With endpoint routing, the CORS middleware must be configured to execute between the calls to UseRouting and UseEndpoints.
         // The call to UseCors must be placed after UseRouting, but before UseAuthorization.
-        // Middleware order: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.1#middleware-order
+        // Middleware order: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-7.0
 
-        app.UseCors(CORS_Origins);
+        app.UseCors(x => x.WithOrigins(new string[] {
+                "http://www.vyntix.com",
+                "https://www.vyntix.com",
+                "http://vyntix.com",
+                "https://vyntix.com",
+                "http://localhost",
+                "https://localhost",
+                "http://localhost:5031",
+                "https://localhost:5031",
+                "http://dev.vyntix.com",
+                "http://vyntixweb.azurewebsites.net",
+                "https://vyntixweb.azurewebsites.net",
+                "https://vyntixweb-staging.azurewebsites.net"
+            }).AllowAnyMethod().AllowAnyHeader());
 
         app.UseAuthentication();
         app.UseAuthorization();

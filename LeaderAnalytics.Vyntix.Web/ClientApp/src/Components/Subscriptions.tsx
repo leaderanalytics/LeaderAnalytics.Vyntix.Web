@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { GetSubscriptionPlans } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { SaveAppState } from '../Services/Services';
 import business from '../Assets/business-use.jpg';
 import nonbusiness from '../Assets/non-business-use.jpg';
@@ -20,7 +20,7 @@ import AppInsights from '../Services/AppInsights';
 function Subscriptions() {
     AppInsights.LogPageView("Subscriptions");
     const appState: AppState = useContext(GlobalContext);
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
@@ -29,7 +29,7 @@ function Subscriptions() {
         
         if (planChoice === "0") {
             AppInsights.LogEvent("Select Business Subscription");
-            history.push("/SubPlans"); // Business subscription
+            navigate("/SubPlans"); // Business subscription
         }
         else if (planChoice === "1") {
             AppInsights.LogEvent("Select Non-Business Subscription");
@@ -43,10 +43,10 @@ function Subscriptions() {
 
             // if the user is not logged in, prompt them to log in.
             if (appState.UserID === null || appState.UserID.length < 2) {
-                history.push("/SubSignIn");
+                navigate("/SubSignIn");
             }
             else {
-                history.push("/SubConfirmation");
+                navigate("/SubConfirmation");
             }
         }
     }

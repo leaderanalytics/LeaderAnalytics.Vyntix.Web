@@ -1,7 +1,7 @@
 ﻿import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { Button } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { GlobalContext, AppState } from '../AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBirthdayCake, faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -18,7 +18,7 @@ import AppInsights from '../Services/AppInsights';
 function CorpSubAllocation() {
     AppInsights.LogPageView("CorpSubResponse");
     const appState: AppState = useContext(GlobalContext);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [msg, setmsg] = useState("");
     const { a } = useParams() as any;   // admin ID
     const { s } = useParams() as any;   // subscriber ID
@@ -41,7 +41,7 @@ function CorpSubAllocation() {
     },[1]);
 
     const clickHandler = () => {
-        history.push("/");
+        navigate("/");
     }
 
     return (

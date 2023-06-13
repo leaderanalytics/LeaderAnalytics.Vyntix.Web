@@ -5,7 +5,7 @@ import { useAsyncEffect } from 'use-async-effect';
 import { GetSubscriptionPlans, GetCorpSubscriptionInfo, IsNullOrEmpty } from '../Services/Services';
 import SubscriptionPlan from '../Model/SubscriptionPlan';
 import { GlobalContext, AppState } from '../AppState';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { SaveAppState, FormatMoney } from '../Services/Services';
 import { Image, Button, Nav, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,7 +23,7 @@ function SubPlans() {
     const [promoCodes, setPromoCodes] = useState(appState.PromoCodes);
     const [corpSubscriptionID, setCorpSubscriptionID] = useState(appState.CorpSubscriptionID);
     const [selectedPlan, setSelectedPlan] = useState(appState.SubscriptionPlan);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [plans, setPlans] = useState(new Array<SubscriptionPlan>());
     const [dialogProps, setDialogProps] = useState(new DialogProps("", DialogType.None, () => { }));
 
@@ -97,10 +97,10 @@ function SubPlans() {
 
         // if the user is not logged in, prompt them to log in.
         if (appState.UserID === null || appState.UserID.length < 2) {
-            history.push("/SubSignIn");
+            navigate("/SubSignIn");
         }
         else {
-            history.push("/SubConfirmation");
+            navigate("/SubConfirmation");
         }
     }
 

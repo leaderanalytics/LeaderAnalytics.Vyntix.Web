@@ -3,88 +3,117 @@
 public class UserRecord // Named to not conflict with Graph.User
 {
     private string _email;
-    public User User { get; set; }
+    private User User { get; set; }
 
+
+    private string _BillingID;
     public string BillingID
     {
         get
         {
-            if (User.AdditionalData.TryGetValue(UserAttributes.BillingID, out object obj))
-                return obj?.ToString();
-
-            return null;
+            if (_BillingID is null)
+                if (User.AdditionalData.TryGetValue(UserAttributes.BillingID, out object obj))
+                    _BillingID = ((JsonElement)obj).Deserialize<string>();
+            
+            return _BillingID;
         }
-        set { User.AdditionalData[UserAttributes.BillingID] = value; }
+        set
+        {
+            _BillingID = value;
+            User.AdditionalData[UserAttributes.BillingID] = JsonSerializer.SerializeToElement(value);
+        }
     }
 
+    private bool? _IsBanned;
     public bool IsBanned
     {
         get
         {
-            if (User.AdditionalData.TryGetValue(UserAttributes.IsBanned, out object obj))
-                return Convert.ToBoolean(obj);
-
-            return false;
+            if (_IsBanned is null)
+                if (User.AdditionalData.TryGetValue(UserAttributes.IsBanned, out object obj))
+                    _IsBanned = ((JsonElement)obj).Deserialize<bool>();
+            
+            return _IsBanned.HasValue ? _IsBanned.Value : false;
         }
 
-        set { User.AdditionalData[UserAttributes.IsBanned] = value; }
+        set
+        {
+            _IsBanned = value;
+            User.AdditionalData[UserAttributes.IsBanned] = JsonSerializer.SerializeToElement(value);
+        }
     }
 
+    private bool? _IsCorporateAdmin;
     public bool IsCorporateAdmin
     {
         get
         {
-            if (User.AdditionalData.TryGetValue(UserAttributes.IsCorporateAdmin, out object obj))
-                return Convert.ToBoolean(obj);
+            if (_IsCorporateAdmin is null)
+                if (User.AdditionalData.TryGetValue(UserAttributes.IsCorporateAdmin, out object obj))
+                    _IsCorporateAdmin = ((JsonElement)obj).Deserialize<bool>();
 
-            return false;
+            return _IsCorporateAdmin.HasValue ? _IsCorporateAdmin.Value : false;
         }
 
-        set { User.AdditionalData[UserAttributes.IsCorporateAdmin] = value; }
+        set
+        {
+            _IsCorporateAdmin = value;
+            User.AdditionalData[UserAttributes.IsCorporateAdmin] = JsonSerializer.SerializeToElement(value);
+        }
     }
 
+    private bool? _IsOptIn;
     public bool IsOptIn
     {
         get
         {
-            if (User.AdditionalData.TryGetValue(UserAttributes.IsOptIn, out object obj))
-                return Convert.ToBoolean(obj);
+            if (_IsOptIn is null)
+                if (User.AdditionalData.TryGetValue(UserAttributes.IsOptIn, out object obj))
+                    _IsOptIn = ((JsonElement)obj).Deserialize<bool>();
 
-            return false;
+            return _IsOptIn.HasValue ? _IsOptIn.Value : false;
         }
         set
         {
-            User.AdditionalData[UserAttributes.IsOptIn] = value;
+            _IsOptIn = value;
+            User.AdditionalData[UserAttributes.IsOptIn] = JsonSerializer.SerializeToElement(value);
         }
+        
     }
 
+    private string _PaymentProviderCustomerID;
     public string PaymentProviderCustomerID
     {
         get
         {
-            if (User.AdditionalData.TryGetValue(UserAttributes.PaymentProviderCustomerID, out object obj))
-                return obj?.ToString();
+            if (_PaymentProviderCustomerID is null)
+                if (User.AdditionalData.TryGetValue(UserAttributes.PaymentProviderCustomerID, out object obj))
+                    _PaymentProviderCustomerID = ((JsonElement)obj).Deserialize<string>();
 
-            return null;
+            return _PaymentProviderCustomerID;
         }
         set
         {
-            User.AdditionalData[UserAttributes.PaymentProviderCustomerID] = value;
+            _PaymentProviderCustomerID = value;
+            User.AdditionalData[UserAttributes.PaymentProviderCustomerID] = JsonSerializer.SerializeToElement(value);
         }
     }
 
+    private DateTime? _SuspendedUntil;
     public DateTime? SuspendedUntil
     {
         get
         {
-            if (User.AdditionalData.TryGetValue(UserAttributes.SuspendedUntil, out object obj))
-                return obj == null ? (DateTime?)null : Convert.ToDateTime(obj.ToString().Substring(1)).ToUniversalTime();
+            if(_SuspendedUntil is null)
+                if (User.AdditionalData.TryGetValue(UserAttributes.SuspendedUntil, out object obj))
+                    _SuspendedUntil = ((JsonElement)obj).Deserialize<DateTime>().ToUniversalTime();
 
-            return null;
+            return _SuspendedUntil;
         }
         set
         {
-            User.AdditionalData[UserAttributes.SuspendedUntil] = value.HasValue ? "z" + value.Value.ToString("o") : null;
+            _SuspendedUntil = value.HasValue ? value.Value.ToUniversalTime() : null;
+            User.AdditionalData[UserAttributes.SuspendedUntil] = JsonSerializer.SerializeToElement(value.HasValue ? "z" + value.Value.ToString("o") : null);
         }
     } // UTC
 
@@ -92,7 +121,6 @@ public class UserRecord // Named to not conflict with Graph.User
     {
         get
         {
-
             if (!string.IsNullOrEmpty(_email))
                 return _email;
 
@@ -118,10 +146,7 @@ public class UserRecord // Named to not conflict with Graph.User
         // or self - service sign - up using email verification (EmailVerified). Read - only.
 
         // 
-        get
-        {
-            return User.CreationType == "LocalAccount";
-        }
+        get => User.CreationType == "LocalAccount";
     }
 
     public UserRecord()
@@ -145,4 +170,6 @@ public class UserRecord // Named to not conflict with Graph.User
         if (User.AdditionalData == null)
             User.AdditionalData = new Dictionary<string, object>();
     }
+
+    public User GraphUser() => User;
 }
