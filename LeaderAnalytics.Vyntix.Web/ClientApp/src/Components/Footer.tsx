@@ -43,14 +43,14 @@ function Documentation() {
                     <div className="footer-cell">
                         <div className="grow-align-right">
                             <a href="https://www.LeaderAnalytics.com" target="_blank"><span className="logo rh6">Leader Analytics</span></a>
-                            <p className="txt">Oceanside, CA</p>
+                            <p className="txt">Medford, OR</p>
                         </div>
                     </div>
                  </div>
 
                 <div className="footer-row">
                     <div className="footer-cell">
-                        <span className="txt">&copy; 2020 Leader Analytics</span>
+                        <span className="txt">&copy; 2023 Leader Analytics</span>
                     </div>
                 </div>
             </div>

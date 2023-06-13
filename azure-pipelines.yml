@@ -5,7 +5,10 @@
 
 
 trigger:
-- release/*
+  tags:
+      include:
+        - release/*  
+
 
 pool:
   vmImage: 'windows-latest'
@@ -14,14 +17,15 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  system.debug: false
 
 steps:
 
 - task: UseDotNet@2
-  displayName: 'Use dotnet 6'
+  displayName: 'Use dotnet 7'
   inputs:
     packageType: 'sdk'
-    version: '6.x'
+    version: '7.x'
 
 - task: DotNetCoreCLI@2
   displayName: 'DotNet Restore NuGet packages'
@@ -31,11 +35,19 @@ steps:
     vstsFeed: 'LeaderAnalyticsFeed'
     includeNuGetOrg: true
 
-- task: Npm@1
+- script: |
+    npm install npm@8.3.1 -g
+  displayName: Install specific version of npm
+
+- script: |
+    cd Blog/ClientApp
+    npm --version
+  displayName: 'verify npm version'
+
+- script: |
+    cd Blog/ClientApp
+    npm install
   displayName: 'npm install'
-  inputs:
-    command: install
-    workingDir: LeaderAnalytics.Vyntix.Web/ClientApp
 
 - task: Npm@1
   displayName: 'npm build'
