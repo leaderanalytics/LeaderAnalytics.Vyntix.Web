@@ -28,8 +28,6 @@ Limit job authorization scope to current project for non-release pipelines
 Limit job authorization scope to current project for release pipelines
 
 
-SSL Cert instructions are here: C:\Users\sam\Documents\SSL\PoshACME\notes.txt
-
 Google Mobile-Friendly Test: https://search.google.com/test/mobile-friendly
 Google Search console: https://search.google.com/search-console/about
 

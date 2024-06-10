@@ -75,7 +75,7 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.5" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ClientApp\src\Assets\" />
+    <Folder Include="ClientApp\src\Assets\ObserverDesktop\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="StaticHTML\CorpSubNoticeEmailTemplate.html" />

@@ -668,6 +668,42 @@ a {
         margin-bottom:2vw;
     }
 }
+
+/* --------------------------------------- 
+# Downloads
+--------------------------------------- */
+
+.appList {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 2vw;
+    padding-left:1vw;
+    padding-right:1vw;
+}
+
+.app {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+}
+
+.appImages{
+
+}
+
+.appDescription {
+    margin-left:2vw;
+}
+.appImage
+{
+    min-width:500px;
+}
+
+
+
+
 /* --------------------------------------- 
 # Footer 
     --------------------------------------- */
@@ -774,6 +810,32 @@ a {
     color: $modal-accent5;
     border:none !important;
 }
+
+/* --------------------------------------- 
+# Slide 
+    --------------------------------------- */
+.each-slide-effect > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    height: 80vh;
+    width: 80vw !important;
+}
+
+.each-slide-effect span {
+    padding: 0px;
+    font-size: 20px;
+    background: #efefef;
+    text-align: center;
+}
+
+.slideshow-container {
+    width:85vw !important;
+    max-width:85vw !important;
+}
+
+
 /* ---------- Relative layout  ---------- */
 
 .rh1 { font-size: clamp(40px,4vw,80px); }
