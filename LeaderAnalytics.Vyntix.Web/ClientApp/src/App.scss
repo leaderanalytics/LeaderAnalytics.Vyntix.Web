@@ -22,14 +22,14 @@
 
 $navbar-dark-color:#AAA0A0;
 
-$accent1:#844D36;
-$accent2:#86B3D1;
+$accent1:#474E68;
+$accent2: gray;// #6B728E;
 $accent3:#8E8268;
 $accent4:white; /*#FEF9C7;*/
 $accent5:#1e2226;
 
 $modal-accent1: #8D8741;
-$modal-accent2: #659DBD;
+$modal-accent2: #414141;//#6B728E;
 $modal-accent3: #DAAD86;
 $modal-accent4: #BC986A;
 $modal-accent5: #FBEEC1;
@@ -179,6 +179,7 @@ a {
 .logo-large {
     width: clamp(80px,12vw,200px);
     height: auto;
+    margin-left:8px;
 }
 
 .nav-container {

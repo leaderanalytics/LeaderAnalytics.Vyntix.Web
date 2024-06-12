@@ -82,7 +82,7 @@ const TopNav = () => {
     return (
         <Navbar variant="dark" expand="lg" collapseOnSelect fixed="top" className="nav-container dark-bg">
             <Dialog dialogProps={dialogProps} />
-            <Navbar.Brand href="/">
+            <Navbar.Brand href="/" >
                 <Image src={logo} className="logo-large" />
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" >

@@ -19,7 +19,7 @@ function Documentation() {
 
             <div>
                 <div className="pageBanner rp1">
-                    <span className="rh3">Frequently Asked Questions</span>
+                    <span className="rh5">Frequently Asked Questions</span>
                 </div>
             </div>
 
@@ -27,7 +27,7 @@ function Documentation() {
             <Accordion>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header className="faq-header" onClick={() => CardClick('0')}>
-                        <span className="rh5">When will Vyntix be released?</span>
+                        <span className="rh6">When will Vyntix be released?</span>
                     </Accordion.Header>
                     <Accordion.Body>
                             <span className="rh6">
@@ -40,7 +40,7 @@ function Documentation() {
 
                 <Accordion.Item eventKey="1">
                     <Accordion.Header  className="faq-header" onClick={() => CardClick('1')}>
-                            <span className="rh5">What will the monthly cost for a subscription be?</span>
+                            <span className="rh6">What will the monthly cost for a subscription be?</span>
                     </Accordion.Header>
                     <Accordion.Body>
                                 <span className="rh6">For the lowest tier (individuals and very small organizations) the monthly cost will be about the same as the cost for lunch for one person.  
@@ -53,7 +53,7 @@ function Documentation() {
 
                 <Accordion.Item eventKey="2">
                     <Accordion.Header className="faq-header" onClick={(e) => CardClick('2')}>
-                            <span className="rh5">Will Vyntix support data providers other than FRED?</span>
+                            <span className="rh6">Will Vyntix support data providers other than FRED?</span>
                     </Accordion.Header>
                     <Accordion.Body>
                                 <span className="rh6">Yes, we will support data providers as is feasable and as requested by our subscribers.
@@ -65,7 +65,7 @@ function Documentation() {
 
                 <Accordion.Item eventKey="3">
                     <Accordion.Header className="faq-header" onClick={() => CardClick('3')}>
-                            <span className="rh5">What are the differences beween the subscription plans?</span>
+                            <span className="rh6">What are the differences beween the subscription plans?</span>
                     </Accordion.Header>
                     <Accordion.Body>
                                 <span className="rh6">There is only one subscription plan.  It is free for non-business use or priced differently based on revenue of the subscriber.</span>
@@ -75,7 +75,7 @@ function Documentation() {
 
                 <Accordion.Item eventKey="4">
                     <Accordion.Header className="faq-header" onClick={() => CardClick('4')}>
-                            <span className="rh5">Does my Vyntix subscription include the cost of data?</span>
+                            <span className="rh6">Does my Vyntix subscription include the cost of data?</span>
                     </Accordion.Header>
                     <Accordion.Body>
                                 <span className="rh6">No.  At the time of this writng Vyntix only supports FRED - which is free to the general public.  In the future support may be added
@@ -87,7 +87,7 @@ function Documentation() {
 
             <div>
                 <div className="pageBanner rp1">
-                    <span className="rh3">Service Documentation</span>
+                    <span className="rh5">Service Documentation</span>
                 </div>
             </div>
 
@@ -98,7 +98,7 @@ function Documentation() {
 
                     <div className="rml2 rmr2 rmb2">
                         <div className="pageBanner section-header rp1">
-                            <span className="rh4">Vyntix FRED Client</span>
+                            <span className="rh5">Vyntix FRED Client</span>
                         </div>
 
                         <div className="section-body rh6 rp1"> 
@@ -111,13 +111,13 @@ function Documentation() {
 
                     <div className="rm2">
                         <div className="pageBanner section-header rp1">
-                            <span className="rh4">Vyntix FRED Downloader (Observer)</span>
+                            <span className="rh5">Vyntix Observer CLI</span>
                         </div>
 
                         <div className="section-body rh6 rp1">
-                            <p><b>Status:</b> In development</p>
-                            <p><b>Expected:</b> Q4 2023</p>
-                            <p><b>Description:</b> Cross platform (Linux/Mac/Windows) command line utilitiy that a downloads data from FRED and saves it to a file or a database.  A desktop version is also in development.</p>
+                            <p><b>Status:</b> Windows version released</p>
+                            <p><b>Release Date:</b> Q2 2024</p>
+                            <p><b>Description:</b>Cross platform (Linux/Mac/Windows) command line utilitiy that a downloads data from FRED and saves it to a database.</p>
                             <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
@@ -125,40 +125,26 @@ function Documentation() {
 
                     <div className="rm2">
                         <div className="pageBanner section-header rp1">
-                            <span className="rh4">Vyntix Data Manager</span>
+                            <span className="rh5">Vyntix Observer Desktop</span>
                         </div>
 
                         <div className="section-body rh6 rp1">
-                            <p><b>Status:</b> In development</p>
-                            <p><b>Expected:</b> Q4 2024</p>
-                            <p><b>Description:</b> Windows desktop utility for managing data from multiple data providers.</p>
+                            <p><b>Status:</b> Windows version released</p>
+                            <p><b>Release Date:</b> Q2 2024</p>
+                            <p><b>Description:</b> Cross platform (Linux/Mac/Windows) desktop utility that a downloads data from FRED and saves it to a database.</p>
                             <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
 
                     <div className="rm2">
                         <div className="pageBanner section-header rp1">
-                            <span className="rh4">Vyntix API</span>
+                            <span className="rh5">Vyntix API</span>
                         </div>
 
                         <div className="section-body rh6 rp1">
                             <p><b>Status:</b> In development</p>
                             <p><b>Expected:</b> Q3 2024</p>
                             <p><b>Description:</b> An API for creating and managing forecasts.</p>
-                            <p><a href="/docs" target="_blank">Documentation</a></p>
-                        </div>
-                    </div>
-
-
-                    <div className="rm2">
-                        <div className="pageBanner section-header rp1">
-                            <span className="rh4">Vyntix Desktop</span>
-                        </div>
-
-                        <div className="section-body rh6 rp1">
-                            <p><b>Status:</b> In development</p>
-                            <p><b>Expected:</b> Q4 2024</p>
-                            <p><b>Description:</b> Windows desktop application for managing forecasts.</p>
                             <p><a href="/docs" target="_blank">Documentation</a></p>
                         </div>
                     </div>
