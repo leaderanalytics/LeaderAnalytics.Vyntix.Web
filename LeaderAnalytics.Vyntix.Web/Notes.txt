@@ -55,3 +55,5 @@ https://github.com/Azure-Samples/ms-identity-javascript-react-tutorial/blob/main
 
 https://stackoverflow.com/questions/65472666/calling-custom-hook-in-event-handler
 https://stackoverflow.com/questions/53845595/wrong-react-hooks-behaviour-with-event-listener
+
+https://stackoverflow.com/questions/62520254/does-azure-key-vault-support-regular-text-files
