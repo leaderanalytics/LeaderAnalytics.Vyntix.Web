@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		version.json = version.json
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "..\Core\Core\Core.csproj", "{EC19AC05-6D06-487A-9587-474CCF4FEA8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,18 @@ Global
 		{47ED7520-D6D4-4CE9-83C0-EE8BA1764D89}.Release|x64.Build.0 = Release|Any CPU
 		{47ED7520-D6D4-4CE9-83C0-EE8BA1764D89}.Release|x86.ActiveCfg = Release|Any CPU
 		{47ED7520-D6D4-4CE9-83C0-EE8BA1764D89}.Release|x86.Build.0 = Release|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Debug|x64.Build.0 = Debug|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Debug|x86.Build.0 = Debug|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Release|x64.ActiveCfg = Release|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Release|x64.Build.0 = Release|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Release|x86.ActiveCfg = Release|Any CPU
+		{EC19AC05-6D06-487A-9587-474CCF4FEA8F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

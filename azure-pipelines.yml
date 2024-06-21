@@ -22,10 +22,10 @@ variables:
 steps:
 
 - task: UseDotNet@2
-  displayName: 'Use dotnet 7'
+  displayName: 'Use dotnet 8'
   inputs:
     packageType: 'sdk'
-    version: '7.x'
+    version: '8.x'
 
 - task: DotNetCoreCLI@2
   displayName: 'DotNet Restore NuGet packages'
@@ -44,6 +44,20 @@ steps:
     npm --version
   displayName: 'verify npm version'
 
+- task: AzureKeyVault@1
+  name: KeyVaultSecrets
+  displayName: Get Stripe key from Key Vault
+  inputs:
+    azureSubscription: 'All Azure Services'
+    KeyVaultName: 'LeaderAnalyticsVault'
+    SecretsFilter: 'stripe-live-apikey'
+
+- powershell: |
+    (Get-Content $(Build.SourcesDirectory)/leaderanalytics.vyntix.web/ClientApp/src/Config/AppConfig.prod.tsx).Replace('[stripe-live-apikey]', '$(stripe-live-apikey)') | Set-Content $(Build.SourcesDirectory)/leaderanalytics.vyntix.web/ClientApp/src/Config/AppConfig.prod.tsx
+    get-content $(Build.SourcesDirectory)/leaderanalytics.vyntix.web/ClientApp/src/Config/AppConfig.prod.tsx
+  displayName: Replace Stripe secret
+
+
 - script: |
     cd LeaderAnalytics.Vyntix.Web\ClientApp
     npm install
@@ -55,6 +69,7 @@ steps:
     customCommand: run build
     workingDir: LeaderAnalytics.Vyntix.Web/ClientApp
 
+
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 
@@ -65,6 +80,7 @@ steps:
     publishWebProjects: true
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingdirectory) --self-contained'
     zipAfterPublish: true
+
 
 - task: AzureRmWebAppDeployment@4
   displayName: 'AzureRmWebAppDeployment@4'
