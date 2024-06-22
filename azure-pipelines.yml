@@ -51,7 +51,7 @@ steps:
     secureFile: 'appsettings.Production.json'
 
 - powershell: |
-    Copy-Item  $(appsettingsProd.securFilePath) -Destination  $(Build.SourcesDirectory)/LeaderAnalytics.Vyntix.Web
+    Copy-Item  $(appsettingsProd.secureFilePath) -Destination  $(Build.SourcesDirectory)/LeaderAnalytics.Vyntix.Web
   displayName: Copy appsettings.Production.json from temp to source folder
 
 - script: |
