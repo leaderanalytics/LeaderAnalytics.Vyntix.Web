@@ -22,7 +22,7 @@ export const policies = {
 export const msalConfig = {
     auth: {
         clientId: "7f892e9e-97d5-42fb-a553-f9d585d6742b",
-        authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/B2C_1_susi2",
+        authority: "https://leaderanalytics.onmicrosoft.com",
         knownAuthorities: ["https://leaderanalytics.b2clogin.com"],
         redirectUri: "https://localhost:5031",
         postLogoutRedirectUri: "https://localhost:5031"
@@ -31,7 +31,6 @@ export const msalConfig = {
 
 // Scopes you add here will be prompted for consent during login
 export const loginRequest = {
-    scopes: ['https://LeaderAnalytics.onmicrosoft.com/eb373a05-0053-49c4-aba1-a7630fedfef7/read',
-        'https://LeaderAnalytics.onmicrosoft.com/eb373a05-0053-49c4-aba1-a7630fedfef7/Write',
-        'https://LeaderAnalytics.onmicrosoft.com/eb373a05-0053-49c4-aba1-a7630fedfef7/access_as_user']
+    scopes: ['https://LeaderAnalytics.onmicrosoft.com/be098f0e-6e50-40c4-9a36-212762d209fe/read',
+        'https://LeaderAnalytics.onmicrosoft.com/be098f0e-6e50-40c4-9a36-212762d209fe/access_as_user']
 };

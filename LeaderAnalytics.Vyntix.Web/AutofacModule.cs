@@ -17,7 +17,7 @@ public class AutofacModule
         builder.RegisterInstance(subscriptionFilePathParameter).SingleInstance();
         builder.RegisterInstance(configFilePathParameter).SingleInstance();
 
-        ClientCredentialsHelper helper = new ClientCredentialsHelper(AzureADConfig.ReadFromConfig(config));
+        ClientCredentialsHelper helper = new ClientCredentialsHelper(AzureADB2CConfig.ReadFromConfig(config));
         builder.RegisterInstance<HttpClient>(helper.AuthorizedClient()).SingleInstance(); // Registers HttpClient that is injected into EMailController - do not use for GraphService
         builder.Register<Func<HttpClient>>(c => () => new HttpClient()).SingleInstance();
 

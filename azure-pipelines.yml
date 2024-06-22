@@ -22,10 +22,10 @@ variables:
 steps:
 
 - task: UseDotNet@2
-  displayName: 'Use dotnet 7'
+  displayName: 'Use dotnet 8'
   inputs:
     packageType: 'sdk'
-    version: '7.x'
+    version: '8.x'
 
 - task: DotNetCoreCLI@2
   displayName: 'DotNet Restore NuGet packages'
@@ -44,6 +44,36 @@ steps:
     npm --version
   displayName: 'verify npm version'
 
+# These tasks get a secret from the vault and replace a searchable string in a file with that secret
+# Retained as an example for future reference
+# See following tasks that use a Secure File 
+# - task: AzureKeyVault@1
+#   name: KeyVaultSecrets
+#   displayName: Get Stripe key from Key Vault
+#   inputs:
+#     azureSubscription: 'All Azure Services'
+#     KeyVaultName: 'LeaderAnalyticsVault'
+#     SecretsFilter: 'stripe-live-apikey'
+
+# - powershell: |
+#     (Get-Content $(Build.SourcesDirectory)/leaderanalytics.vyntix.web/ClientApp/src/Config/AppConfig.prod.tsx).Replace('[stripe-live-apikey]', '$(stripe-live-apikey)') | Set-Content $(Build.SourcesDirectory)/leaderanalytics.vyntix.web/ClientApp/src/Config/AppConfig.prod.tsx
+#     get-content $(Build.SourcesDirectory)/leaderanalytics.vyntix.web/ClientApp/src/Config/AppConfig.prod.tsx
+#   displayName: Replace Stripe secret
+
+# Copy Secure File (Pipelines -> Library (on icon bar below Pipelines) -> Secure files tab)
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops
+
+- task: DownloadSecureFile@1
+  name: appsettingsProd
+  displayName: 'Get appsettings.Production.json from Secure File storage'
+  inputs:
+    secureFile: 'appsettings.Production.json'
+
+- powershell: |
+    Copy-Item  $(appsettingsProd.securFilePath) -Destination  $(Build.SourcesDirectory)/LeaderAnalytics.Vyntix.Web
+  displayName: Copy appsettings.Production.json from temp to source folder
+
+
 - script: |
     cd LeaderAnalytics.Vyntix.Web\ClientApp
     npm install
@@ -55,6 +85,7 @@ steps:
     customCommand: run build
     workingDir: LeaderAnalytics.Vyntix.Web/ClientApp
 
+
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 
@@ -65,6 +96,7 @@ steps:
     publishWebProjects: true
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingdirectory) --self-contained'
     zipAfterPublish: true
+
 
 - task: AzureRmWebAppDeployment@4
   displayName: 'AzureRmWebAppDeployment@4'
