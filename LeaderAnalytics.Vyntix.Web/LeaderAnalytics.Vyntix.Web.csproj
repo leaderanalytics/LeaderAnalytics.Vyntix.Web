@@ -60,7 +60,7 @@
     <PackageReference Include="Autofac" Version="8.0.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="LeaderAnalytics.Caching" Version="4.0.27" />
-    <PackageReference Include="LeaderAnalytics.Core" Version="4.1.0" />
+    <PackageReference Include="LeaderAnalytics.Core" Version="4.1.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="8.0.6" />
 	<PackageReference Include="Microsoft.Graph" Version="4.15.0" />
