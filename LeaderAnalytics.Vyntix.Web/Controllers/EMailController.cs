@@ -50,8 +50,17 @@ public class EMailController : Controller
         try
         {
 
-            var apiResult = await apiClient.GetStreamAsync(QueryHelpers.AddQueryString("api/Captcha/CaptchaImage", "ipaddress", ipaddress));
-            return new FileStreamResult(apiResult, "image/jpeg");
+            //var apiResult = await apiClient.GetStreamAsync(QueryHelpers.AddQueryString("api/Captcha/CaptchaImage", "ipaddress", ipaddress));
+            //return new FileStreamResult(apiResult, "image/jpeg");
+
+            Uri url = new Uri($"{apiClient.BaseAddress.ToString().TrimEnd('/')}/{QueryHelpers.AddQueryString("/api/Captcha/CaptchaImage", "ipaddress", ipaddress).TrimStart('/')}");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+            var apiResponse = await apiClient.SendAsync(request);
+            
+            if (apiResponse.StatusCode != System.Net.HttpStatusCode.OK)
+                throw new Exception($"Error calling Captcha API.  Url is {request.RequestUri}, Response is {apiResponse.StatusCode}.  Content is {apiResponse.Content}");
+            
+            return new FileStreamResult(apiResponse.Content.ReadAsStream(), "image/jpeg");
         }
         catch (Exception ex)
         {
