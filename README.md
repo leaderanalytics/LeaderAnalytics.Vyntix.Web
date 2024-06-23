@@ -10,4 +10,4 @@ This codebase demonstrates Azure Active Directory OIDC identity authentication a
 Functionality for email processing, Captcha verification, and other utility services is proviced by LeaderAnalytics.API.
 
 
-![Leader Analytics](./Logo.PNG)
+![Leader Analytics](./logo.PNG)
