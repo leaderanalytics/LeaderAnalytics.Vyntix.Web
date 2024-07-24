@@ -56,7 +56,7 @@ function Downloads() {
         AppInsights.LogEvent("ObserverCLIDownloaded");
         await SendEmail("Observer CLI");
     }
-    const SendEmail = async (appName) => {
+    const SendEmail = async (appName : string) => {
         let msg = new ContactRequest();
         msg.Name = "Unknown";
         msg.EMail = "Unknown";
