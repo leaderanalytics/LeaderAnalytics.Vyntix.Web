@@ -141,11 +141,12 @@ export const FormatMoney = (num: number) => {
     return formatter.format(num); 
 }
 
-export const SendContactRequest = async (request: ContactRequest): Promise<AsyncResult> => {
-    AppInsights.LogEvent("SendContactRequest")
-    const url = AppConfig.host + 'email/SendContactRequest';
+export const SendContactRequest = async (request: ContactRequest, isInternal: boolean): Promise<AsyncResult> => {
+    const requestType = isInternal ? "SendInternalMessage" : "SendContactRequest";
+    AppInsights.LogEvent(requestType)
+    const url = AppConfig.host + (isInternal ? 'email/SendInternalMessage' : 'email/SendContactRequest');
     const msg = 'From Site:LeaderAnalytics.Vyntix.Web' + '\r\nName: ' + request.Name + '\r\nPhone: ' + request.Phone + '\r\nEmail: ' + request.EMail + '\r\nRequirement: ' + request.Requirement + '\r\nComment: ' + request.Message;
-    AppInsights.LogEvent("SendContactRequest", {"Message": msg});
+    AppInsights.LogEvent(requestType, { "Message": msg });
 
     let response = await fetch(url, {
         method: 'POST',
@@ -160,7 +161,7 @@ export const SendContactRequest = async (request: ContactRequest): Promise<Async
 
     if (!result.Success) {
         result.ErrorMessage = await response.json();
-        AppInsights.LogEvent("SendContactRequest failed", { "ErrorMessage": result.ErrorMessage })
+        AppInsights.LogEvent(requestType + " failed", { "ErrorMessage": result.ErrorMessage })
     }
     return result;
 }

@@ -1,4 +1,6 @@
-﻿namespace LeaderAnalytics.Vyntix.Web.Controllers;
+﻿using System.Net;
+
+namespace LeaderAnalytics.Vyntix.Web.Controllers;
 
 [Route("[controller]/[action]")]
 [ApiController]
@@ -42,8 +44,24 @@ public class EMailController : Controller
         return result;
     }
 
+    [HttpPost]
+    public async Task<IActionResult> SendInternalMessage(LeaderAnalytics.Vyntix.Web.Model.ContactRequest msg)
+    {
+        string ipaddress  = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
+        msg.Msg += Environment.NewLine + "IP: " + ipaddress;
+        Uri url = new Uri($"{apiClient.BaseAddress.ToString().TrimEnd('/')}/{QueryHelpers.AddQueryString("/api/Captcha/CaptchaCode", "ipaddress", ipaddress).TrimStart('/')}");
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+        var apiResponse = await apiClient.SendAsync(request);
+        if (apiResponse.StatusCode == HttpStatusCode.OK)
+        {
+            msg.CaptchaCode = await apiResponse.Content.ReadAsStringAsync();
+            return await SendContactRequest(msg);
+        }
+        return null;
+    }
 
-    [HttpGet]
+
+        [HttpGet]
     public async Task<IActionResult> CaptchaImage()
     {
         string ipaddress = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();

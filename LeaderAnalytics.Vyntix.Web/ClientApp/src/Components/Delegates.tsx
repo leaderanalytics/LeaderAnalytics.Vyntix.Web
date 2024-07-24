@@ -61,7 +61,7 @@ function Delegates() {
             return;
         }
         setDialogProps(new DialogProps("Please wait while your message is sent.", DialogType.Wait, () => { setDialogProps(new DialogProps("", DialogType.None, () => { })); }));
-        const result: AsyncResult = await SendContactRequest(msg);
+        const result: AsyncResult = await SendContactRequest(msg,false);
         
 
         if (result.Success) {
