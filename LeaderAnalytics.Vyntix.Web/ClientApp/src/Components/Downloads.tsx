@@ -122,7 +122,7 @@ function Downloads() {
                         </p>
 
                         <a className="downloadButton"
-                            href="https://github.com/leaderanalytics/Observer.Desktop/releases/download/windows%2F1.0.10.1/LeaderAnalytics.Vyntix.Observer.Desktop-win-Setup.exe"
+                            href="https://github.com/leaderanalytics/Observer.Desktop/releases/download/windows%2F1.0.11.1/LeaderAnalytics.Vyntix.Observer.Desktop-win-Setup.exe"
                             download="Observer Desktop for Windows"
                             onClick={handleDownloadClick}
                             rel="noreferrer">
