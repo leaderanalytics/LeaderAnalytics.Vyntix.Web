@@ -1,19 +1,22 @@
-﻿namespace LeaderAnalytics.Vyntix.Web;
+﻿using Autofac.Core;
 
-public class AutofacModule
+namespace LeaderAnalytics.Vyntix.Web;
+
+public class AutofacModule : Autofac.Module
 {
+    private ServiceRegistrar registrar;
 
-    public void ConfigureServices(ContainerBuilder builder, ServiceRegistrar registrar)
+    public AutofacModule(ServiceRegistrar registrar) => this.registrar = registrar ?? throw new ArgumentNullException(nameof(registrar));
+
+    protected override void Load(ContainerBuilder builder)
     {
         if (builder == null)
             throw new ArgumentNullException(nameof(builder));
-        if (registrar == null)
-            throw new ArgumentNullException(nameof(registrar));
 
-        IConfiguration config = registrar.BuildConfiguration();
-        string subscriptionsFilePath = Path.Combine(registrar.AppSettingsFilePath, $"subscriptions.{registrar.EnvironmentName}.json");
+        IConfiguration config = registrar.config;
+        string subscriptionsFilePath = Path.Combine(AppContext.BaseDirectory, $"subscriptions.{registrar.EnvironmentName}.json");
         SubscriptionFilePathParameter subscriptionFilePathParameter = new SubscriptionFilePathParameter() { Value = subscriptionsFilePath };
-        ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = registrar.AppSettingsFileName };
+        ConfigFilePathParameter configFilePathParameter = new ConfigFilePathParameter() { Value = Path.Combine(AppContext.BaseDirectory, $"appsettings.{registrar.EnvironmentName}.json") };
         builder.RegisterInstance(subscriptionFilePathParameter).SingleInstance();
         builder.RegisterInstance(configFilePathParameter).SingleInstance();
 

@@ -12,8 +12,12 @@ public class BaseTest
 
     public BaseTest()
     {
+        ConfigHelper.CopyConfigFromSource(Core.EnvironmentName.development, Program.configFileSourceFolder, AppContext.BaseDirectory);
         ServiceCollection = new ServiceCollection();
-        IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        IConfiguration config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .AddJsonFile("appsettings.development.json", false)
+            .Build();
         registrar = new ServiceRegistrar(config, "Development");
         registrar.ConfigureServices(ServiceCollection);
     }
@@ -47,7 +51,8 @@ public class BaseTest
     protected virtual void CreateContainer()
     {
         ContainerBuilder = new ContainerBuilder();
-        new AutofacModule().ConfigureServices(ContainerBuilder, registrar);
+        ContainerBuilder.RegisterModule(new AutofacModule(registrar));
+        
     }
 
     protected ILifetimeScope GetLifetimeScope()

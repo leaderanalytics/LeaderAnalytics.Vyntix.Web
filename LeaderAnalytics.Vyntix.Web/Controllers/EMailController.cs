@@ -47,17 +47,20 @@ public class EMailController : Controller
     [HttpPost]
     public async Task<IActionResult> SendInternalMessage(LeaderAnalytics.Vyntix.Web.Model.ContactRequest msg)
     {
+        IActionResult result = null;
         string ipaddress  = accessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
         msg.Msg += Environment.NewLine + "IP: " + ipaddress;
-        Uri url = new Uri($"{apiClient.BaseAddress.ToString().TrimEnd('/')}/{QueryHelpers.AddQueryString("/api/Captcha/CaptchaCode", "ipaddress", ipaddress).TrimStart('/')}");
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
-        var apiResponse = await apiClient.SendAsync(request);
-        if (apiResponse.StatusCode == HttpStatusCode.OK)
+        EmailMessage email = new EmailMessage { From = "DoNotReply@LeaderAnalytics.com", To = ["leaderanalytics@outlook.com", "sam.wheat@outlook.com"], IsHTML = false, Msg = msg.Msg, Subject = "Internal Message from LeaderAnalytics.Vyntix.com" };
+        var apiResult = await apiClient.PostAsync("api/Message/SendEmailMessage", new StringContent(System.Text.Json.JsonSerializer.Serialize(email), Encoding.UTF8, "application/json"));
+        if (apiResult.StatusCode == System.Net.HttpStatusCode.Created)
+            result = CreatedAtAction("SendInternalMessage", "email") as IActionResult;
+        else
         {
-            msg.CaptchaCode = await apiResponse.Content.ReadAsStringAsync();
-            return await SendContactRequest(msg);
+            string errorMsg = await apiResult.Content.ReadAsStringAsync();
+            result = BadRequest(errorMsg);
+            Log.Error("Failed to send Internal message.  The response from the API server is: {@e}", apiResult);
         }
-        return null;
+        return result;
     }
 
 

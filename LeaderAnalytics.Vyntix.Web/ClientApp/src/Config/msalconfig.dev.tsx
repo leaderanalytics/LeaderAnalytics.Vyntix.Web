@@ -22,7 +22,7 @@ export const policies = {
 export const msalConfig = {
     auth: {
         clientId: "7f892e9e-97d5-42fb-a553-f9d585d6742b",
-        authority: "https://leaderanalytics.onmicrosoft.com",
+        authority: "https://leaderanalytics.b2clogin.com/leaderanalytics.onmicrosoft.com/B2C_1_susi2",
         knownAuthorities: ["https://leaderanalytics.b2clogin.com"],
         redirectUri: "https://localhost:5031",
         postLogoutRedirectUri: "https://localhost:5031"
