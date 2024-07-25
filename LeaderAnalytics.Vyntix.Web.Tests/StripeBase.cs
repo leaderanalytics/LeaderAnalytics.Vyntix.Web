@@ -14,9 +14,7 @@ public abstract class StripeBase : BaseTest
         Mock<IWebHostEnvironment> envMock = new Mock<IWebHostEnvironment>();
         envMock.Setup(x => x.EnvironmentName).Returns("Development");
         IWebHostEnvironment env = envMock.Object;
-        Startup startup = new Startup(env, config);
         IServiceCollection serviceCollection = new ServiceCollection();
-        startup.ConfigureServices(serviceCollection);
         Container = serviceCollection.BuildServiceProvider();
         StripeClient = Container.GetService<StripeClient>();
     }

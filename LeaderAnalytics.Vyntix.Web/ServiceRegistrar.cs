@@ -2,10 +2,7 @@
 
 public class ServiceRegistrar
 {
-    private bool isBuilt;
-    private string _appSettingsFilePath;
-    private string _appSettingsFileName;
-    protected IConfiguration config;
+    public IConfiguration config { get; private set; }
     public readonly string EnvironmentName;
 
 
@@ -15,48 +12,9 @@ public class ServiceRegistrar
         this.EnvironmentName = environmentName ?? throw new ArgumentNullException(nameof(environmentName));
     }
 
-    public string AppSettingsFilePath
-    {
-        get
-        {
-            if (!string.IsNullOrEmpty(_appSettingsFilePath))
-                return _appSettingsFilePath;
-
-            _appSettingsFilePath = EnvironmentName == "Development" ? config["AuthConfig"] : string.Empty;
-            return _appSettingsFilePath;
-        }
-    }
-
-    public string AppSettingsFileName
-    {
-        get
-        {
-            if (!string.IsNullOrEmpty(_appSettingsFileName))
-                return _appSettingsFileName;
-
-            _appSettingsFileName = Path.Combine(AppSettingsFilePath, $"appsettings.{EnvironmentName}.json");
-            return _appSettingsFileName;
-        }
-    }
-
-    public IConfiguration BuildConfiguration()
-    {
-        if (isBuilt)
-            return config;
-
-        isBuilt = true;
-
-        config = new ConfigurationBuilder()
-            .AddConfiguration(config)
-            .AddJsonFile(AppSettingsFileName, false)
-            .Build();
-
-        return config;
-    }
-
     public void ConfigureServices(IServiceCollection services)
     {
-        BuildConfiguration();
+        
         // Configuration to sign-in users with Azure AD B2C - Not MSAL.  MSAL is used to call APIs.
         services.AddMicrosoftIdentityWebAppAuthentication(config, "AzureADB2C");
 
