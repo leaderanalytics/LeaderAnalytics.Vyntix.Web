@@ -122,7 +122,7 @@ function Downloads() {
                         </p>
 
                         <a className="downloadButton"
-                            href="https://github.com/leaderanalytics/Observer.Desktop/releases/download/windows%2F1.0.11.1/LeaderAnalytics.Vyntix.Observer.Desktop-win-Setup.exe"
+                            href="https://github.com/leaderanalytics/Observer.Desktop/releases/download/windows%2F1.0.12.1/LeaderAnalytics.Vyntix.Observer.Desktop-win-Setup.exe"
                             download="Observer Desktop for Windows"
                             onClick={handleDownloadClick}
                             rel="noreferrer">
@@ -173,7 +173,7 @@ function Downloads() {
 
 
                         <a className="downloadButton"
-                            href="https://github.com/leaderanalytics/Observer.CLI/releases/download/windows%2F1.0.7.1/LeaderAnalytics.Vyntix.Observer.CLI-win-Setup.exe"
+                            href="https://github.com/leaderanalytics/Observer.CLI/releases/download/windows%2F1.0.12.1/LeaderAnalytics.Vyntix.Observer.CLI-win-Setup.exe"
                             download="Observer CLI for Windows"
                             onClick={handleCLIDownloadClick}
                             rel="noreferrer">
